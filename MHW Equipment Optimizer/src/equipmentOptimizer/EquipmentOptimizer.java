@@ -15,6 +15,7 @@ public class EquipmentOptimizer {
 	static List<ArrayList<Equipment>> equipmentList;
 
 	public static void main(String[] args) {
+		
 		setName = "";
 		setSize = Integer.MAX_VALUE;
 		requirments = new ArrayList<SkillRequirment>();
