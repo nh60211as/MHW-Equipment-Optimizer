@@ -9,57 +9,68 @@ import java.util.Map;
 
 public class EquipmentOptimizer {
 
+	// 所有裝備的資料
+	static List<ArrayList<Equipment>> equipmentList;
+	
+	// 需求技能的資料
 	static String setName;
 	static int setSize;
-	static List<SkillRequirment> requirments;
-	static List<ArrayList<Equipment>> equipmentList;
+	static List<SkillRequirement> skillRequirement;
+	
+	// 包含裝備的資料
+	static List<ArrayList<Integer>> includedEquipmentList;
 
 	public static void main(String[] args) {
-		
-		setName = "";
-		setSize = Integer.MAX_VALUE;
-		requirments = new ArrayList<SkillRequirment>();
+
 		equipmentList = new ArrayList<ArrayList<Equipment> >();
 		for(int i=1;i<=7;i++)
 			equipmentList.add(new ArrayList<Equipment>());
+		
+		setName = "";
+		setSize = Integer.MAX_VALUE;
+		skillRequirement = new ArrayList<SkillRequirement>();
+		
+		includedEquipmentList = new ArrayList<ArrayList<Integer> >();
+		for(int i=1;i<=7;i++)
+			includedEquipmentList.add(new ArrayList<Integer>());
 
-		String requirmentFileName = args[0];
-		readFile(requirmentFileName);
+		String[] equipmentFileName = {"_武器.txt", "_頭.txt", "_身.txt", "_腕.txt", "_腰.txt", "_腳.txt", "_護石.txt"};
+		for(int i=0;i<=equipmentFileName.length-1;i++)
+			readEquipmentFile(equipmentFileName[i]);
+		
+		String requirementFileName = args[0];
+		readRequirmentFile(requirementFileName);
 
-		//		String[] equipmentFileName = {"_武器.txt", "_頭.txt", "_身.txt", "_腕.txt", "_腰.txt", "_腳.txt", "_護石.txt"};
-		//		for(int i=0;i<=equipmentFileName.length-1;i++)
-		//			readFile(equipmentFileName[i]);
-
-		//		System.out.println(requirments.size());
+		//		System.out.println(requirements.size());
 		//		for(int i=0;i<=equipmentLists.size()-1;i++)
 		//			System.out.println(equipmentLists.get(i).size());
 
 		//開始配對裝備
-		for(int e1=0;e1<=equipmentList.get(0).size()-1;e1++)
-			for(int e2=0;e2<=equipmentList.get(1).size()-1;e2++)
-				for(int e3=0;e3<=equipmentList.get(2).size()-1;e3++)
-					for(int e4=0;e4<=equipmentList.get(3).size()-1;e4++)
-						for(int e5=0;e5<=equipmentList.get(4).size()-1;e5++)
-							for(int e6=0;e6<=equipmentList.get(5).size()-1;e6++)
-								for(int e7=0;e7<=equipmentList.get(6).size()-1;e7++){
+		for(int e1=0;e1<=includedEquipmentList.get(0).size()-1;e1++)
+			for(int e2=0;e2<=includedEquipmentList.get(1).size()-1;e2++)
+				for(int e3=0;e3<=includedEquipmentList.get(2).size()-1;e3++)
+					for(int e4=0;e4<=includedEquipmentList.get(3).size()-1;e4++)
+						for(int e5=0;e5<=includedEquipmentList.get(4).size()-1;e5++)
+							for(int e6=0;e6<=includedEquipmentList.get(5).size()-1;e6++)
+								for(int e7=0;e7<=includedEquipmentList.get(6).size()-1;e7++){
 									List<Equipment> currentEquipment = new ArrayList<Equipment>();
 									//e1=0;e2=1;e3=3;e4=1;e5=0;e6=0;e7=0;
-									currentEquipment.add(0, equipmentList.get(0).get(e1));
-									currentEquipment.add(1, equipmentList.get(1).get(e2));
-									currentEquipment.add(2, equipmentList.get(2).get(e3));
-									currentEquipment.add(3, equipmentList.get(3).get(e4));
-									currentEquipment.add(4, equipmentList.get(4).get(e5));
-									currentEquipment.add(5, equipmentList.get(5).get(e6));
-									currentEquipment.add(6, equipmentList.get(6).get(e7));
+									currentEquipment.add(0, equipmentList.get(0).get(includedEquipmentList.get(0).get(e1)));
+									currentEquipment.add(1, equipmentList.get(1).get(includedEquipmentList.get(1).get(e2)));
+									currentEquipment.add(2, equipmentList.get(2).get(includedEquipmentList.get(2).get(e3)));
+									currentEquipment.add(3, equipmentList.get(3).get(includedEquipmentList.get(3).get(e4)));
+									currentEquipment.add(4, equipmentList.get(4).get(includedEquipmentList.get(4).get(e5)));
+									currentEquipment.add(5, equipmentList.get(5).get(includedEquipmentList.get(5).get(e6)));
+									currentEquipment.add(6, equipmentList.get(6).get(includedEquipmentList.get(6).get(e7)));
 
 									int defense = 0;
 									int elementalDef[] = new int[5];
 									int isSetSize = 0;
 									int numberOfHole[] = new int[4];
-									int skillHave[] = new int[requirments.size()];
-									int skillNeed[] = new int[requirments.size()];
+									int skillHave[] = new int[skillRequirement.size()];
+									int skillNeed[] = new int[skillRequirement.size()];
 									for(int i=0;i<=skillNeed.length-1;i++)
-										skillNeed[i] = requirments.get(i).required;
+										skillNeed[i] = skillRequirement.get(i).required;
 
 									for(int i=0;i<=currentEquipment.size()-1;i++){
 										defense += currentEquipment.get(i).defense;
@@ -75,8 +86,8 @@ public class EquipmentOptimizer {
 										numberOfHole[1] += currentEquipment.get(i).decor1;
 
 										Map<String,Integer> skill = currentEquipment.get(i).skill;
-										for(int j=0;j<=requirments.size()-1;j++){
-											String currentSkillName = requirments.get(j).skillName;
+										for(int j=0;j<=skillRequirement.size()-1;j++){
+											String currentSkillName = skillRequirement.get(j).skillName;
 											if(skill.containsKey(currentSkillName))
 												skillHave[j] += skill.get(currentSkillName);
 										}
@@ -90,7 +101,7 @@ public class EquipmentOptimizer {
 									for(int i=0;i<=skillNeed.length-1;i++){
 										int gemNeed = skillNeed[i]-skillHave[i];
 										if(gemNeed>=1)
-											if(gemNeed>requirments.get(i).owned) {
+											if(gemNeed>skillRequirement.get(i).owned) {
 												success = false;
 												break;
 											}
@@ -100,7 +111,7 @@ public class EquipmentOptimizer {
 									for(int i=0;i<=skillNeed.length-1;i++){
 										int temp = skillNeed[i]-skillHave[i];
 										if(temp>=1)
-											numberOfHoleNeed[requirments.get(i).levelOfDecor] += temp;
+											numberOfHoleNeed[skillRequirement.get(i).levelOfDecor] += temp;
 									}
 
 									for(int i=3;i>=1;i--){
@@ -129,7 +140,7 @@ public class EquipmentOptimizer {
 
 	}
 
-	private static void readFile(String fileName) {
+	private static void readEquipmentFile(String fileName) {
 		BufferedReader br = null;
 		FileReader fr = null;
 		try {
@@ -147,27 +158,69 @@ public class EquipmentOptimizer {
 				if(currentLine.substring(0, 1).contentEquals("#"))
 					continue;
 
-				currentFlag = changeReadFlag(currentLine);
-				//System.out.println("currentFlag " + currentFlag);
+				currentFlag = changeReadFlag(currentLine); // currentFlag 只能為-2或是0~6
+				//System.out.println(currentLine);
+				if(currentFlag!=-2)
+					readFlag = currentFlag;
+				else
+					equipmentList.get(readFlag).add(new Equipment(currentLine));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (br != null)
+					br.close();
+				if (fr != null)
+					fr.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+
+	private static void readRequirmentFile(String fileName) {
+		BufferedReader br = null;
+		FileReader fr = null;
+		try {
+			fr = new FileReader(fileName);
+			br = new BufferedReader(fr);
+
+			//開始閱讀檔案
+			int readFlag = -2;
+			int currentFlag = -2;
+			String currentLine = "";
+
+			while ((currentLine = br.readLine()) != null) {
+				if(currentLine.length()==0)
+					continue;
+				if(currentLine.substring(0, 1).contentEquals("#"))
+					continue;
+
+				currentFlag = changeReadFlag(currentLine); // currentFlag 只能為-2或是0~6
 				//System.out.println(currentLine);
 				if(currentFlag!=-2)
 					readFlag = currentFlag;
 				else{
-					//System.out.println("readFlag " + readFlag);
+					String[] stringBlock = currentLine.split(",");
 					if(readFlag==-1) {
-						String[] stringBlock = currentLine.split(",");
 						if(stringBlock.length==2) {
 							setName = stringBlock[0];
 							setSize = Integer.parseInt(stringBlock[1]);
 						}
 						else
-						requirments.add(new SkillRequirment(stringBlock));
+							skillRequirement.add(new SkillRequirement(stringBlock));
 					}
 					else{
-						ArrayList<Equipment> currentList = equipmentList.get(readFlag);
-						//System.out.println(currentList.size() + " " + currentList);
-						currentList.add(new Equipment(currentLine));
-						equipmentList.set(readFlag, currentList);
+						for(int equipmentNow=0;equipmentNow<=stringBlock.length-1;equipmentNow++) {
+							ArrayList<Equipment> currentEquipmentList = equipmentList.get(readFlag);
+							//System.out.println(currentList.size() + " " + currentList);
+							for(int i=0;i<=currentEquipmentList.size()-1;i++)
+								if(stringBlock[equipmentNow].contentEquals(currentEquipmentList.get(i).equipmentName)) {
+									includedEquipmentList.get(readFlag).add(i);
+									break;
+								}
+						}
 					}
 				}
 			}
@@ -184,7 +237,7 @@ public class EquipmentOptimizer {
 			}
 		}
 	}
-
+	
 	private static int changeReadFlag(String currentLine){
 		if(currentLine.equals("需求：")) return -1;
 		else if(currentLine.equals("武器：")) return 0;
