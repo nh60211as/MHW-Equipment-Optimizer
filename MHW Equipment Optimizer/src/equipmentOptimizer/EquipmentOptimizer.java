@@ -197,7 +197,7 @@ public class EquipmentOptimizer {
 				if(currentLine.substring(0, 1).contentEquals("#"))
 					continue;
 
-				currentFlag = changeReadFlag(currentLine); // currentFlag 只能為-2或是0~6
+				currentFlag = changeReadFlag(currentLine);
 				//System.out.println(currentLine);
 				if(currentFlag!=-2)
 					readFlag = currentFlag;
