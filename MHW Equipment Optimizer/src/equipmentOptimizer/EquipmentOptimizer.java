@@ -9,19 +9,20 @@ import java.util.Map;
 
 public class EquipmentOptimizer {
 
+	static String setName;
+	static int setSize;
 	static List<SkillRequirment> requirments;
 	static List<ArrayList<Equipment>> equipmentList;
 
 	public static void main(String[] args) {
-		int setSize = 0;
-		String setName = "(無)";
-
+		setName = "";
+		setSize = Integer.MAX_VALUE;
 		requirments = new ArrayList<SkillRequirment>();
 		equipmentList = new ArrayList<ArrayList<Equipment> >();
 		for(int i=1;i<=7;i++)
 			equipmentList.add(new ArrayList<Equipment>());
 
-		String requirmentFileName = "火防禦.txt";
+		String requirmentFileName = args[0];
 		readFile(requirmentFileName);
 
 		//		String[] equipmentFileName = {"_武器.txt", "_頭.txt", "_身.txt", "_腕.txt", "_腰.txt", "_腳.txt", "_護石.txt"};
@@ -152,8 +153,15 @@ public class EquipmentOptimizer {
 					readFlag = currentFlag;
 				else{
 					//System.out.println("readFlag " + readFlag);
-					if(readFlag==-1)
-						requirments.add(new SkillRequirment(currentLine));
+					if(readFlag==-1) {
+						String[] stringBlock = currentLine.split(",");
+						if(stringBlock.length==2) {
+							setName = stringBlock[0];
+							setSize = Integer.parseInt(stringBlock[1]);
+						}
+						else
+						requirments.add(new SkillRequirment(stringBlock));
+					}
 					else{
 						ArrayList<Equipment> currentList = equipmentList.get(readFlag);
 						//System.out.println(currentList.size() + " " + currentList);
