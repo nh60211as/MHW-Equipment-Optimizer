@@ -11,36 +11,73 @@ public class EquipmentOptimizer {
 
 	// 所有裝備的資料
 	static List<ArrayList<Equipment>> equipmentList;
-	
+
 	// 需求技能的資料
 	static String setName;
 	static int setSize;
 	static List<SkillRequirement> skillRequirement;
-	
+
 	// 包含裝備的資料
-	static List<ArrayList<Integer>> includedEquipmentList;
+	static List<List<Integer>> includedEquipmentList;
 
 	public static void main(String[] args) {
 
 		equipmentList = new ArrayList<ArrayList<Equipment> >();
 		for(int i=1;i<=7;i++)
 			equipmentList.add(new ArrayList<Equipment>());
-		
-		setName = "";
+
+		setName = ""; //setName在readRequirmentFile(requirementFileName);執行後應該為"(無)"或是系列技能名稱
 		setSize = Integer.MAX_VALUE;
 		skillRequirement = new ArrayList<SkillRequirement>();
-		
-		includedEquipmentList = new ArrayList<ArrayList<Integer> >();
+
+		includedEquipmentList = new ArrayList<List<Integer> >();
 		for(int i=1;i<=7;i++)
 			includedEquipmentList.add(new ArrayList<Integer>());
 
 		String[] equipmentFileName = {"_武器.txt", "_頭.txt", "_身.txt", "_腕.txt", "_腰.txt", "_腳.txt", "_護石.txt"};
 		for(int i=0;i<=equipmentFileName.length-1;i++)
 			readEquipmentFile(equipmentFileName[i]);
-		
+
 		String requirementFileName = args[0];
 		readRequirmentFile(requirementFileName);
 
+		for(int bodyPartNow=0;bodyPartNow<=includedEquipmentList.size()-1;bodyPartNow++) {
+			if(includedEquipmentList.get(bodyPartNow).size()==0) {
+				if(bodyPartNow==0) { //若裝備為武器
+					System.out.println("未指定武器");
+					return;
+				}
+				else if(bodyPartNow==6) { //若裝備為護石
+					for(int equipmentNow=0;equipmentNow<=equipmentList.get(bodyPartNow).size()-1;equipmentNow++)
+						for(int skillNow=0;skillNow<=skillRequirement.size()-1;skillNow++)
+							if(equipmentList.get(bodyPartNow).get(equipmentNow).skill.containsKey(skillRequirement.get(skillNow).skillName)) {
+								if(!includedEquipmentList.get(bodyPartNow).contains(equipmentNow))
+									includedEquipmentList.get(bodyPartNow).add(equipmentNow);
+							}
+				}
+				else { //若為頭、身、腕、腰、腳
+					if(setName.contentEquals("(無)")) {
+						for(int equipmentNow=0;equipmentNow<=equipmentList.get(bodyPartNow).size()-1;equipmentNow++)
+							for(int skillNow=0;skillNow<=skillRequirement.size()-1;skillNow++)
+								if(equipmentList.get(bodyPartNow).get(equipmentNow).skill.containsKey(skillRequirement.get(skillNow).skillName)) {
+									if(!includedEquipmentList.get(bodyPartNow).contains(equipmentNow))
+										includedEquipmentList.get(bodyPartNow).add(equipmentNow);
+								}
+					}
+					else {
+						for(int equipmentNow=0;equipmentNow<=equipmentList.get(bodyPartNow).size()-1;equipmentNow++)
+							for(int skillNow=0;skillNow<=skillRequirement.size()-1;skillNow++)
+								if(equipmentList.get(bodyPartNow).get(equipmentNow).skill.containsKey(skillRequirement.get(skillNow).skillName)
+										|| equipmentList.get(bodyPartNow).get(equipmentNow).setBonus.contentEquals(setName)) {
+									if(!includedEquipmentList.get(bodyPartNow).contains(equipmentNow))
+										includedEquipmentList.get(bodyPartNow).add(equipmentNow);
+								}
+					}
+				}
+			}
+			else
+				continue;
+		}
 		//		System.out.println(requirements.size());
 		//		for(int i=0;i<=equipmentLists.size()-1;i++)
 		//			System.out.println(equipmentLists.get(i).size());
@@ -237,7 +274,7 @@ public class EquipmentOptimizer {
 			}
 		}
 	}
-	
+
 	private static int changeReadFlag(String currentLine){
 		if(currentLine.equals("需求：")) return -1;
 		else if(currentLine.equals("武器：")) return 0;
