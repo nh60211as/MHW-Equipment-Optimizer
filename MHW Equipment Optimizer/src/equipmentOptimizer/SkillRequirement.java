@@ -1,6 +1,6 @@
 package equipmentOptimizer;
 
-public class SkillRequirement {
+public class SkillRequirement{
 	String skillName;
 	int required;
 	int owned;
