@@ -112,7 +112,14 @@ public class EquipmentOptimizer {
 							for(Equipment e6:includedEquipmentList.get(5))
 								for(Equipment e7:includedEquipmentList.get(6)){
 									List<Equipment> currentEquipment = new ArrayList<Equipment>();
-									//e1=0;e2=1;e3=3;e4=1;e5=0;e6=0;e7=0;
+									//									currentEquipment.add(0, includedEquipmentList.get(0).get(0));
+									//									currentEquipment.add(1, includedEquipmentList.get(0).get(0));
+									//									currentEquipment.add(2, includedEquipmentList.get(0).get(0));
+									//									currentEquipment.add(3, includedEquipmentList.get(0).get(0));
+									//									currentEquipment.add(4, includedEquipmentList.get(0).get(0));
+									//									currentEquipment.add(5, includedEquipmentList.get(0).get(0));
+									//									currentEquipment.add(6, includedEquipmentList.get(0).get(0));
+
 									currentEquipment.add(0, e1);
 									currentEquipment.add(1, e2);
 									currentEquipment.add(2, e3);
