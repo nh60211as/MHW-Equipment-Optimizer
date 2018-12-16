@@ -105,22 +105,32 @@ public class Equipment {
 		else if(this.defense<anotherEquipment.defense)
 			score[0] = -1;
 
-		if(this.totalDecor==anotherEquipment.totalDecor)
+		if(this.totalDecor>anotherEquipment.totalDecor)
+			score[1] = 1;
+		else if(this.totalDecor==anotherEquipment.totalDecor)
 			score[1] = isBetterWhenSameDecro(this,anotherEquipment);
+		else if(this.totalDecor<anotherEquipment.totalDecor)
+			score[1] = -1;
 
-		if(this.totalCombinedDecor==anotherEquipment.totalCombinedDecor)
+		if(this.totalCombinedDecor>anotherEquipment.totalCombinedDecor)
+			score[2] = 1;
+		else if(this.totalCombinedDecor==anotherEquipment.totalCombinedDecor)
 			score[2] = isBetterWhenSameDecro(this,anotherEquipment);
+		else if(this.totalCombinedDecor<anotherEquipment.totalCombinedDecor)
+			score[2] = -1;
 
 		int thisIsBetterFlag = score[0];
 		for(int i=1;i<=score.length-1;i++) {
-			if(thisIsBetterFlag==1)
+			if(thisIsBetterFlag==1) {
 				if(score[i]==-1)
 					return 0;
+			}
 			else if(thisIsBetterFlag==0)
 				thisIsBetterFlag = score[i];
-			else if(thisIsBetterFlag==-1)
+			else if(thisIsBetterFlag==-1) {
 				if(score[i]==1)
 					return 0;
+			}
 		}
 
 		return thisIsBetterFlag;

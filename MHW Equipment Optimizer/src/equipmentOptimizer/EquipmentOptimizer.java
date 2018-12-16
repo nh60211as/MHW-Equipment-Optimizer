@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class EquipmentOptimizer {
@@ -57,30 +58,35 @@ public class EquipmentOptimizer {
 							}
 				}
 				else { //若為頭、身、腕、腰、腳
-					for(Equipment equipmentNow:equipmentList.get(bodyPartNow)) {
-						equipmentNow.setIsReplaceable(skillRequirement,setName);
-						if(!equipmentNow.isReplaceable())
-							includedEquipmentList.get(bodyPartNow).add(equipmentNow);
+					for(int equipmentNow=0;equipmentNow<=equipmentList.get(bodyPartNow).size()-1;equipmentNow++) {
+						equipmentList.get(bodyPartNow).get(equipmentNow).setIsReplaceable(skillRequirement,setName);
+						if(!equipmentList.get(bodyPartNow).get(equipmentNow).isReplaceable() || includedEquipmentList.get(bodyPartNow).size()==0)
+							includedEquipmentList.get(bodyPartNow).add(equipmentList.get(bodyPartNow).get(equipmentNow));
 						else {
-							for(Equipment includedEquipmentNow:includedEquipmentList.get(bodyPartNow)) {
-								if(includedEquipmentNow.isReplaceable()) {
-									int isEquipmentNowBetter = equipmentNow.isBetter(includedEquipmentNow);
+							List<Integer> marked2remove = new ArrayList<Integer>();
+							boolean marked2add = false;
+							for(int includedEquipmentNow=0;includedEquipmentNow<=includedEquipmentList.get(bodyPartNow).size()-1;includedEquipmentNow++) {
+								if(includedEquipmentList.get(bodyPartNow).get(includedEquipmentNow).isReplaceable()) {
+									int isEquipmentNowBetter = includedEquipmentList.get(bodyPartNow).get(includedEquipmentNow).isBetter(equipmentList.get(bodyPartNow).get(equipmentNow));
 									switch(isEquipmentNowBetter) {
 									case 1:
 										break;
 									case 0:
-										includedEquipmentList.get(bodyPartNow).add(equipmentNow);
+										marked2add = true;
 										break;
 									case -1:
-										includedEquipmentList.get(bodyPartNow).remove(includedEquipmentNow);
-										includedEquipmentList.get(bodyPartNow).add(equipmentNow);
+										marked2remove.add(includedEquipmentNow);
+										marked2add = true;
 										break;
 									default:
 										break;
 									}
 								}
-
 							}
+							for(int i=marked2remove.size()-1;i>=0;i--)
+								includedEquipmentList.get(bodyPartNow).remove((int)marked2remove.get(i));
+							if(marked2add)
+								includedEquipmentList.get(bodyPartNow).add(equipmentList.get(bodyPartNow).get(equipmentNow));
 						}
 					}
 				}
@@ -171,18 +177,7 @@ public class EquipmentOptimizer {
 
 									if(!success)
 										continue;
-									for(int i=0;i<=currentEquipment.size()-1;i++)
-										System.out.print(currentEquipment.get(i).equipmentName + ",");
-									System.out.println();
-									System.out.print("防禦力： " + defense + ", ");
-									System.out.print("屬性抗性：  ");
-									for(int i=0;i<=elementalDef.length-1;i++) {
-										if(elementalDef[i]>=0)
-											System.out.print("+" + elementalDef[i] + ",");
-										else
-											System.out.print(elementalDef[i] + ",");
-									}
-									System.out.println(" 剩餘裝飾品數： " + numberOfHole[0]);
+									printEquipment(currentEquipment, defense, elementalDef, numberOfHole[0]);
 								}
 
 	}
@@ -296,5 +291,59 @@ public class EquipmentOptimizer {
 		else if(currentLine.equals("護石：")) return 6;
 
 		return -2;
+	}
+
+	private static void printEquipment(List<Equipment> currentEquipment, int defense, int elementalDef[], int remainDecroSlot) {
+		for(int i=0;i<=currentEquipment.size()-2;i++)
+			System.out.print(currentEquipment.get(i).equipmentName + ",");
+		System.out.println(currentEquipment.get(currentEquipment.size()-1).equipmentName);
+
+		Map<String,Integer> skill = new HashMap<String,Integer>();
+		for(Equipment equipmentNow:currentEquipment) {
+			for (String key : equipmentNow.skill.keySet()) {
+				if(!skill.containsKey(key))
+					skill.put(key, equipmentNow.skill.get(key));
+				else
+					skill.put(key, skill.get(key)+equipmentNow.skill.get(key));
+			}
+		}
+		for(SkillRequirement skillRequirementNow:skillRequirement) {
+			skill.put(skillRequirementNow.skillName, skillRequirementNow.required);
+		}
+		System.out.println(skill.toString());
+
+		String skillName = "防禦";
+		if(skill.containsKey(skillName)) {
+			int defBonus = skill.get(skillName);
+			defBonus = (defBonus>=8) ? 7 : defBonus; // 強制設定防禦技能至7以下
+			defense += defBonus*5;
+			if(defBonus>=4)
+				for(int i=0;i<=elementalDef.length-1;i++)
+					elementalDef[i] += 3;
+		}
+
+		String elementalDefPrefix[] = {"火","水","雷","冰","龍"};
+		for(int i=0;i<=elementalDef.length-1;i++) {
+			skillName = elementalDefPrefix[i]+"耐性";
+			if(skill.containsKey(skillName)) {
+				int elementaldefBonus = skill.get(skillName);
+				elementaldefBonus = (elementaldefBonus>=4) ? 3 : elementaldefBonus; // 強制設定耐性技能至3以下
+				elementalDef[i] += elementaldefBonus*6;
+				if(elementaldefBonus==3){
+					elementalDef[i] += 2;
+					defense += 10;
+				}
+			}
+		}
+
+		System.out.print("防禦力： " + defense + ", ");
+		System.out.print("屬性抗性：  ");
+		for(int i=0;i<=elementalDef.length-1;i++) {
+			if(elementalDef[i]>=0)
+				System.out.print("+" + elementalDef[i] + ",");
+			else
+				System.out.print(elementalDef[i] + ",");
+		}
+		System.out.println(" 剩餘裝飾品數： " + remainDecroSlot);
 	}
 }
