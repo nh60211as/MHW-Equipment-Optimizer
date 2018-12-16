@@ -10,14 +10,14 @@ import java.util.Map;
 
 public class EquipmentOptimizer {
 
+	// 所有裝備的資料
+	static ArrayList<ArrayList<Equipment>> equipmentList;
+	// 所有裝飾珠的資料
+	static List<SkillRequirement> decroList;
 	// 需求技能的資料
 	static String setName;
 	static int setSize;
 	static List<SkillRequirement> skillRequirement;
-
-	// 所有裝備的資料
-	static ArrayList<ArrayList<Equipment>> equipmentList;
-
 	// 包含裝備的資料
 	static ArrayList<ArrayList<Equipment>> includedEquipmentList;
 
@@ -26,6 +26,8 @@ public class EquipmentOptimizer {
 		equipmentList = new ArrayList<ArrayList<Equipment> >();
 		for(int i=1;i<=7;i++)
 			equipmentList.add(new ArrayList<Equipment>());
+
+		decroList = new ArrayList<SkillRequirement>();
 
 		setName = ""; //setName在readRequirmentFile(requirementFileName);執行後應該為"(無)"或是系列技能名稱
 		setSize = Integer.MAX_VALUE;
@@ -39,6 +41,9 @@ public class EquipmentOptimizer {
 		String[] equipmentFileName = {"_武器.txt", "_頭.txt", "_身.txt", "_腕.txt", "_腰.txt", "_腳.txt", "_護石.txt"};
 		for(String stringNow:equipmentFileName)
 			readEquipmentFile(equipmentFileDirectory+stringNow);
+
+		String decroFileName = "_擁有裝飾珠.txt";
+		readDecroFile(equipmentFileDirectory+decroFileName);
 
 		String requirementFileName = args[0];
 		readRequirmentFile(requirementFileName);
@@ -245,13 +250,17 @@ public class EquipmentOptimizer {
 					readFlag = currentFlag;
 				else{
 					String[] stringBlock = currentLine.split(",");
-					if(readFlag==-1) {
-						if(stringBlock.length==2) {
-							setName = stringBlock[0];
-							setSize = Integer.parseInt(stringBlock[1]);
-						}
-						else
-							skillRequirement.add(new SkillRequirement(stringBlock));
+					if(readFlag==-3) {
+						setName = stringBlock[0];
+						setSize = Integer.parseInt(stringBlock[1]);
+					}
+					else if(readFlag==-1){
+						for(SkillRequirement decroNow:decroList)
+							if(stringBlock[0].contentEquals(decroNow.skillName)) {
+								decroNow.setRequired(Integer.parseInt(stringBlock[1]));
+								skillRequirement.add(decroNow);
+								break;
+							}
 					}
 					else{
 						for(int equipmentNow=0;equipmentNow<=stringBlock.length-1;equipmentNow++) {
@@ -281,7 +290,8 @@ public class EquipmentOptimizer {
 	}
 
 	private static int changeReadFlag(String currentLine){
-		if(currentLine.equals("需求：")) return -1;
+		if(currentLine.equals("系列需求：")) return -3;
+		else if(currentLine.equals("需求：")) return -1;
 		else if(currentLine.equals("武器：")) return 0;
 		else if(currentLine.equals("頭：")) return 1;
 		else if(currentLine.equals("身：")) return 2;
@@ -291,6 +301,46 @@ public class EquipmentOptimizer {
 		else if(currentLine.equals("護石：")) return 6;
 
 		return -2;
+	}
+
+	private static void readDecroFile(String fileName) {
+		BufferedReader br = null;
+		FileReader fr = null;
+		try {
+			fr = new FileReader(fileName);
+			br = new BufferedReader(fr);
+
+			//開始閱讀檔案
+			int levelOfDecor = 0;
+			String currentLine = "";
+
+			while ((currentLine = br.readLine()) != null) {
+				if(currentLine.length()==0)
+					continue;
+				if(currentLine.substring(0, 1).contentEquals("#"))
+					continue;
+
+				String[] stringBlock = currentLine.split(",");
+				if(stringBlock.length==2) {
+					if(stringBlock[0].contentEquals("鑲嵌槽等級"))
+						levelOfDecor = Integer.parseInt(stringBlock[1]);
+				}
+				else if(stringBlock.length==3) {
+					decroList.add(new SkillRequirement(stringBlock, levelOfDecor));
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (br != null)
+					br.close();
+				if (fr != null)
+					fr.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
 	}
 
 	private static void printEquipment(List<Equipment> currentEquipment, int defense, int elementalDef[], int remainDecroSlot) {
