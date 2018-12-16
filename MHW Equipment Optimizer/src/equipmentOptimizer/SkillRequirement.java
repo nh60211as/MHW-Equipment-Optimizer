@@ -4,28 +4,23 @@ public class SkillRequirement {
 	String skillName;
 	int required;
 	int owned;
+	boolean isReplaceable;
 	int levelOfDecor;
 	
-	public SkillRequirement(String skillName, int required, int have, int levelOfHole){
-		this.skillName = skillName;
-		this.required = required;
-		this.owned = have;
-		this.levelOfDecor = levelOfHole;
-	}
-	
 	public SkillRequirement(String[] stringBlock){
-		this.skillName = stringBlock[0];
-		this.required = Integer.parseInt(stringBlock[1]);
-		this.owned = Integer.parseInt(stringBlock[2]);
-		this.levelOfDecor = Integer.parseInt(stringBlock[3]);
+		SkillRequirement_main(stringBlock);
 	}
 	
 	public SkillRequirement(String input){
 		String[] stringBlock = input.split(",");
-		
+		SkillRequirement_main(stringBlock);
+	}
+	
+	private void SkillRequirement_main(String[] stringBlock) {
 		this.skillName = stringBlock[0];
 		this.required = Integer.parseInt(stringBlock[1]);
 		this.owned = Integer.parseInt(stringBlock[2]);
+		isReplaceable = (this.required-this.owned)<=0;
 		this.levelOfDecor = Integer.parseInt(stringBlock[3]);
 	}
 }

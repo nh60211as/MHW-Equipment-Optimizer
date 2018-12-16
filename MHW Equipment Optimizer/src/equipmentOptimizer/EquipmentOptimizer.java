@@ -9,16 +9,16 @@ import java.util.Map;
 
 public class EquipmentOptimizer {
 
-	// 所有裝備的資料
-	static List<ArrayList<Equipment>> equipmentList;
-
 	// 需求技能的資料
 	static String setName;
 	static int setSize;
 	static List<SkillRequirement> skillRequirement;
 
+	// 所有裝備的資料
+	static ArrayList<ArrayList<Equipment>> equipmentList;
+
 	// 包含裝備的資料
-	static List<List<Integer>> includedEquipmentList;
+	static ArrayList<ArrayList<Equipment>> includedEquipmentList;
 
 	public static void main(String[] args) {
 
@@ -30,13 +30,14 @@ public class EquipmentOptimizer {
 		setSize = Integer.MAX_VALUE;
 		skillRequirement = new ArrayList<SkillRequirement>();
 
-		includedEquipmentList = new ArrayList<List<Integer> >();
+		includedEquipmentList = new ArrayList<ArrayList<Equipment> >();
 		for(int i=1;i<=7;i++)
-			includedEquipmentList.add(new ArrayList<Integer>());
+			includedEquipmentList.add(new ArrayList<Equipment>());
 
+		String equipmentFileDirectory = "裝備檔案/";
 		String[] equipmentFileName = {"_武器.txt", "_頭.txt", "_身.txt", "_腕.txt", "_腰.txt", "_腳.txt", "_護石.txt"};
-		for(int i=0;i<=equipmentFileName.length-1;i++)
-			readEquipmentFile(equipmentFileName[i]);
+		for(String stringNow:equipmentFileName)
+			readEquipmentFile(equipmentFileDirectory+stringNow);
 
 		String requirementFileName = args[0];
 		readRequirmentFile(requirementFileName);
@@ -48,30 +49,39 @@ public class EquipmentOptimizer {
 					return;
 				}
 				else if(bodyPartNow==6) { //若裝備為護石
-					for(int equipmentNow=0;equipmentNow<=equipmentList.get(bodyPartNow).size()-1;equipmentNow++)
-						for(int skillNow=0;skillNow<=skillRequirement.size()-1;skillNow++)
-							if(equipmentList.get(bodyPartNow).get(equipmentNow).skill.containsKey(skillRequirement.get(skillNow).skillName)) {
+					for(Equipment equipmentNow:equipmentList.get(bodyPartNow))
+						for(SkillRequirement skillNow:skillRequirement)
+							if(equipmentNow.skill.containsKey(skillNow.skillName)) {
 								if(!includedEquipmentList.get(bodyPartNow).contains(equipmentNow))
 									includedEquipmentList.get(bodyPartNow).add(equipmentNow);
 							}
 				}
 				else { //若為頭、身、腕、腰、腳
-					if(setName.contentEquals("(無)")) {
-						for(int equipmentNow=0;equipmentNow<=equipmentList.get(bodyPartNow).size()-1;equipmentNow++)
-							for(int skillNow=0;skillNow<=skillRequirement.size()-1;skillNow++)
-								if(equipmentList.get(bodyPartNow).get(equipmentNow).skill.containsKey(skillRequirement.get(skillNow).skillName)) {
-									if(!includedEquipmentList.get(bodyPartNow).contains(equipmentNow))
+					for(Equipment equipmentNow:equipmentList.get(bodyPartNow)) {
+						equipmentNow.setIsReplaceable(skillRequirement,setName);
+						if(!equipmentNow.isReplaceable())
+							includedEquipmentList.get(bodyPartNow).add(equipmentNow);
+						else {
+							for(Equipment includedEquipmentNow:includedEquipmentList.get(bodyPartNow)) {
+								if(includedEquipmentNow.isReplaceable()) {
+									int isEquipmentNowBetter = equipmentNow.isBetter(includedEquipmentNow);
+									switch(isEquipmentNowBetter) {
+									case 1:
+										break;
+									case 0:
 										includedEquipmentList.get(bodyPartNow).add(equipmentNow);
-								}
-					}
-					else {
-						for(int equipmentNow=0;equipmentNow<=equipmentList.get(bodyPartNow).size()-1;equipmentNow++)
-							for(int skillNow=0;skillNow<=skillRequirement.size()-1;skillNow++)
-								if(equipmentList.get(bodyPartNow).get(equipmentNow).skill.containsKey(skillRequirement.get(skillNow).skillName)
-										|| equipmentList.get(bodyPartNow).get(equipmentNow).setBonus.contentEquals(setName)) {
-									if(!includedEquipmentList.get(bodyPartNow).contains(equipmentNow))
+										break;
+									case -1:
+										includedEquipmentList.get(bodyPartNow).remove(includedEquipmentNow);
 										includedEquipmentList.get(bodyPartNow).add(equipmentNow);
+										break;
+									default:
+										break;
+									}
 								}
+
+							}
+						}
 					}
 				}
 			}
@@ -83,22 +93,22 @@ public class EquipmentOptimizer {
 		//			System.out.println(equipmentLists.get(i).size());
 
 		//開始配對裝備
-		for(int e1=0;e1<=includedEquipmentList.get(0).size()-1;e1++)
-			for(int e2=0;e2<=includedEquipmentList.get(1).size()-1;e2++)
-				for(int e3=0;e3<=includedEquipmentList.get(2).size()-1;e3++)
-					for(int e4=0;e4<=includedEquipmentList.get(3).size()-1;e4++)
-						for(int e5=0;e5<=includedEquipmentList.get(4).size()-1;e5++)
-							for(int e6=0;e6<=includedEquipmentList.get(5).size()-1;e6++)
-								for(int e7=0;e7<=includedEquipmentList.get(6).size()-1;e7++){
+		for(Equipment e1:includedEquipmentList.get(0))
+			for(Equipment e2:includedEquipmentList.get(1))
+				for(Equipment e3:includedEquipmentList.get(2))
+					for(Equipment e4:includedEquipmentList.get(3))
+						for(Equipment e5:includedEquipmentList.get(4))
+							for(Equipment e6:includedEquipmentList.get(5))
+								for(Equipment e7:includedEquipmentList.get(6)){
 									List<Equipment> currentEquipment = new ArrayList<Equipment>();
 									//e1=0;e2=1;e3=3;e4=1;e5=0;e6=0;e7=0;
-									currentEquipment.add(0, equipmentList.get(0).get(includedEquipmentList.get(0).get(e1)));
-									currentEquipment.add(1, equipmentList.get(1).get(includedEquipmentList.get(1).get(e2)));
-									currentEquipment.add(2, equipmentList.get(2).get(includedEquipmentList.get(2).get(e3)));
-									currentEquipment.add(3, equipmentList.get(3).get(includedEquipmentList.get(3).get(e4)));
-									currentEquipment.add(4, equipmentList.get(4).get(includedEquipmentList.get(4).get(e5)));
-									currentEquipment.add(5, equipmentList.get(5).get(includedEquipmentList.get(5).get(e6)));
-									currentEquipment.add(6, equipmentList.get(6).get(includedEquipmentList.get(6).get(e7)));
+									currentEquipment.add(0, e1);
+									currentEquipment.add(1, e2);
+									currentEquipment.add(2, e3);
+									currentEquipment.add(3, e4);
+									currentEquipment.add(4, e5);
+									currentEquipment.add(5, e6);
+									currentEquipment.add(6, e7);
 
 									int defense = 0;
 									int elementalDef[] = new int[5];
@@ -250,11 +260,11 @@ public class EquipmentOptimizer {
 					}
 					else{
 						for(int equipmentNow=0;equipmentNow<=stringBlock.length-1;equipmentNow++) {
-							ArrayList<Equipment> currentEquipmentList = equipmentList.get(readFlag);
+							List<Equipment> currentEquipmentList = equipmentList.get(readFlag);
 							//System.out.println(currentList.size() + " " + currentList);
 							for(int i=0;i<=currentEquipmentList.size()-1;i++)
 								if(stringBlock[equipmentNow].contentEquals(currentEquipmentList.get(i).equipmentName)) {
-									includedEquipmentList.get(readFlag).add(i);
+									includedEquipmentList.get(readFlag).add(currentEquipmentList.get(i));
 									break;
 								}
 						}
