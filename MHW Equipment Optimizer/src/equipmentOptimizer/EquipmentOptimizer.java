@@ -103,6 +103,7 @@ public class EquipmentOptimizer {
 		//		for(int i=0;i<=equipmentLists.size()-1;i++)
 		//			System.out.println(equipmentLists.get(i).size());
 
+		System.out.println("符合條件的裝備：");
 		//開始配對裝備
 		for(Equipment e1:includedEquipmentList.get(0))
 			for(Equipment e2:includedEquipmentList.get(1))
@@ -409,6 +410,6 @@ public class EquipmentOptimizer {
 			else
 				System.out.print(elementalDef[i] + ",");
 		}
-		System.out.println(" 剩餘裝飾品數： " + remainDecroSlot);
+		System.out.println(" 剩餘鑲嵌槽： " + remainDecroSlot);
 	}
 }
