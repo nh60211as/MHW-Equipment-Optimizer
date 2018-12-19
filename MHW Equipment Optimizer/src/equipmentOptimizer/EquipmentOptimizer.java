@@ -262,22 +262,30 @@ public class EquipmentOptimizer {
 						setSize = Integer.parseInt(stringBlock[1]);
 					}
 					else if(readFlag==-1){
+						boolean found = false;
 						for(SkillRequirement decroNow:decroList)
 							if(stringBlock[0].contentEquals(decroNow.skillName)) {
 								decroNow.setRequired(Integer.parseInt(stringBlock[1]));
 								skillRequirement.add(decroNow);
+								found = true;
 								break;
 							}
+						if(!found)
+							System.out.println("警告：找不到技能-" + stringBlock[0]);
 					}
 					else{
-						for(int equipmentNow=0;equipmentNow<=stringBlock.length-1;equipmentNow++) {
+						// stringBlock = {礦石鎧甲α,礦石鎧甲β}
+						for(int stringNow=0;stringNow<=stringBlock.length-1;stringNow++) {
+							boolean found = false;
 							List<Equipment> currentEquipmentList = equipmentList.get(readFlag);
-							//System.out.println(currentList.size() + " " + currentList);
-							for(int i=0;i<=currentEquipmentList.size()-1;i++)
-								if(stringBlock[equipmentNow].contentEquals(currentEquipmentList.get(i).equipmentName)) {
-									includedEquipmentList.get(readFlag).add(currentEquipmentList.get(i));
+							for(Equipment equipmentNow:currentEquipmentList)
+								if(stringBlock[stringNow].contentEquals(equipmentNow.equipmentName)) {
+									includedEquipmentList.get(readFlag).add(equipmentNow);
+									found = true;
 									break;
 								}
+							if(!found)
+								System.out.println("警告：找不到裝備-" + stringBlock[0]);
 						}
 					}
 				}
