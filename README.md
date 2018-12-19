@@ -13,7 +13,8 @@
 ### 必要檔案：
 
 安裝 JRE 1.8.0_191 或以上\
-https://www.oracle.com/technetwork/java/javase/downloads/index.html
+https://www.oracle.com/technetwork/java/javase/downloads/index.html \
+確認系統路徑有JRE在裡面
 
 ### 裝飾珠設定(設定完成後只要在獲得新的裝飾珠後修改即可)：
 
