@@ -6,13 +6,13 @@
 ## 使用工具
 
 -	Eclipse IDE for Java Developers (2018-09)
--	JRE System Library (1.8)
+-	Java Development Kit (1.8.0_66)
 
 ## 如何使用
 
 ### 必要檔案：
 
-安裝 JRE 1.8.0_191 或以上\
+安裝 Java Runtime Environment 1.8.0_66 或以上\
 https://www.oracle.com/technetwork/java/javase/downloads/index.html \
 確認系統路徑有JRE在裡面
 
