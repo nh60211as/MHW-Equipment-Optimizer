@@ -16,7 +16,7 @@
 https://www.oracle.com/technetwork/java/javase/downloads/index.html \
 確認系統路徑有JRE在裡面
 
-下載最新版的程式壓縮檔(內含jar檔、裝備資訊檔案、範例)
+下載最新版的程式壓縮檔(內含jar檔、裝備資訊檔案、範例)\
 https://github.com/nh60211as/MHW-Equipment-Optimizer/releases
 
 ### 裝飾珠設定(設定完成後只要在獲得新的裝飾珠後修改即可)：
