@@ -13,7 +13,7 @@ public class EquipmentOptimizer {
 	// 所有裝備的資料
 	static ArrayList<ArrayList<Equipment>> equipmentList;
 	// 所有裝飾珠的資料
-	static List<SkillRequirement> decroList;
+	static List<SkillRequirement> decorList;
 	// 需求技能的資料
 	static String setName;
 	static int setSize;
@@ -27,7 +27,7 @@ public class EquipmentOptimizer {
 		for(int i=1;i<=7;i++)
 			equipmentList.add(new ArrayList<Equipment>());
 
-		decroList = new ArrayList<SkillRequirement>();
+		decorList = new ArrayList<SkillRequirement>();
 
 		setName = ""; //setName在readRequirmentFile(requirementFileName);執行後應該為"(無)"或是系列技能名稱
 		setSize = Integer.MAX_VALUE;
@@ -264,10 +264,10 @@ public class EquipmentOptimizer {
 					}
 					else if(readFlag==-1){
 						boolean found = false;
-						for(SkillRequirement decroNow:decroList)
-							if(stringBlock[0].contentEquals(decroNow.skillName)) {
-								decroNow.setRequired(Integer.parseInt(stringBlock[1]));
-								skillRequirement.add(decroNow);
+						for(SkillRequirement decorNow:decorList)
+							if(stringBlock[0].contentEquals(decorNow.skillName)) {
+								decorNow.setRequired(Integer.parseInt(stringBlock[1]));
+								skillRequirement.add(decorNow);
 								found = true;
 								break;
 							}
@@ -342,7 +342,7 @@ public class EquipmentOptimizer {
 						levelOfDecor = Integer.parseInt(stringBlock[1]);
 				}
 				else if(stringBlock.length==3) {
-					decroList.add(new SkillRequirement(stringBlock, levelOfDecor));
+					decorList.add(new SkillRequirement(stringBlock, levelOfDecor));
 				}
 			}
 		} catch (IOException e) {
