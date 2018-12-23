@@ -129,7 +129,7 @@ public class EquipmentOptimizer {
 									currentEquipment.add(5, e6);
 									currentEquipment.add(6, e7);
 
-									int defense = 0;
+									int defense = 1;
 									int elementalDef[] = new int[5];
 									int isSetSize = 0;
 									int numberOfHole[] = new int[4];
