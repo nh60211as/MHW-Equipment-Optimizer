@@ -1,8 +1,10 @@
 package equipmentOptimizer;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -105,6 +107,175 @@ public class EquipmentOptimizer {
 
 		System.out.println("符合條件的裝備：");
 		//開始配對裝備
+		findMatchingEquipmentList();
+
+	}
+
+	private static void readEquipmentFile(String fileName) {
+		Reader reader = null;
+		BufferedReader br = null;
+		try {
+			reader = new InputStreamReader(new FileInputStream(fileName),"UTF-8");
+			br = new BufferedReader(reader);
+
+			//開始閱讀檔案
+			int readFlag = -2;
+			int currentFlag = -2;
+			String currentLine = "";
+
+			while ((currentLine = br.readLine()) != null) {
+				if(currentLine.length()==0)
+					continue;
+				if(currentLine.substring(0, 1).contentEquals("#"))
+					continue;
+
+				currentFlag = changeReadFlag(currentLine); // currentFlag 只能為-2或是0~6
+				//System.out.println(currentLine);
+				if(currentFlag!=-2)
+					readFlag = currentFlag;
+				else
+					equipmentList.get(readFlag).add(new Equipment(currentLine));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (br != null)
+					br.close();
+				if (reader != null)
+					reader.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+
+	private static void readRequirmentFile(String fileName) {
+		Reader reader = null;
+		BufferedReader br = null;
+		try {
+			reader = new InputStreamReader(new FileInputStream(fileName),"UTF-8");
+			br = new BufferedReader(reader);
+
+			//開始閱讀檔案
+			int readFlag = -2;
+			int currentFlag = -2;
+			String currentLine = "";
+
+			while ((currentLine = br.readLine()) != null) {
+				if(currentLine.length()==0)
+					continue;
+				if(currentLine.substring(0, 1).contentEquals("#"))
+					continue;
+
+				currentFlag = changeReadFlag(currentLine);
+				//System.out.println(currentLine);
+				if(currentFlag!=-2)
+					readFlag = currentFlag;
+				else{
+					String[] stringBlock = currentLine.split(",");
+					if(readFlag==-3) {
+						setName = stringBlock[0];
+						setSize = Integer.parseInt(stringBlock[1]);
+					}
+					else if(readFlag==-1){
+						boolean found = false;
+						for(SkillRequirement decorNow:decorList)
+							if(stringBlock[0].contentEquals(decorNow.skillName)) {
+								decorNow.setRequired(Integer.parseInt(stringBlock[1]));
+								skillRequirement.add(decorNow);
+								found = true;
+								break;
+							}
+						if(!found)
+							System.out.println("警告：找不到技能-" + stringBlock[0]);
+					}
+					else{
+						// stringBlock = {礦石鎧甲α,礦石鎧甲β}
+						for(int stringNow=0;stringNow<=stringBlock.length-1;stringNow++) {
+							boolean found = false;
+							List<Equipment> currentEquipmentList = equipmentList.get(readFlag);
+							for(Equipment equipmentNow:currentEquipmentList)
+								if(stringBlock[stringNow].contentEquals(equipmentNow.equipmentName)) {
+									includedEquipmentList.get(readFlag).add(equipmentNow);
+									found = true;
+									break;
+								}
+							if(!found)
+								System.out.println("警告：找不到裝備-" + stringBlock[0]);
+						}
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (br != null)
+					br.close();
+				if (reader != null)
+					reader.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+
+	private static int changeReadFlag(String currentLine){
+		if(currentLine.equals("系列需求：")) return -3;
+		else if(currentLine.equals("需求：")) return -1;
+		else if(currentLine.equals("武器：")) return 0;
+		else if(currentLine.equals("頭：")) return 1;
+		else if(currentLine.equals("身：")) return 2;
+		else if(currentLine.equals("腕：")) return 3;
+		else if(currentLine.equals("腰：")) return 4;
+		else if(currentLine.equals("腳：")) return 5;
+		else if(currentLine.equals("護石：")) return 6;
+
+		return -2;
+	}
+
+	private static void readDecroFile(String fileName) {
+		Reader reader = null;
+		BufferedReader br = null;
+		try {
+			reader = new InputStreamReader(new FileInputStream(fileName),"UTF-8");
+			br = new BufferedReader(reader);
+
+			//開始閱讀檔案
+			int levelOfDecor = 0;
+			String currentLine = "";
+
+			while ((currentLine = br.readLine()) != null) {
+				if(currentLine.length()==0)
+					continue;
+				if(currentLine.substring(0, 1).contentEquals("#"))
+					continue;
+
+				String[] stringBlock = currentLine.split(",");
+				if(stringBlock.length==2) {
+					if(stringBlock[0].contentEquals("鑲嵌槽等級"))
+						levelOfDecor = Integer.parseInt(stringBlock[1]);
+				}
+				else if(stringBlock.length==3) {
+					decorList.add(new SkillRequirement(stringBlock, levelOfDecor));
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (br != null)
+					br.close();
+				if (reader != null)
+					reader.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+
+	private static void findMatchingEquipmentList() {
 		for(Equipment e1:includedEquipmentList.get(0))
 			for(Equipment e2:includedEquipmentList.get(1))
 				for(Equipment e3:includedEquipmentList.get(2))
@@ -113,13 +284,13 @@ public class EquipmentOptimizer {
 							for(Equipment e6:includedEquipmentList.get(5))
 								for(Equipment e7:includedEquipmentList.get(6)){
 									List<Equipment> currentEquipment = new ArrayList<Equipment>();
-									//									currentEquipment.add(0, includedEquipmentList.get(0).get(0));
-									//									currentEquipment.add(1, includedEquipmentList.get(0).get(0));
-									//									currentEquipment.add(2, includedEquipmentList.get(0).get(0));
-									//									currentEquipment.add(3, includedEquipmentList.get(0).get(0));
-									//									currentEquipment.add(4, includedEquipmentList.get(0).get(0));
-									//									currentEquipment.add(5, includedEquipmentList.get(0).get(0));
-									//									currentEquipment.add(6, includedEquipmentList.get(0).get(0));
+									//currentEquipment.add(0, includedEquipmentList.get(0).get(0));
+									//currentEquipment.add(1, includedEquipmentList.get(0).get(0));
+									//currentEquipment.add(2, includedEquipmentList.get(0).get(0));
+									//currentEquipment.add(3, includedEquipmentList.get(0).get(0));
+									//currentEquipment.add(4, includedEquipmentList.get(0).get(0));
+									//currentEquipment.add(5, includedEquipmentList.get(0).get(0));
+									//currentEquipment.add(6, includedEquipmentList.get(0).get(0));
 
 									currentEquipment.add(0, e1);
 									currentEquipment.add(1, e2);
@@ -192,171 +363,6 @@ public class EquipmentOptimizer {
 										continue;
 									printEquipment(currentEquipment, defense, elementalDef, numberOfHole[0]);
 								}
-
-	}
-
-	private static void readEquipmentFile(String fileName) {
-		BufferedReader br = null;
-		FileReader fr = null;
-		try {
-			fr = new FileReader(fileName);
-			br = new BufferedReader(fr);
-
-			//開始閱讀檔案
-			int readFlag = -2;
-			int currentFlag = -2;
-			String currentLine = "";
-
-			while ((currentLine = br.readLine()) != null) {
-				if(currentLine.length()==0)
-					continue;
-				if(currentLine.substring(0, 1).contentEquals("#"))
-					continue;
-
-				currentFlag = changeReadFlag(currentLine); // currentFlag 只能為-2或是0~6
-				//System.out.println(currentLine);
-				if(currentFlag!=-2)
-					readFlag = currentFlag;
-				else
-					equipmentList.get(readFlag).add(new Equipment(currentLine));
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (br != null)
-					br.close();
-				if (fr != null)
-					fr.close();
-			} catch (IOException ex) {
-				ex.printStackTrace();
-			}
-		}
-	}
-
-	private static void readRequirmentFile(String fileName) {
-		BufferedReader br = null;
-		FileReader fr = null;
-		try {
-			fr = new FileReader(fileName);
-			br = new BufferedReader(fr);
-
-			//開始閱讀檔案
-			int readFlag = -2;
-			int currentFlag = -2;
-			String currentLine = "";
-
-			while ((currentLine = br.readLine()) != null) {
-				if(currentLine.length()==0)
-					continue;
-				if(currentLine.substring(0, 1).contentEquals("#"))
-					continue;
-
-				currentFlag = changeReadFlag(currentLine);
-				//System.out.println(currentLine);
-				if(currentFlag!=-2)
-					readFlag = currentFlag;
-				else{
-					String[] stringBlock = currentLine.split(",");
-					if(readFlag==-3) {
-						setName = stringBlock[0];
-						setSize = Integer.parseInt(stringBlock[1]);
-					}
-					else if(readFlag==-1){
-						boolean found = false;
-						for(SkillRequirement decorNow:decorList)
-							if(stringBlock[0].contentEquals(decorNow.skillName)) {
-								decorNow.setRequired(Integer.parseInt(stringBlock[1]));
-								skillRequirement.add(decorNow);
-								found = true;
-								break;
-							}
-						if(!found)
-							System.out.println("警告：找不到技能-" + stringBlock[0]);
-					}
-					else{
-						// stringBlock = {礦石鎧甲α,礦石鎧甲β}
-						for(int stringNow=0;stringNow<=stringBlock.length-1;stringNow++) {
-							boolean found = false;
-							List<Equipment> currentEquipmentList = equipmentList.get(readFlag);
-							for(Equipment equipmentNow:currentEquipmentList)
-								if(stringBlock[stringNow].contentEquals(equipmentNow.equipmentName)) {
-									includedEquipmentList.get(readFlag).add(equipmentNow);
-									found = true;
-									break;
-								}
-							if(!found)
-								System.out.println("警告：找不到裝備-" + stringBlock[0]);
-						}
-					}
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (br != null)
-					br.close();
-				if (fr != null)
-					fr.close();
-			} catch (IOException ex) {
-				ex.printStackTrace();
-			}
-		}
-	}
-
-	private static int changeReadFlag(String currentLine){
-		if(currentLine.equals("系列需求：")) return -3;
-		else if(currentLine.equals("需求：")) return -1;
-		else if(currentLine.equals("武器：")) return 0;
-		else if(currentLine.equals("頭：")) return 1;
-		else if(currentLine.equals("身：")) return 2;
-		else if(currentLine.equals("腕：")) return 3;
-		else if(currentLine.equals("腰：")) return 4;
-		else if(currentLine.equals("腳：")) return 5;
-		else if(currentLine.equals("護石：")) return 6;
-
-		return -2;
-	}
-
-	private static void readDecroFile(String fileName) {
-		BufferedReader br = null;
-		FileReader fr = null;
-		try {
-			fr = new FileReader(fileName);
-			br = new BufferedReader(fr);
-
-			//開始閱讀檔案
-			int levelOfDecor = 0;
-			String currentLine = "";
-
-			while ((currentLine = br.readLine()) != null) {
-				if(currentLine.length()==0)
-					continue;
-				if(currentLine.substring(0, 1).contentEquals("#"))
-					continue;
-
-				String[] stringBlock = currentLine.split(",");
-				if(stringBlock.length==2) {
-					if(stringBlock[0].contentEquals("鑲嵌槽等級"))
-						levelOfDecor = Integer.parseInt(stringBlock[1]);
-				}
-				else if(stringBlock.length==3) {
-					decorList.add(new SkillRequirement(stringBlock, levelOfDecor));
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (br != null)
-					br.close();
-				if (fr != null)
-					fr.close();
-			} catch (IOException ex) {
-				ex.printStackTrace();
-			}
-		}
 	}
 
 	private static void printEquipment(List<Equipment> currentEquipment, int defense, int elementalDef[], int remainDecroSlot) {
