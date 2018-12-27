@@ -6,13 +6,13 @@
 ## 使用工具
 
 -	Eclipse IDE for Java Developers (2018-09)
--	Java Development Kit (1.8.0_66)
+-	Java Development Kit (1.8.0_191)
 
 ## 如何使用
 
 ### 必要檔案：
 
-安裝 Java Runtime Environment 1.8.0_66 或以上\
+安裝 Java Runtime Environment 1.8.0_191 或以上\
 https://www.oracle.com/technetwork/java/javase/downloads/index.html \
 確認系統路徑有JRE在裡面
 
@@ -77,7 +77,7 @@ https://github.com/nh60211as/MHW-Equipment-Optimizer/releases
 Windows 10 命令提示字元：
 ```
 cd <MHW-Equipment-Optimizer.jar 的目錄>
-java -Dfile.encoding=UTF-8 -jar MHW-Equipment-Optimizer.jar <需求檔案名稱.txt>
+java -jar MHW-Equipment-Optimizer.jar <需求檔案名稱.txt>
 ```
 
 ### 輸出範例：
