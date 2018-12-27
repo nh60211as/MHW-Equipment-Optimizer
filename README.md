@@ -82,7 +82,7 @@ java -jar MHW-Equipment-Optimizer.jar <需求檔案名稱.txt>
 
 ### 輸出範例：
 ```
-java -Dfile.encoding=UTF-8 -jar MHW-Equipment-Optimizer.jar 狩獵笛.txt
+java -jar MHW-Equipment-Optimizer.jar 狩獵笛.txt
 符合條件的裝備：
 爆鱗鼓赤紅星光,爆鱗龍頭盔β,絢輝龍鎧羅鎧甲β,烏爾德腕甲β,烏爾德腰甲γ,烏爾德護腿γ,匠之護石III
 {匠=3, 體力增強=3, 昏厥耐性=3, 耳塞=5, 弱點特效=3, 超會心=1, 體力回復量UP=3, 龍屬性攻擊強化=1, 回復速度=3, 無傷=2, 吹笛名人=1}
