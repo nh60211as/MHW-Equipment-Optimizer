@@ -2,11 +2,9 @@ package equipmentOptimizer;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class EquipmentOptimizer {
-
+	static DecorationList decorationList;
 	// 需求技能的資料
 	static SetBonusList setBonusList;
 	static DecorationList includedSkill;
@@ -25,7 +23,7 @@ public class EquipmentOptimizer {
 		String[] equipmentFileName = {"_武器.txt", "_頭.txt", "_身.txt", "_腕.txt", "_腰.txt", "_腳.txt", "_護石.txt"};
 
 		// 所有裝飾珠的資料
-		DecorationList decorationList = ReadFile.readDecorationFile(equipmentFileDirectory,decorationFileName);
+		decorationList = ReadFile.readDecorationFile(equipmentFileDirectory,decorationFileName);
 		// 所有裝備的資料
 		EquipmentList equipmentList = ReadFile.readEquipmentFile(equipmentFileDirectory,equipmentFileName);
 
@@ -148,7 +146,7 @@ public class EquipmentOptimizer {
 									//檢查是否為套裝
 									if(!setBonusList.checkSetBonus(currentSetBonusList))
 										continue;
-									
+
 									for(int i=0;i<=currentEquipment.size()-1;i++){
 										defense += currentEquipment.get(i).defense;
 										elementalDef[0] += currentEquipment.get(i).fireDef;
@@ -168,7 +166,7 @@ public class EquipmentOptimizer {
 												skillHave[j] += skill.getSkillLevel(currentSkillName);
 										}
 									}
-									
+
 									boolean success = true;
 
 									for(int i=0;i<=skillNeed.length-1;i++){
@@ -203,26 +201,30 @@ public class EquipmentOptimizer {
 
 	private static void printEquipment(List<Equipment> currentEquipment, int defense, int elementalDef[], int remainDecroSlot) {
 		for(int i=0;i<=currentEquipment.size()-2;i++)
-			System.out.print(currentEquipment.get(i).equipmentName + ",");
+			System.out.print(currentEquipment.get(i).equipmentName + ", ");
 		System.out.println(currentEquipment.get(currentEquipment.size()-1).equipmentName);
 
-		Map<String,Integer> skill = new HashMap<String,Integer>();
+		SkillList skill = new SkillList();
 		for(Equipment equipmentNow:currentEquipment) {
-			for (String key : equipmentNow.skillList.skillName()) {
-				if(!skill.containsKey(key))
-					skill.put(key, equipmentNow.skillList.getSkillLevel(key));
-				else
-					skill.put(key, skill.get(key)+equipmentNow.skillList.getSkillLevel(key));
+			for (String skillNameNow : equipmentNow.skillList.skillName()) {
+				skill.plus(skillNameNow, equipmentNow.skillList.getSkillLevel(skillNameNow));
 			}
 		}
 		for(Decoration skillRequirementNow:includedSkill) {
-			skill.put(skillRequirementNow.skillName, skillRequirementNow.required);
+			skill.set(skillRequirementNow.skillName, Math.max(skillRequirementNow.required, skill.getSkillLevel(skillRequirementNow.skillName)));
 		}
-		System.out.println(skill.toString());
+		
+		List<String> skillNameList = skill.skillName();
+		for(int i=0;i<=skill.size()-1;i++) {
+			String skillNow = skillNameList.get(i);
+			int indexOfDecorationList = decorationList.indexOf(skillNow);
+			skill.setSkillLevel(i, Math.min(skill.getSkillLevel(i), decorationList.get(indexOfDecorationList).max));
+		}
+		skill.print();
 
 		String skillName = "防禦";
-		if(skill.containsKey(skillName)) {
-			int defBonus = skill.get(skillName);
+		if(skill.contains(skillName)) {
+			int defBonus = skill.getSkillLevel(skillName);
 			defBonus = (defBonus>=8) ? 7 : defBonus; // 強制設定防禦技能至7以下
 			defense += defBonus*5;
 			if(defBonus>=4)
@@ -233,8 +235,8 @@ public class EquipmentOptimizer {
 		String elementalDefPrefix[] = {"火","水","雷","冰","龍"};
 		for(int i=0;i<=elementalDef.length-1;i++) {
 			skillName = elementalDefPrefix[i]+"耐性";
-			if(skill.containsKey(skillName)) {
-				int elementaldefBonus = skill.get(skillName);
+			if(skill.contains(skillName)) {
+				int elementaldefBonus = skill.getSkillLevel(skillName);
 				elementaldefBonus = (elementaldefBonus>=4) ? 3 : elementaldefBonus; // 強制設定耐性技能至3以下
 				elementalDef[i] += elementaldefBonus*6;
 				if(elementaldefBonus==3){
