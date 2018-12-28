@@ -9,7 +9,7 @@ import java.util.Set;
 public class EquipmentOptimizer {
 
 	// 所有裝備的資料
-	static List<List<Equipment>> equipmentList;
+	static EquipmentList equipmentList;
 	// 所有裝飾珠的資料
 	static List<SkillRequirement> decorationList;
 	// 需求技能的資料
@@ -18,14 +18,16 @@ public class EquipmentOptimizer {
 	static List<SkillRequirement> excludedSkill;
 	// 包含裝備的資料
 	static List<List<Equipment>> includedEquipmentList;
-	static List<List<Equipment>> excludedEquipmentList; // 尚未實做
+	static List<List<Equipment>> excludedEquipmentList; // todo
 
 	public static void main(String[] args) {
 
 		// 初始化函數
-		equipmentList = new ArrayList<List<Equipment> >();
-		for(int i=1;i<=7;i++)
-			equipmentList.add(new ArrayList<Equipment>());
+		
+		// 讀取裝備資訊和技能資訊
+		String equipmentFileDirectory = "裝備檔案/";
+		String[] equipmentFileName = {"_武器.txt", "_頭.txt", "_身.txt", "_腕.txt", "_腰.txt", "_腳.txt", "_護石.txt"};
+		equipmentList = ReadFile.readEquipmentFile(equipmentFileDirectory,equipmentFileName);
 
 		decorationList = new ArrayList<SkillRequirement>();
 
@@ -36,12 +38,6 @@ public class EquipmentOptimizer {
 		for(int i=1;i<=7;i++)
 			includedEquipmentList.add(new ArrayList<Equipment>());
 		// 結束初始化函數
-
-		// 讀取裝備資訊和技能資訊
-		String equipmentFileDirectory = "裝備檔案/";
-		String[] equipmentFileName = {"_武器.txt", "_頭.txt", "_身.txt", "_腕.txt", "_腰.txt", "_腳.txt", "_護石.txt"};
-		for(String stringNow:equipmentFileName)
-			ReadFile.readEquipmentFile(equipmentFileDirectory+stringNow,equipmentList);
 		
 		String decroFileName = "_擁有裝飾珠.txt";
 		ReadFile.readDecorationFile(equipmentFileDirectory+decroFileName,decorationList);
