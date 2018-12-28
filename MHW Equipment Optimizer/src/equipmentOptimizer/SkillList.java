@@ -21,6 +21,18 @@ public class SkillList {
 		return _skillName.contains(skillName);
 	}
 	
+	public boolean contains(DecorationList decorationList) {
+		for(SkillRequirement skillNow:decorationList) {
+			boolean tf = _skillName.contains(skillNow.skillName);
+			if(tf)
+				return true;
+			else
+				continue;
+		}
+			
+		return false;
+	}
+	
 	// return the first index of the instance. return -1 if not found
 	public int indexOf(String skillName) {
 		return _skillName.indexOf(skillName);

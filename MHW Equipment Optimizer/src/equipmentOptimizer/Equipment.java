@@ -11,6 +11,7 @@ public class Equipment {
 	int decor3;
 	int decor2;
 	int decor1;
+	int maxDecorLevel;
 	int totalDecor;
 
 	String setBonus;
@@ -67,15 +68,16 @@ public class Equipment {
 		for(int skillNow=0;skillNow<=skillRequirement.size()-1;skillNow++) {
 			int indexOfSkill = skillList.indexOf(skillRequirement.get(skillNow).skillName);
 			if(indexOfSkill!=-1) {
+				int skillLevel = skillList.getSkillLevel(skillRequirement.get(skillNow).skillName);
 				switch(skillRequirement.get(skillNow).levelOfDecor) {
 				case 1:
-					combinedDecor1 += skillList.getSkillLevel(skillRequirement.get(skillNow).skillName);
+					combinedDecor1 += skillLevel;
 					break;
 				case 2:
-					combinedDecor2 += skillList.getSkillLevel(skillRequirement.get(skillNow).skillName);
+					combinedDecor2 += skillLevel;
 					break;
 				case 3:
-					combinedDecor3 += skillList.getSkillLevel(skillRequirement.get(skillNow).skillName);
+					combinedDecor3 += skillLevel;
 					break;
 				default:
 					break;
@@ -164,7 +166,7 @@ public class Equipment {
 		else
 			return -1;
 	}
-
+	
 	private static int isBetterWhenSameCombinedDecro(Equipment e1, Equipment e2) {
 		int e1Score = e1.combinedDecor3*100+e1.combinedDecor2*10+e1.combinedDecor1;
 		int e2Score = e2.combinedDecor3*100+e2.combinedDecor2*10+e2.combinedDecor1;

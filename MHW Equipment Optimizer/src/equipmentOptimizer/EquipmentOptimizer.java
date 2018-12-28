@@ -31,6 +31,7 @@ public class EquipmentOptimizer {
 
 		setBonusList = new SetBonusList();
 		includedSkill = new DecorationList();
+		excludedSkill = new DecorationList();
 
 		includedEquipmentList = new EquipmentList();
 
@@ -40,7 +41,8 @@ public class EquipmentOptimizer {
 		String requirementFileName = args[0];
 		ReadFile.readRequirmentFile(requirementFileName,
 				decorationList,equipmentList,
-				setBonusList,includedSkill,includedEquipmentList);
+				setBonusList,includedSkill,excludedSkill,
+				includedEquipmentList);
 
 		for(int bodyPartNow=0;bodyPartNow<=includedEquipmentList.size()-1;bodyPartNow++) {
 			if(includedEquipmentList.get(bodyPartNow).size()==0) {
@@ -60,6 +62,8 @@ public class EquipmentOptimizer {
 					for(int equipmentNow=0;equipmentNow<=equipmentList.get(bodyPartNow).size()-1;equipmentNow++) {
 						Equipment currentEquipment = equipmentList.get(bodyPartNow).get(equipmentNow);
 						currentEquipment.setIsReplaceable(includedSkill,setBonusList);
+						if(currentEquipment.skillList.contains(excludedSkill))
+							continue;
 						if(!currentEquipment.isReplaceable() || includedEquipmentList.get(bodyPartNow).size()==0)
 							includedEquipmentList.get(bodyPartNow).add(currentEquipment);
 						else {

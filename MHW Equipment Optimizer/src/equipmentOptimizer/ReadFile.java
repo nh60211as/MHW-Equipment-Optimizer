@@ -9,14 +9,16 @@ import java.util.List;
 import java.util.Map;
 
 public class ReadFile {
-	private static final int DEFAULT_READ_FLAG = -3;
-	private static final int SET_BONUS_READ_FLAG = -2;
-	private static final int SKILL_REQUIREMENT_READ_FLAG = -1;
+	private static final int DEFAULT_READ_FLAG = -4;
+	private static final int SET_BONUS_READ_FLAG = -3;
+	private static final int SKILL_INCLUSION_READ_FLAG = -2;
+	private static final int SKILL_EXCLUSION_READ_FLAG = -1;
 
 
 	private static int changeReadFlag(String currentLine){
 		if(currentLine.equals("系列需求：")) return SET_BONUS_READ_FLAG;
-		else if(currentLine.equals("需求：")) return SKILL_REQUIREMENT_READ_FLAG;
+		else if(currentLine.equals("需求：")) return SKILL_INCLUSION_READ_FLAG;
+		else if(currentLine.equals("排除：")) return SKILL_EXCLUSION_READ_FLAG;
 		else if(currentLine.equals("武器：")) return 0;
 		else if(currentLine.equals("頭：")) return 1;
 		else if(currentLine.equals("身：")) return 2;
@@ -119,7 +121,8 @@ public class ReadFile {
 
 	public static void readRequirmentFile(String fileName,
 			DecorationList decorationList,EquipmentList equipmentList,
-			SetBonusList setBouns,DecorationList includedSkill,EquipmentList includedEquipmentList) {
+			SetBonusList setBouns,DecorationList includedSkill,DecorationList excludedSkill,
+			EquipmentList includedEquipmentList) {
 		Reader reader = null;
 		BufferedReader br = null;
 		try {
@@ -145,7 +148,7 @@ public class ReadFile {
 					String[] stringBlock = currentLine.split(",");
 					if(readFlag==SET_BONUS_READ_FLAG)
 						setBouns.add(stringBlock[0], Integer.parseInt(stringBlock[1]));
-					else if(readFlag==SKILL_REQUIREMENT_READ_FLAG){
+					else if(readFlag==SKILL_INCLUSION_READ_FLAG){
 						boolean found = false;
 						for(SkillRequirement decorNow:decorationList) {
 							String skillNow = stringBlock[0];
@@ -159,7 +162,21 @@ public class ReadFile {
 						}
 
 						if(!found)
-							System.out.println("警告：找不到技能-" + stringBlock[0]);
+							System.out.println("警告：找不到需求技能-" + stringBlock[0]);
+					}
+					else if(readFlag==SKILL_EXCLUSION_READ_FLAG){
+						boolean found = false;
+						for(SkillRequirement decorNow:decorationList) {
+							String skillNow = stringBlock[0];
+							if(skillNow.contentEquals(decorNow.skillName)) {
+								excludedSkill.add(decorNow);
+								found = true;
+								break;
+							}
+						}
+
+						if(!found)
+							System.out.println("警告：找不到排除技能-" + stringBlock[0]);
 					}
 					else{
 						// stringBlock = {礦石鎧甲α,礦石鎧甲β}
