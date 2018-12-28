@@ -87,7 +87,7 @@ java -jar MHW-Equipment-Optimizer.jar <需求檔案名稱.txt>
 
 ### 輸出範例：
 ```
-java -jar MHW-Equipment-Optimizer.jar 狩獵笛.txt
+java -jar MHW-Equipment-Optimizer.jar 大劍.txt
 符合條件的裝備：
 龍熱機關式鋼翼改, 骷髏面罩α, 騰龍戰鎧α, 騰龍腕甲α, 騰龍腰甲α, 騰龍護腿α, 挑戰護石II
 匠=2, 看破=7, 超會心=3, 攻擊=4, 強化持續=1, 挑戰者=2, 弱點特效=3, 無屬性強化=1
