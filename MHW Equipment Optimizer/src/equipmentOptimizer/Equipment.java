@@ -1,7 +1,5 @@
 package equipmentOptimizer;
 
-import java.util.Map;
-import java.util.HashMap;
 import java.util.List;
 
 public class Equipment {
@@ -16,8 +14,9 @@ public class Equipment {
 	int decor2;
 	int decor1;
 	int totalDecor;
+
 	String setBonus;
-	Map<String,Integer> skill;
+	SkillList skillList;
 
 	private boolean isReplaceable;
 	private int combinedDecor3;
@@ -59,25 +58,26 @@ public class Equipment {
 		// (無)
 		setBonus = skillBlock[0];
 
-		skill = new HashMap<String,Integer>();
+		skillList = new SkillList();
 		for(int i=1;i<=skillBlock.length-1;i+=2)
-			this.skill.put(skillBlock[i], Integer.parseInt(skillBlock[i+1]));
+			skillList.add(skillBlock[i], Integer.parseInt(skillBlock[i+1]));
 
 		isReplaceable = true;
 	}
 
-	public void setIsReplaceable(List<SkillRequirement> skillRequirement, String setName) {
-		for(int skillNow=0;skillNow<=skillRequirement.size()-1;skillNow++)
-			if(skill.containsKey(skillRequirement.get(skillNow).skillName)) {
+	public void setIsReplaceable(DecorationList skillRequirement, SetBonusList setBonusList) {
+		for(int skillNow=0;skillNow<=skillRequirement.size()-1;skillNow++) {
+			int indexOfSkill = skillList.indexOf(skillRequirement.get(skillNow).skillName);
+			if(indexOfSkill!=-1) {
 				switch(skillRequirement.get(skillNow).levelOfDecor) {
 				case 1:
-					combinedDecor1 += skill.get(skillRequirement.get(skillNow).skillName);
+					combinedDecor1 += skillList.getSkillLevel(skillRequirement.get(skillNow).skillName);
 					break;
 				case 2:
-					combinedDecor2 += skill.get(skillRequirement.get(skillNow).skillName);
+					combinedDecor2 += skillList.getSkillLevel(skillRequirement.get(skillNow).skillName);
 					break;
 				case 3:
-					combinedDecor3 += skill.get(skillRequirement.get(skillNow).skillName);
+					combinedDecor3 += skillList.getSkillLevel(skillRequirement.get(skillNow).skillName);
 					break;
 				default:
 					break;
@@ -86,7 +86,9 @@ public class Equipment {
 				if(!skillRequirement.get(skillNow).isReplaceable)
 					isReplaceable = false;
 			}
-		if(setBonus.contentEquals(setName) && !setBonus.contentEquals("(無)"))
+		}
+
+		if(setBonusList.contains(setBonus) && !setBonus.contentEquals("(無)"))
 			isReplaceable = false;
 		totalCombinedDecor = combinedDecor3+combinedDecor2+combinedDecor1;
 	}

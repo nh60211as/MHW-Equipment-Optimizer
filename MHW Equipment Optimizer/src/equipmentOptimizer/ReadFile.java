@@ -13,6 +13,65 @@ public class ReadFile {
 	private static final int SET_BONUS_READ_FLAG = -2;
 	private static final int SKILL_REQUIREMENT_READ_FLAG = -1;
 
+
+	private static int changeReadFlag(String currentLine){
+		if(currentLine.equals("系列需求：")) return SET_BONUS_READ_FLAG;
+		else if(currentLine.equals("需求：")) return SKILL_REQUIREMENT_READ_FLAG;
+		else if(currentLine.equals("武器：")) return 0;
+		else if(currentLine.equals("頭：")) return 1;
+		else if(currentLine.equals("身：")) return 2;
+		else if(currentLine.equals("腕：")) return 3;
+		else if(currentLine.equals("腰：")) return 4;
+		else if(currentLine.equals("腳：")) return 5;
+		else if(currentLine.equals("護石：")) return 6;
+
+		return DEFAULT_READ_FLAG;
+	}
+	
+	public static DecorationList readDecorationFile(String equipmentFileDirectory, String decorationFileName) {
+		DecorationList decorationList = new DecorationList();
+		
+		Reader reader = null;
+		BufferedReader br = null;
+		try {
+			reader = new InputStreamReader(new FileInputStream(equipmentFileDirectory+decorationFileName),"UTF-8");
+			br = new BufferedReader(reader);
+
+			//開始閱讀檔案
+			int levelOfDecor = 0;
+			String currentLine = "";
+
+			while ((currentLine = br.readLine()) != null) {
+				if(currentLine.length()==0)
+					continue;
+				if(currentLine.substring(0, 1).contentEquals("#"))
+					continue;
+
+				String[] stringBlock = currentLine.split(",");
+				if(stringBlock.length==2) {
+					if(stringBlock[0].contentEquals("鑲嵌槽等級"))
+						levelOfDecor = Integer.parseInt(stringBlock[1]);
+				}
+				else if(stringBlock.length==3) {
+					decorationList.add(new SkillRequirement(stringBlock, levelOfDecor));
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (br != null)
+					br.close();
+				if (reader != null)
+					reader.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+		
+		return decorationList;
+	}
+	
 	public static EquipmentList readEquipmentFile(String equipmentFileDirectory, String[] equipmentFileName) {
 		EquipmentList equipmentList = new EquipmentList();
 		
@@ -59,11 +118,8 @@ public class ReadFile {
 	}
 
 	public static void readRequirmentFile(String fileName,
-			EquipmentList equipmentList,
-			List<SkillRequirement> decorationList,
-			Map<String,Integer> setBouns,
-			List<SkillRequirement> includedSkill,
-			List<List<Equipment>> includedEquipmentList) {
+			DecorationList decorationList,EquipmentList equipmentList,
+			SetBonusList setBouns,DecorationList includedSkill,EquipmentList includedEquipmentList) {
 		Reader reader = null;
 		BufferedReader br = null;
 		try {
@@ -88,7 +144,7 @@ public class ReadFile {
 				else{
 					String[] stringBlock = currentLine.split(",");
 					if(readFlag==SET_BONUS_READ_FLAG)
-						setBouns.put(stringBlock[0], Integer.parseInt(stringBlock[1]));
+						setBouns.add(stringBlock[0], Integer.parseInt(stringBlock[1]));
 					else if(readFlag==SKILL_REQUIREMENT_READ_FLAG){
 						boolean found = false;
 						for(SkillRequirement decorNow:decorationList) {
@@ -136,57 +192,4 @@ public class ReadFile {
 		}
 	}
 
-	private static int changeReadFlag(String currentLine){
-		if(currentLine.equals("系列需求：")) return SET_BONUS_READ_FLAG;
-		else if(currentLine.equals("需求：")) return SKILL_REQUIREMENT_READ_FLAG;
-		else if(currentLine.equals("武器：")) return 0;
-		else if(currentLine.equals("頭：")) return 1;
-		else if(currentLine.equals("身：")) return 2;
-		else if(currentLine.equals("腕：")) return 3;
-		else if(currentLine.equals("腰：")) return 4;
-		else if(currentLine.equals("腳：")) return 5;
-		else if(currentLine.equals("護石：")) return 6;
-
-		return DEFAULT_READ_FLAG;
-	}
-
-	public static void readDecorationFile(String fileName, List<SkillRequirement> decorationList) {
-		Reader reader = null;
-		BufferedReader br = null;
-		try {
-			reader = new InputStreamReader(new FileInputStream(fileName),"UTF-8");
-			br = new BufferedReader(reader);
-
-			//開始閱讀檔案
-			int levelOfDecor = 0;
-			String currentLine = "";
-
-			while ((currentLine = br.readLine()) != null) {
-				if(currentLine.length()==0)
-					continue;
-				if(currentLine.substring(0, 1).contentEquals("#"))
-					continue;
-
-				String[] stringBlock = currentLine.split(",");
-				if(stringBlock.length==2) {
-					if(stringBlock[0].contentEquals("鑲嵌槽等級"))
-						levelOfDecor = Integer.parseInt(stringBlock[1]);
-				}
-				else if(stringBlock.length==3) {
-					decorationList.add(new SkillRequirement(stringBlock, levelOfDecor));
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (br != null)
-					br.close();
-				if (reader != null)
-					reader.close();
-			} catch (IOException ex) {
-				ex.printStackTrace();
-			}
-		}
-	}
 }

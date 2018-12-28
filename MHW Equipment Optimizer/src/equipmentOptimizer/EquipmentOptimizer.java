@@ -4,21 +4,16 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class EquipmentOptimizer {
 
-	// 所有裝備的資料
-	static EquipmentList equipmentList;
-	// 所有裝飾珠的資料
-	static List<SkillRequirement> decorationList;
 	// 需求技能的資料
-	static Map<String,Integer> setBonus;
-	static List<SkillRequirement> includedSkill;
-	static List<SkillRequirement> excludedSkill;
+	static SetBonusList setBonusList;
+	static DecorationList includedSkill;
+	static DecorationList excludedSkill;
 	// 包含裝備的資料
-	static List<List<Equipment>> includedEquipmentList;
-	static List<List<Equipment>> excludedEquipmentList; // todo
+	static EquipmentList includedEquipmentList;
+	static EquipmentList excludedEquipmentList; // todo
 
 	public static void main(String[] args) {
 
@@ -26,30 +21,26 @@ public class EquipmentOptimizer {
 		
 		// 讀取裝備資訊和技能資訊
 		String equipmentFileDirectory = "裝備檔案/";
+		String decorationFileName = "_擁有裝飾珠.txt";
 		String[] equipmentFileName = {"_武器.txt", "_頭.txt", "_身.txt", "_腕.txt", "_腰.txt", "_腳.txt", "_護石.txt"};
-		equipmentList = ReadFile.readEquipmentFile(equipmentFileDirectory,equipmentFileName);
+		
+		// 所有裝飾珠的資料
+		DecorationList decorationList = ReadFile.readDecorationFile(equipmentFileDirectory,decorationFileName);
+		// 所有裝備的資料
+		EquipmentList equipmentList = ReadFile.readEquipmentFile(equipmentFileDirectory,equipmentFileName);
 
-		decorationList = new ArrayList<SkillRequirement>();
+		setBonusList = new SetBonusList();
+		includedSkill = new DecorationList();
 
-		setBonus = new HashMap<String,Integer>();
-		includedSkill = new ArrayList<SkillRequirement>();
-
-		includedEquipmentList = new ArrayList<List<Equipment> >();
-		for(int i=1;i<=7;i++)
-			includedEquipmentList.add(new ArrayList<Equipment>());
+		includedEquipmentList = new EquipmentList();
+		
 		// 結束初始化函數
 		
-		String decroFileName = "_擁有裝飾珠.txt";
-		ReadFile.readDecorationFile(equipmentFileDirectory+decroFileName,decorationList);
-
 		// 讀取技能需求檔案
 		String requirementFileName = args[0];
 		ReadFile.readRequirmentFile(requirementFileName,
-				equipmentList,
-				decorationList,
-				setBonus,
-				includedSkill,
-				includedEquipmentList);
+				decorationList,equipmentList,
+				setBonusList,includedSkill,includedEquipmentList);
 
 		for(int bodyPartNow=0;bodyPartNow<=includedEquipmentList.size()-1;bodyPartNow++) {
 			if(includedEquipmentList.get(bodyPartNow).size()==0) {
@@ -60,16 +51,17 @@ public class EquipmentOptimizer {
 				else if(bodyPartNow==6) { //若裝備為護石
 					for(Equipment equipmentNow:equipmentList.get(bodyPartNow))
 						for(SkillRequirement skillNow:includedSkill)
-							if(equipmentNow.skill.containsKey(skillNow.skillName)) {
+							if(equipmentNow.skillList.contains(skillNow.skillName)) {
 								if(!includedEquipmentList.get(bodyPartNow).contains(equipmentNow))
 									includedEquipmentList.get(bodyPartNow).add(equipmentNow);
 							}
 				}
 				else { //若為頭、身、腕、腰、腳
 					for(int equipmentNow=0;equipmentNow<=equipmentList.get(bodyPartNow).size()-1;equipmentNow++) {
-						equipmentList.get(bodyPartNow).get(equipmentNow).setIsReplaceable(includedSkill,"(無)"); // todo
-						if(!equipmentList.get(bodyPartNow).get(equipmentNow).isReplaceable() || includedEquipmentList.get(bodyPartNow).size()==0)
-							includedEquipmentList.get(bodyPartNow).add(equipmentList.get(bodyPartNow).get(equipmentNow));
+						Equipment currentEquipment = equipmentList.get(bodyPartNow).get(equipmentNow);
+						currentEquipment.setIsReplaceable(includedSkill,setBonusList);
+						if(!currentEquipment.isReplaceable() || includedEquipmentList.get(bodyPartNow).size()==0)
+							includedEquipmentList.get(bodyPartNow).add(currentEquipment);
 						else {
 							List<Integer> marked2remove = new ArrayList<Integer>();
 							boolean marked2add = false;
@@ -108,11 +100,10 @@ public class EquipmentOptimizer {
 
 		System.out.println("符合條件的裝備：");
 		//開始配對裝備
-		findMatchingEquipmentList();
-
+		findAndPrintMatchingEquipmentList();
 	}
 
-	private static void findMatchingEquipmentList() {
+	private static void findAndPrintMatchingEquipmentList() {
 		for(Equipment e1:includedEquipmentList.get(0))
 			for(Equipment e2:includedEquipmentList.get(1))
 				for(Equipment e3:includedEquipmentList.get(2))
@@ -154,17 +145,18 @@ public class EquipmentOptimizer {
 										elementalDef[3] += currentEquipment.get(i).iceDef;
 										elementalDef[4] += currentEquipment.get(i).dragonDef;
 
-										Set<String> setNames = setBonus.keySet();
-										isSetSize += (setNames.contains(currentEquipment.get(i).setBonus)) ? 1: 0;
+										//Set<String> setNames = setBonus.keySet();
+										//isSetSize += (setNames.contains(currentEquipment.get(i).setBonus)) ? 1: 0;
+										// todo
 										numberOfHole[3] += currentEquipment.get(i).decor3;
 										numberOfHole[2] += currentEquipment.get(i).decor2;
 										numberOfHole[1] += currentEquipment.get(i).decor1;
 
-										Map<String,Integer> skill = currentEquipment.get(i).skill;
+										SkillList skill = currentEquipment.get(i).skillList;
 										for(int j=0;j<=includedSkill.size()-1;j++){
 											String currentSkillName = includedSkill.get(j).skillName;
-											if(skill.containsKey(currentSkillName))
-												skillHave[j] += skill.get(currentSkillName);
+											if(skill.contains(currentSkillName))
+												skillHave[j] += skill.getSkillLevel(currentSkillName);
 										}
 									}
 
@@ -210,11 +202,11 @@ public class EquipmentOptimizer {
 
 		Map<String,Integer> skill = new HashMap<String,Integer>();
 		for(Equipment equipmentNow:currentEquipment) {
-			for (String key : equipmentNow.skill.keySet()) {
+			for (String key : equipmentNow.skillList.skillName()) {
 				if(!skill.containsKey(key))
-					skill.put(key, equipmentNow.skill.get(key));
+					skill.put(key, equipmentNow.skillList.getSkillLevel(key));
 				else
-					skill.put(key, skill.get(key)+equipmentNow.skill.get(key));
+					skill.put(key, skill.get(key)+equipmentNow.skillList.getSkillLevel(key));
 			}
 		}
 		for(SkillRequirement skillRequirementNow:includedSkill) {
