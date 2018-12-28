@@ -1,6 +1,6 @@
 package equipmentOptimizer;
 
-public class SkillRequirement{
+public class Decoration{
 	String skillName;
 	int max;
 	int owned;
@@ -9,16 +9,16 @@ public class SkillRequirement{
 	int required;
 	boolean isReplaceable;
 	
-	public SkillRequirement(String[] stringBlock){
-		SkillRequirement_main(stringBlock);
+	public Decoration(String[] stringBlock){
+		Decoration_main(stringBlock);
 	}
 	
-	public SkillRequirement(String input){
+	public Decoration(String input){
 		String[] stringBlock = input.split(",");
-		SkillRequirement_main(stringBlock);
+		Decoration_main(stringBlock);
 	}
 	
-	public SkillRequirement(String[] stringBlock, int levelOfDecor){
+	public Decoration(String[] stringBlock, int levelOfDecor){
 		this.skillName = stringBlock[0];
 		this.max = Integer.parseInt(stringBlock[1]);
 		this.owned = Integer.parseInt(stringBlock[2]);
@@ -28,7 +28,7 @@ public class SkillRequirement{
 		isReplaceable = true;
 	}
 	
-	private void SkillRequirement_main(String[] stringBlock) {
+	private void Decoration_main(String[] stringBlock) {
 		this.skillName = stringBlock[0];
 		this.max = Integer.parseInt(stringBlock[1]);
 		this.owned = Integer.parseInt(stringBlock[2]);

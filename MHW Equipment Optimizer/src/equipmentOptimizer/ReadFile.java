@@ -40,7 +40,7 @@ public class ReadFile {
 			br = new BufferedReader(reader);
 
 			//開始閱讀檔案
-			int levelOfDecor = 0;
+			int levelOfDecoration = 0;
 			String currentLine = "";
 
 			while ((currentLine = br.readLine()) != null) {
@@ -52,10 +52,10 @@ public class ReadFile {
 				String[] stringBlock = currentLine.split(",");
 				if(stringBlock.length==2) {
 					if(stringBlock[0].contentEquals("鑲嵌槽等級"))
-						levelOfDecor = Integer.parseInt(stringBlock[1]);
+						levelOfDecoration = Integer.parseInt(stringBlock[1]);
 				}
 				else if(stringBlock.length==3) {
-					decorationList.add(new SkillRequirement(stringBlock, levelOfDecor));
+					decorationList.add(new Decoration(stringBlock, levelOfDecoration));
 				}
 			}
 		} catch (IOException e) {
@@ -95,8 +95,7 @@ public class ReadFile {
 					if(currentLine.substring(0, 1).contentEquals("#"))
 						continue;
 
-					currentFlag = changeReadFlag(currentLine); // currentFlag 只能為-2或是0~6
-					//System.out.println(currentLine);
+					currentFlag = changeReadFlag(currentLine); // currentFlag 只能為DEFAULT_READ_FLAG或是0~6
 					if(currentFlag!=DEFAULT_READ_FLAG)
 						readFlag = currentFlag;
 					else
@@ -119,9 +118,9 @@ public class ReadFile {
 		return equipmentList;
 	}
 
-	public static void readRequirmentFile(String fileName,
-			DecorationList decorationList,EquipmentList equipmentList,
-			SetBonusList setBouns,DecorationList includedSkill,DecorationList excludedSkill,
+	public static void readRequirementFile(String fileName,
+			DecorationList decorationList ,EquipmentList equipmentList,
+			SetBonusList setBouns,DecorationList includedSkill, DecorationList excludedSkill,
 			EquipmentList includedEquipmentList) {
 		Reader reader = null;
 		BufferedReader br = null;
@@ -141,7 +140,6 @@ public class ReadFile {
 					continue;
 
 				currentFlag = changeReadFlag(currentLine);
-				//System.out.println(currentLine);
 				if(currentFlag!=DEFAULT_READ_FLAG)
 					readFlag = currentFlag;
 				else{
@@ -149,48 +147,46 @@ public class ReadFile {
 					if(readFlag==SET_BONUS_READ_FLAG)
 						setBouns.add(stringBlock[0], Integer.parseInt(stringBlock[1]));
 					else if(readFlag==SKILL_INCLUSION_READ_FLAG){
-						boolean found = false;
-						for(SkillRequirement decorNow:decorationList) {
-							String skillNow = stringBlock[0];
-							int skillLevelNow = Integer.parseInt(stringBlock[1]);
-							if(skillNow.contentEquals(decorNow.skillName) && (skillLevelNow>=1)) {
-								decorNow.setRequired(skillLevelNow);
-								includedSkill.add(decorNow);
-								found = true;
-								break;
-							}
+						String readSkill = stringBlock[0];
+						int readSkillRequirement = Integer.parseInt(stringBlock[1]);
+						
+						if(readSkillRequirement<=0) {
+							System.out.println("警告：自動忽略-" + currentLine);
+							continue;
 						}
-
-						if(!found)
+						
+						int indexOfReadSkill = decorationList.indexOf(readSkill);
+						if(indexOfReadSkill!=-1) {
+							Decoration temp = decorationList.get(indexOfReadSkill);
+							temp.setRequired(readSkillRequirement);
+							includedSkill.add(temp);
+						}
+						else {
 							System.out.println("警告：找不到需求技能-" + stringBlock[0]);
+						}
 					}
 					else if(readFlag==SKILL_EXCLUSION_READ_FLAG){
-						boolean found = false;
-						for(SkillRequirement decorNow:decorationList) {
-							String skillNow = stringBlock[0];
-							if(skillNow.contentEquals(decorNow.skillName)) {
-								excludedSkill.add(decorNow);
-								found = true;
-								break;
+						for(String readSkill:stringBlock) {
+							int indexOfReadSkill = decorationList.indexOf(readSkill);
+							if(indexOfReadSkill!=-1) {
+								Decoration temp = decorationList.get(indexOfReadSkill);
+								excludedSkill.add(temp);
+							}
+							else {
+								System.out.println("警告：找不到排除技能-" + stringBlock[0]);
 							}
 						}
-
-						if(!found)
-							System.out.println("警告：找不到排除技能-" + stringBlock[0]);
 					}
 					else{
 						// stringBlock = {礦石鎧甲α,礦石鎧甲β}
-						for(int stringNow=0;stringNow<=stringBlock.length-1;stringNow++) {
-							boolean found = false;
-							List<Equipment> currentEquipmentList = equipmentList.get(readFlag);
-							for(Equipment equipmentNow:currentEquipmentList)
-								if(stringBlock[stringNow].contentEquals(equipmentNow.equipmentName)) {
-									includedEquipmentList.get(readFlag).add(equipmentNow);
-									found = true;
-									break;
-								}
-							if(!found)
+						for(String readEquipment:stringBlock) {
+							int indexOfReadEquipment = equipmentList.indexOf(readFlag, readEquipment);
+							if(indexOfReadEquipment!=-1) {
+								includedEquipmentList.add(readFlag,equipmentList.get(readFlag,indexOfReadEquipment));
+							}
+							else {
 								System.out.println("警告：找不到裝備-" + stringBlock[0]);
+							}
 						}
 					}
 				}

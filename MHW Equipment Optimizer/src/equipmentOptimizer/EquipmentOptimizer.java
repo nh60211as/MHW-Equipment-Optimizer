@@ -13,7 +13,7 @@ public class EquipmentOptimizer {
 	static DecorationList excludedSkill;
 	// 包含裝備的資料
 	static EquipmentList includedEquipmentList;
-	static EquipmentList excludedEquipmentList; // todo
+	static EquipmentList excludedEquipmentList; // 尚未實做
 
 	public static void main(String[] args) {
 
@@ -39,24 +39,25 @@ public class EquipmentOptimizer {
 
 		// 讀取技能需求檔案
 		String requirementFileName = args[0];
-		ReadFile.readRequirmentFile(requirementFileName,
+		ReadFile.readRequirementFile(requirementFileName,
 				decorationList,equipmentList,
 				setBonusList,includedSkill,excludedSkill,
 				includedEquipmentList);
 
 		for(int bodyPartNow=0;bodyPartNow<=includedEquipmentList.size()-1;bodyPartNow++) {
 			if(includedEquipmentList.get(bodyPartNow).size()==0) {
-				if(bodyPartNow==0) { //若裝備為武器
-					System.out.println("未指定武器");
+				if(bodyPartNow==EquipmentList.WEAPON) { //若裝備為武器
+					System.out.println("未指定武器，結束程式");
 					return;
 				}
-				else if(bodyPartNow==6) { //若裝備為護石
-					for(Equipment equipmentNow:equipmentList.get(bodyPartNow))
-						for(SkillRequirement skillNow:includedSkill)
+				else if(bodyPartNow==EquipmentList.CHARM) { //若裝備為護石
+					for(Equipment equipmentNow:equipmentList.get(bodyPartNow)) {
+						for(Decoration skillNow:includedSkill) {
 							if(equipmentNow.skillList.contains(skillNow.skillName)) {
-								if(!includedEquipmentList.get(bodyPartNow).contains(equipmentNow))
-									includedEquipmentList.get(bodyPartNow).add(equipmentNow);
+								includedEquipmentList.add(bodyPartNow, equipmentNow);
 							}
+						}
+					}
 				}
 				else { //若為頭、身、腕、腰、腳
 					for(int equipmentNow=0;equipmentNow<=equipmentList.get(bodyPartNow).size()-1;equipmentNow++) {
@@ -116,13 +117,13 @@ public class EquipmentOptimizer {
 							for(Equipment e6:includedEquipmentList.get(5))
 								for(Equipment e7:includedEquipmentList.get(6)){
 									List<Equipment> currentEquipment = new ArrayList<Equipment>();
-//									currentEquipment.add(0, includedEquipmentList.get(0).get(0));
-//									currentEquipment.add(1, includedEquipmentList.get(1).get(5));
-//									currentEquipment.add(2, includedEquipmentList.get(2).get(1));
-//									currentEquipment.add(3, includedEquipmentList.get(3).get(8));
-//									currentEquipment.add(4, includedEquipmentList.get(4).get(7));
-//									currentEquipment.add(5, includedEquipmentList.get(5).get(0));
-//									currentEquipment.add(6, includedEquipmentList.get(6).get(7));
+									//									currentEquipment.add(0, includedEquipmentList.get(0).get(0));
+									//									currentEquipment.add(1, includedEquipmentList.get(1).get(5));
+									//									currentEquipment.add(2, includedEquipmentList.get(2).get(1));
+									//									currentEquipment.add(3, includedEquipmentList.get(3).get(8));
+									//									currentEquipment.add(4, includedEquipmentList.get(4).get(7));
+									//									currentEquipment.add(5, includedEquipmentList.get(5).get(0));
+									//									currentEquipment.add(6, includedEquipmentList.get(6).get(7));
 
 									currentEquipment.add(0, e1);
 									currentEquipment.add(1, e2);
@@ -142,14 +143,19 @@ public class EquipmentOptimizer {
 										skillNeed[i] = includedSkill.get(i).required;
 
 									for(int i=0;i<=currentEquipment.size()-1;i++){
+										currentSetBonusList.plus1(currentEquipment.get(i).setBonus);
+									}
+									//檢查是否為套裝
+									if(!setBonusList.checkSetBonus(currentSetBonusList))
+										continue;
+									
+									for(int i=0;i<=currentEquipment.size()-1;i++){
 										defense += currentEquipment.get(i).defense;
 										elementalDef[0] += currentEquipment.get(i).fireDef;
 										elementalDef[1] += currentEquipment.get(i).waterDef;
 										elementalDef[2] += currentEquipment.get(i).thunderDef;
 										elementalDef[3] += currentEquipment.get(i).iceDef;
 										elementalDef[4] += currentEquipment.get(i).dragonDef;
-
-										currentSetBonusList.plus1(currentEquipment.get(i).setBonus);
 
 										numberOfHole[3] += currentEquipment.get(i).decor3;
 										numberOfHole[2] += currentEquipment.get(i).decor2;
@@ -162,11 +168,8 @@ public class EquipmentOptimizer {
 												skillHave[j] += skill.getSkillLevel(currentSkillName);
 										}
 									}
-
+									
 									boolean success = true;
-									//檢查是否為套裝
-									if(!setBonusList.checkSetBonus(currentSetBonusList))
-										success = false;
 
 									for(int i=0;i<=skillNeed.length-1;i++){
 										int gemNeed = skillNeed[i]-skillHave[i];
@@ -212,7 +215,7 @@ public class EquipmentOptimizer {
 					skill.put(key, skill.get(key)+equipmentNow.skillList.getSkillLevel(key));
 			}
 		}
-		for(SkillRequirement skillRequirementNow:includedSkill) {
+		for(Decoration skillRequirementNow:includedSkill) {
 			skill.put(skillRequirementNow.skillName, skillRequirementNow.required);
 		}
 		System.out.println(skill.toString());

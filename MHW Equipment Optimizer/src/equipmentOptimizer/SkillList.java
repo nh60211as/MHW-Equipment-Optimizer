@@ -22,7 +22,7 @@ public class SkillList {
 	}
 	
 	public boolean contains(DecorationList decorationList) {
-		for(SkillRequirement skillNow:decorationList) {
+		for(Decoration skillNow:decorationList) {
 			boolean tf = _skillName.contains(skillNow.skillName);
 			if(tf)
 				return true;

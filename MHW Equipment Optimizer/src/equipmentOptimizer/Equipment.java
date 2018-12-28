@@ -65,11 +65,11 @@ public class Equipment {
 	}
 
 	public void setIsReplaceable(DecorationList skillRequirement, SetBonusList setBonusList) {
-		for(int skillNow=0;skillNow<=skillRequirement.size()-1;skillNow++) {
-			int indexOfSkill = skillList.indexOf(skillRequirement.get(skillNow).skillName);
+		for(Decoration skillNow:skillRequirement) {
+			int indexOfSkill = skillList.indexOf(skillNow.skillName);
 			if(indexOfSkill!=-1) {
-				int skillLevel = skillList.getSkillLevel(skillRequirement.get(skillNow).skillName);
-				switch(skillRequirement.get(skillNow).levelOfDecor) {
+				int skillLevel = skillList.getSkillLevel(skillNow.skillName);
+				switch(skillNow.levelOfDecor) {
 				case 1:
 					combinedDecor1 += skillLevel;
 					break;
@@ -86,9 +86,9 @@ public class Equipment {
 				isReplaceable = false;
 			}
 		}
-
 		if(setBonusList.contains(setBonus) && !setBonus.contentEquals("(無)"))
 			isReplaceable = false;
+		
 		totalCombinedDecor = combinedDecor3+combinedDecor2+combinedDecor1;
 	}
 
