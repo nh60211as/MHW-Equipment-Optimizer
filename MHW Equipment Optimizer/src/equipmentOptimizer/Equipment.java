@@ -1,7 +1,5 @@
 package equipmentOptimizer;
 
-import java.util.List;
-
 public class Equipment {
 	String equipmentName;
 	int defense;
@@ -83,8 +81,7 @@ public class Equipment {
 					break;
 				}
 
-				if(!skillRequirement.get(skillNow).isReplaceable)
-					isReplaceable = false;
+				isReplaceable = false;
 			}
 		}
 
@@ -107,19 +104,37 @@ public class Equipment {
 		else if(this.defense<anotherEquipment.defense)
 			score[0] = -1;
 
-		if(this.totalDecor>anotherEquipment.totalDecor)
-			score[1] = 1;
-		else if(this.totalDecor==anotherEquipment.totalDecor)
-			score[1] = isBetterWhenSameDecro(this,anotherEquipment);
-		else if(this.totalDecor<anotherEquipment.totalDecor)
-			score[1] = -1;
+		int compareValue = isBetterWhenSameDecro(this,anotherEquipment);
+		if(this.totalDecor>anotherEquipment.totalDecor) { // {0,0,3} , {1,0,0}
+			if(compareValue==-1) // {0,0,3} , {1,0,0}
+				score[1] = 0;
+			else // {0,2,0} , {0,1,0}
+				score[1] = 1;
+		}
+		else if(this.totalDecor==anotherEquipment.totalDecor) // {0,0,3} , {1,1,1}
+			score[1] = compareValue;
+		else if(this.totalDecor<anotherEquipment.totalDecor) { // {1,0,0} , {0,0,3}
+			if(compareValue==1) // {1,0,0} , {0,0,3}
+				score[1] = 0;
+			else // {0,1,0} , {0,2,0}
+				score[1] = -1;
+		}
 
-		if(this.totalCombinedDecor>anotherEquipment.totalCombinedDecor)
-			score[2] = 1;
+		compareValue = isBetterWhenSameCombinedDecro(this,anotherEquipment);
+		if(this.totalCombinedDecor>anotherEquipment.totalCombinedDecor) { // {0,0,3} , {1,0,0}
+			if(compareValue==-1) // {0,0,3} , {1,0,0}
+				score[2] = 0;
+			else // {0,2,0} , {0,1,0}
+				score[2] = 1;
+		}
 		else if(this.totalCombinedDecor==anotherEquipment.totalCombinedDecor)
-			score[2] = isBetterWhenSameDecro(this,anotherEquipment);
-		else if(this.totalCombinedDecor<anotherEquipment.totalCombinedDecor)
-			score[2] = -1;
+			score[2] = compareValue;
+		else if(this.totalCombinedDecor<anotherEquipment.totalCombinedDecor) { // {1,0,0} , {0,0,3}
+			if(compareValue==1) // {1,0,0} , {0,0,3}
+				score[2] = 0;
+			else // {0,1,0} , {0,2,0}
+				score[2] = -1;
+		}
 
 		int thisIsBetterFlag = score[0];
 		for(int i=1;i<=score.length-1;i++) {
@@ -141,6 +156,18 @@ public class Equipment {
 	private static int isBetterWhenSameDecro(Equipment e1, Equipment e2) {
 		int e1Score = e1.decor3*100+e1.decor2*10+e1.decor1;
 		int e2Score = e2.decor3*100+e2.decor2*10+e2.decor1;
+
+		if(e1Score>e2Score)
+			return 1;
+		else if(e1Score==e2Score)
+			return 0;
+		else
+			return -1;
+	}
+
+	private static int isBetterWhenSameCombinedDecro(Equipment e1, Equipment e2) {
+		int e1Score = e1.combinedDecor3*100+e1.combinedDecor2*10+e1.combinedDecor1;
+		int e2Score = e2.combinedDecor3*100+e2.combinedDecor2*10+e2.combinedDecor1;
 
 		if(e1Score>e2Score)
 			return 1;

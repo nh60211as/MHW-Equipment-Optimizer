@@ -18,12 +18,12 @@ public class EquipmentOptimizer {
 	public static void main(String[] args) {
 
 		// 初始化函數
-		
+
 		// 讀取裝備資訊和技能資訊
 		String equipmentFileDirectory = "裝備檔案/";
 		String decorationFileName = "_擁有裝飾珠.txt";
 		String[] equipmentFileName = {"_武器.txt", "_頭.txt", "_身.txt", "_腕.txt", "_腰.txt", "_腳.txt", "_護石.txt"};
-		
+
 		// 所有裝飾珠的資料
 		DecorationList decorationList = ReadFile.readDecorationFile(equipmentFileDirectory,decorationFileName);
 		// 所有裝備的資料
@@ -33,9 +33,9 @@ public class EquipmentOptimizer {
 		includedSkill = new DecorationList();
 
 		includedEquipmentList = new EquipmentList();
-		
+
 		// 結束初始化函數
-		
+
 		// 讀取技能需求檔案
 		String requirementFileName = args[0];
 		ReadFile.readRequirmentFile(requirementFileName,
@@ -112,13 +112,13 @@ public class EquipmentOptimizer {
 							for(Equipment e6:includedEquipmentList.get(5))
 								for(Equipment e7:includedEquipmentList.get(6)){
 									List<Equipment> currentEquipment = new ArrayList<Equipment>();
-									//currentEquipment.add(0, includedEquipmentList.get(0).get(0));
-									//currentEquipment.add(1, includedEquipmentList.get(0).get(0));
-									//currentEquipment.add(2, includedEquipmentList.get(0).get(0));
-									//currentEquipment.add(3, includedEquipmentList.get(0).get(0));
-									//currentEquipment.add(4, includedEquipmentList.get(0).get(0));
-									//currentEquipment.add(5, includedEquipmentList.get(0).get(0));
-									//currentEquipment.add(6, includedEquipmentList.get(0).get(0));
+//									currentEquipment.add(0, includedEquipmentList.get(0).get(0));
+//									currentEquipment.add(1, includedEquipmentList.get(1).get(5));
+//									currentEquipment.add(2, includedEquipmentList.get(2).get(1));
+//									currentEquipment.add(3, includedEquipmentList.get(3).get(8));
+//									currentEquipment.add(4, includedEquipmentList.get(4).get(7));
+//									currentEquipment.add(5, includedEquipmentList.get(5).get(0));
+//									currentEquipment.add(6, includedEquipmentList.get(6).get(7));
 
 									currentEquipment.add(0, e1);
 									currentEquipment.add(1, e2);
@@ -130,7 +130,7 @@ public class EquipmentOptimizer {
 
 									int defense = 1;
 									int elementalDef[] = new int[5];
-									int isSetSize = 0;
+									SetBonusList currentSetBonusList = new SetBonusList();
 									int numberOfHole[] = new int[4];
 									int skillHave[] = new int[includedSkill.size()];
 									int skillNeed[] = new int[includedSkill.size()];
@@ -145,9 +145,8 @@ public class EquipmentOptimizer {
 										elementalDef[3] += currentEquipment.get(i).iceDef;
 										elementalDef[4] += currentEquipment.get(i).dragonDef;
 
-										//Set<String> setNames = setBonus.keySet();
-										//isSetSize += (setNames.contains(currentEquipment.get(i).setBonus)) ? 1: 0;
-										// todo
+										currentSetBonusList.plus1(currentEquipment.get(i).setBonus);
+
 										numberOfHole[3] += currentEquipment.get(i).decor3;
 										numberOfHole[2] += currentEquipment.get(i).decor2;
 										numberOfHole[1] += currentEquipment.get(i).decor1;
@@ -162,7 +161,7 @@ public class EquipmentOptimizer {
 
 									boolean success = true;
 									//檢查是否為套裝
-									if(isSetSize<3) // todo
+									if(!setBonusList.checkSetBonus(currentSetBonusList))
 										success = false;
 
 									for(int i=0;i<=skillNeed.length-1;i++){
