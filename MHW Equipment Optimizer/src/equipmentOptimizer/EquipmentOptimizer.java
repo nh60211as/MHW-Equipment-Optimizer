@@ -1,54 +1,59 @@
 package equipmentOptimizer;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class EquipmentOptimizer {
 
 	// 所有裝備的資料
-	static ArrayList<ArrayList<Equipment>> equipmentList;
+	static List<List<Equipment>> equipmentList;
 	// 所有裝飾珠的資料
-	static List<SkillRequirement> decorList;
+	static List<SkillRequirement> decorationList;
 	// 需求技能的資料
-	static String setName;
-	static int setSize;
-	static List<SkillRequirement> skillRequirement;
+	static Map<String,Integer> setBonus;
+	static List<SkillRequirement> includedSkill;
+	static List<SkillRequirement> excludedSkill;
 	// 包含裝備的資料
-	static ArrayList<ArrayList<Equipment>> includedEquipmentList;
+	static List<List<Equipment>> includedEquipmentList;
+	static List<List<Equipment>> excludedEquipmentList; // 尚未實做
 
 	public static void main(String[] args) {
 
-		equipmentList = new ArrayList<ArrayList<Equipment> >();
+		// 初始化函數
+		equipmentList = new ArrayList<List<Equipment> >();
 		for(int i=1;i<=7;i++)
 			equipmentList.add(new ArrayList<Equipment>());
 
-		decorList = new ArrayList<SkillRequirement>();
+		decorationList = new ArrayList<SkillRequirement>();
 
-		setName = ""; //setName在readRequirmentFile(requirementFileName);執行後應該為"(無)"或是系列技能名稱
-		setSize = Integer.MAX_VALUE;
-		skillRequirement = new ArrayList<SkillRequirement>();
+		setBonus = new HashMap<String,Integer>();
+		includedSkill = new ArrayList<SkillRequirement>();
 
-		includedEquipmentList = new ArrayList<ArrayList<Equipment> >();
+		includedEquipmentList = new ArrayList<List<Equipment> >();
 		for(int i=1;i<=7;i++)
 			includedEquipmentList.add(new ArrayList<Equipment>());
+		// 結束初始化函數
 
+		// 讀取裝備資訊和技能資訊
 		String equipmentFileDirectory = "裝備檔案/";
 		String[] equipmentFileName = {"_武器.txt", "_頭.txt", "_身.txt", "_腕.txt", "_腰.txt", "_腳.txt", "_護石.txt"};
 		for(String stringNow:equipmentFileName)
-			readEquipmentFile(equipmentFileDirectory+stringNow);
-
+			ReadFile.readEquipmentFile(equipmentFileDirectory+stringNow,equipmentList);
+		
 		String decroFileName = "_擁有裝飾珠.txt";
-		readDecroFile(equipmentFileDirectory+decroFileName);
+		ReadFile.readDecorationFile(equipmentFileDirectory+decroFileName,decorationList);
 
+		// 讀取技能需求檔案
 		String requirementFileName = args[0];
-		readRequirmentFile(requirementFileName);
+		ReadFile.readRequirmentFile(requirementFileName,
+				equipmentList,
+				decorationList,
+				setBonus,
+				includedSkill,
+				includedEquipmentList);
 
 		for(int bodyPartNow=0;bodyPartNow<=includedEquipmentList.size()-1;bodyPartNow++) {
 			if(includedEquipmentList.get(bodyPartNow).size()==0) {
@@ -58,7 +63,7 @@ public class EquipmentOptimizer {
 				}
 				else if(bodyPartNow==6) { //若裝備為護石
 					for(Equipment equipmentNow:equipmentList.get(bodyPartNow))
-						for(SkillRequirement skillNow:skillRequirement)
+						for(SkillRequirement skillNow:includedSkill)
 							if(equipmentNow.skill.containsKey(skillNow.skillName)) {
 								if(!includedEquipmentList.get(bodyPartNow).contains(equipmentNow))
 									includedEquipmentList.get(bodyPartNow).add(equipmentNow);
@@ -66,7 +71,7 @@ public class EquipmentOptimizer {
 				}
 				else { //若為頭、身、腕、腰、腳
 					for(int equipmentNow=0;equipmentNow<=equipmentList.get(bodyPartNow).size()-1;equipmentNow++) {
-						equipmentList.get(bodyPartNow).get(equipmentNow).setIsReplaceable(skillRequirement,setName);
+						equipmentList.get(bodyPartNow).get(equipmentNow).setIsReplaceable(includedSkill,"(無)"); // todo
 						if(!equipmentList.get(bodyPartNow).get(equipmentNow).isReplaceable() || includedEquipmentList.get(bodyPartNow).size()==0)
 							includedEquipmentList.get(bodyPartNow).add(equipmentList.get(bodyPartNow).get(equipmentNow));
 						else {
@@ -111,170 +116,6 @@ public class EquipmentOptimizer {
 
 	}
 
-	private static void readEquipmentFile(String fileName) {
-		Reader reader = null;
-		BufferedReader br = null;
-		try {
-			reader = new InputStreamReader(new FileInputStream(fileName),"UTF-8");
-			br = new BufferedReader(reader);
-
-			//開始閱讀檔案
-			int readFlag = -2;
-			int currentFlag = -2;
-			String currentLine = "";
-
-			while ((currentLine = br.readLine()) != null) {
-				if(currentLine.length()==0)
-					continue;
-				if(currentLine.substring(0, 1).contentEquals("#"))
-					continue;
-
-				currentFlag = changeReadFlag(currentLine); // currentFlag 只能為-2或是0~6
-				//System.out.println(currentLine);
-				if(currentFlag!=-2)
-					readFlag = currentFlag;
-				else
-					equipmentList.get(readFlag).add(new Equipment(currentLine));
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (br != null)
-					br.close();
-				if (reader != null)
-					reader.close();
-			} catch (IOException ex) {
-				ex.printStackTrace();
-			}
-		}
-	}
-
-	private static void readRequirmentFile(String fileName) {
-		Reader reader = null;
-		BufferedReader br = null;
-		try {
-			reader = new InputStreamReader(new FileInputStream(fileName),"UTF-8");
-			br = new BufferedReader(reader);
-
-			//開始閱讀檔案
-			int readFlag = -2;
-			int currentFlag = -2;
-			String currentLine = "";
-
-			while ((currentLine = br.readLine()) != null) {
-				if(currentLine.length()==0)
-					continue;
-				if(currentLine.substring(0, 1).contentEquals("#"))
-					continue;
-
-				currentFlag = changeReadFlag(currentLine);
-				//System.out.println(currentLine);
-				if(currentFlag!=-2)
-					readFlag = currentFlag;
-				else{
-					String[] stringBlock = currentLine.split(",");
-					if(readFlag==-3) {
-						setName = stringBlock[0];
-						setSize = Integer.parseInt(stringBlock[1]);
-					}
-					else if(readFlag==-1){
-						boolean found = false;
-						for(SkillRequirement decorNow:decorList)
-							if(stringBlock[0].contentEquals(decorNow.skillName)) {
-								decorNow.setRequired(Integer.parseInt(stringBlock[1]));
-								skillRequirement.add(decorNow);
-								found = true;
-								break;
-							}
-						if(!found)
-							System.out.println("警告：找不到技能-" + stringBlock[0]);
-					}
-					else{
-						// stringBlock = {礦石鎧甲α,礦石鎧甲β}
-						for(int stringNow=0;stringNow<=stringBlock.length-1;stringNow++) {
-							boolean found = false;
-							List<Equipment> currentEquipmentList = equipmentList.get(readFlag);
-							for(Equipment equipmentNow:currentEquipmentList)
-								if(stringBlock[stringNow].contentEquals(equipmentNow.equipmentName)) {
-									includedEquipmentList.get(readFlag).add(equipmentNow);
-									found = true;
-									break;
-								}
-							if(!found)
-								System.out.println("警告：找不到裝備-" + stringBlock[0]);
-						}
-					}
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (br != null)
-					br.close();
-				if (reader != null)
-					reader.close();
-			} catch (IOException ex) {
-				ex.printStackTrace();
-			}
-		}
-	}
-
-	private static int changeReadFlag(String currentLine){
-		if(currentLine.equals("系列需求：")) return -3;
-		else if(currentLine.equals("需求：")) return -1;
-		else if(currentLine.equals("武器：")) return 0;
-		else if(currentLine.equals("頭：")) return 1;
-		else if(currentLine.equals("身：")) return 2;
-		else if(currentLine.equals("腕：")) return 3;
-		else if(currentLine.equals("腰：")) return 4;
-		else if(currentLine.equals("腳：")) return 5;
-		else if(currentLine.equals("護石：")) return 6;
-
-		return -2;
-	}
-
-	private static void readDecroFile(String fileName) {
-		Reader reader = null;
-		BufferedReader br = null;
-		try {
-			reader = new InputStreamReader(new FileInputStream(fileName),"UTF-8");
-			br = new BufferedReader(reader);
-
-			//開始閱讀檔案
-			int levelOfDecor = 0;
-			String currentLine = "";
-
-			while ((currentLine = br.readLine()) != null) {
-				if(currentLine.length()==0)
-					continue;
-				if(currentLine.substring(0, 1).contentEquals("#"))
-					continue;
-
-				String[] stringBlock = currentLine.split(",");
-				if(stringBlock.length==2) {
-					if(stringBlock[0].contentEquals("鑲嵌槽等級"))
-						levelOfDecor = Integer.parseInt(stringBlock[1]);
-				}
-				else if(stringBlock.length==3) {
-					decorList.add(new SkillRequirement(stringBlock, levelOfDecor));
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (br != null)
-					br.close();
-				if (reader != null)
-					reader.close();
-			} catch (IOException ex) {
-				ex.printStackTrace();
-			}
-		}
-	}
-
 	private static void findMatchingEquipmentList() {
 		for(Equipment e1:includedEquipmentList.get(0))
 			for(Equipment e2:includedEquipmentList.get(1))
@@ -304,10 +145,10 @@ public class EquipmentOptimizer {
 									int elementalDef[] = new int[5];
 									int isSetSize = 0;
 									int numberOfHole[] = new int[4];
-									int skillHave[] = new int[skillRequirement.size()];
-									int skillNeed[] = new int[skillRequirement.size()];
+									int skillHave[] = new int[includedSkill.size()];
+									int skillNeed[] = new int[includedSkill.size()];
 									for(int i=0;i<=skillNeed.length-1;i++)
-										skillNeed[i] = skillRequirement.get(i).required;
+										skillNeed[i] = includedSkill.get(i).required;
 
 									for(int i=0;i<=currentEquipment.size()-1;i++){
 										defense += currentEquipment.get(i).defense;
@@ -317,14 +158,15 @@ public class EquipmentOptimizer {
 										elementalDef[3] += currentEquipment.get(i).iceDef;
 										elementalDef[4] += currentEquipment.get(i).dragonDef;
 
-										isSetSize += (currentEquipment.get(i).setBonus.contentEquals(setName)) ? 1: 0;
+										Set<String> setNames = setBonus.keySet();
+										isSetSize += (setNames.contains(currentEquipment.get(i).setBonus)) ? 1: 0;
 										numberOfHole[3] += currentEquipment.get(i).decor3;
 										numberOfHole[2] += currentEquipment.get(i).decor2;
 										numberOfHole[1] += currentEquipment.get(i).decor1;
 
 										Map<String,Integer> skill = currentEquipment.get(i).skill;
-										for(int j=0;j<=skillRequirement.size()-1;j++){
-											String currentSkillName = skillRequirement.get(j).skillName;
+										for(int j=0;j<=includedSkill.size()-1;j++){
+											String currentSkillName = includedSkill.get(j).skillName;
 											if(skill.containsKey(currentSkillName))
 												skillHave[j] += skill.get(currentSkillName);
 										}
@@ -332,13 +174,13 @@ public class EquipmentOptimizer {
 
 									boolean success = true;
 									//檢查是否為套裝
-									if(isSetSize<setSize)
+									if(isSetSize<3) // todo
 										success = false;
 
 									for(int i=0;i<=skillNeed.length-1;i++){
 										int gemNeed = skillNeed[i]-skillHave[i];
 										if(gemNeed>=1)
-											if(gemNeed>skillRequirement.get(i).owned) {
+											if(gemNeed>includedSkill.get(i).owned) {
 												success = false;
 												break;
 											}
@@ -348,7 +190,7 @@ public class EquipmentOptimizer {
 									for(int i=0;i<=skillNeed.length-1;i++){
 										int temp = skillNeed[i]-skillHave[i];
 										if(temp>=1)
-											numberOfHoleNeed[skillRequirement.get(i).levelOfDecor] += temp;
+											numberOfHoleNeed[includedSkill.get(i).levelOfDecor] += temp;
 									}
 
 									for(int i=3;i>=1;i--){
@@ -379,7 +221,7 @@ public class EquipmentOptimizer {
 					skill.put(key, skill.get(key)+equipmentNow.skill.get(key));
 			}
 		}
-		for(SkillRequirement skillRequirementNow:skillRequirement) {
+		for(SkillRequirement skillRequirementNow:includedSkill) {
 			skill.put(skillRequirementNow.skillName, skillRequirementNow.required);
 		}
 		System.out.println(skill.toString());
