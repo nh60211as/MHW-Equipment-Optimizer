@@ -70,7 +70,9 @@ public class EquipmentOptimizer {
 							boolean marked2add = false;
 							for(int includedEquipmentNow=0;includedEquipmentNow<=includedEquipmentList.get(bodyPartNow).size()-1;includedEquipmentNow++) {
 								if(includedEquipmentList.get(bodyPartNow).get(includedEquipmentNow).isReplaceable()) {
-									int isEquipmentNowBetter = includedEquipmentList.get(bodyPartNow).get(includedEquipmentNow).isBetter(equipmentList.get(bodyPartNow).get(equipmentNow));
+									int isEquipmentNowBetter = includedEquipmentList.get(bodyPartNow).get(includedEquipmentNow).isBetter(currentEquipment);
+									//System.out.println(includedEquipmentList.get(bodyPartNow).get(includedEquipmentNow).equipmentName
+									//		+" "+isEquipmentNowBetter+" "+currentEquipment.equipmentName);
 									switch(isEquipmentNowBetter) {
 									case 1:
 										break;
@@ -86,10 +88,16 @@ public class EquipmentOptimizer {
 									}
 								}
 							}
-							for(int i=marked2remove.size()-1;i>=0;i--)
+							//includedEquipmentList.printBodyPart(bodyPartNow);
+							//System.out.print("remove: ");
+							//System.out.println(marked2remove);
+							for(int i=marked2remove.size()-1;i>=0;i--) {
 								includedEquipmentList.get(bodyPartNow).remove((int)marked2remove.get(i));
-							if(marked2add)
-								includedEquipmentList.get(bodyPartNow).add(equipmentList.get(bodyPartNow).get(equipmentNow));
+							}
+							if(marked2add) {
+								//System.out.println("add: " + currentEquipment.equipmentName);
+								includedEquipmentList.get(bodyPartNow).add(currentEquipment);
+							}
 						}
 					}
 				}
@@ -131,8 +139,7 @@ public class EquipmentOptimizer {
 									currentEquipment.add(5, e6);
 									currentEquipment.add(6, e7);
 
-									int defense = 1;
-									int elementalDef[] = new int[5];
+
 									SetBonusList currentSetBonusList = new SetBonusList();
 									int numberOfHole[] = new int[4];
 									int skillHave[] = new int[includedSkill.size()];
@@ -148,13 +155,6 @@ public class EquipmentOptimizer {
 										continue;
 
 									for(int i=0;i<=currentEquipment.size()-1;i++){
-										defense += currentEquipment.get(i).defense;
-										elementalDef[0] += currentEquipment.get(i).fireDef;
-										elementalDef[1] += currentEquipment.get(i).waterDef;
-										elementalDef[2] += currentEquipment.get(i).thunderDef;
-										elementalDef[3] += currentEquipment.get(i).iceDef;
-										elementalDef[4] += currentEquipment.get(i).dragonDef;
-
 										numberOfHole[3] += currentEquipment.get(i).decor3;
 										numberOfHole[2] += currentEquipment.get(i).decor2;
 										numberOfHole[1] += currentEquipment.get(i).decor1;
@@ -195,6 +195,21 @@ public class EquipmentOptimizer {
 
 									if(!success)
 										continue;
+
+									int defense = 1;
+									int elementalDef[] = new int[5];
+									for(int i=0;i<=currentEquipment.size()-1;i++){
+										defense += currentEquipment.get(i).defense;
+										elementalDef[0] += currentEquipment.get(i).fireDef;
+										elementalDef[1] += currentEquipment.get(i).waterDef;
+										elementalDef[2] += currentEquipment.get(i).thunderDef;
+										elementalDef[3] += currentEquipment.get(i).iceDef;
+										elementalDef[4] += currentEquipment.get(i).dragonDef;
+
+										numberOfHole[3] += currentEquipment.get(i).decor3;
+										numberOfHole[2] += currentEquipment.get(i).decor2;
+										numberOfHole[1] += currentEquipment.get(i).decor1;
+									}
 									printEquipment(currentEquipment, defense, elementalDef, numberOfHole[0]);
 								}
 	}
@@ -213,7 +228,7 @@ public class EquipmentOptimizer {
 		for(Decoration skillRequirementNow:includedSkill) {
 			skill.set(skillRequirementNow.skillName, Math.max(skillRequirementNow.required, skill.getSkillLevel(skillRequirementNow.skillName)));
 		}
-		
+
 		List<String> skillNameList = skill.skillName();
 		for(int i=0;i<=skill.size()-1;i++) {
 			String skillNow = skillNameList.get(i);

@@ -82,13 +82,13 @@ public class Equipment {
 				default:
 					break;
 				}
-
-				isReplaceable = false;
+				if(!skillNow.isReplaceable)
+					isReplaceable = false;
 			}
 		}
 		if(setBonusList.contains(setBonus) && !setBonus.contentEquals("(無)"))
 			isReplaceable = false;
-		
+
 		totalCombinedDecor = combinedDecor3+combinedDecor2+combinedDecor1;
 	}
 
@@ -97,62 +97,55 @@ public class Equipment {
 	}
 
 	public int isBetter(Equipment anotherEquipment) {
-		int score[] = {0,0,0}; // defense, 實際裝飾珠, 總和裝飾珠
-
-		if(this.defense>anotherEquipment.defense)
-			score[0] = 1;
-		else if(this.defense==anotherEquipment.defense)
-			score[0] = 0;
-		else if(this.defense<anotherEquipment.defense)
-			score[0] = -1;
-
+		int score[] = {0,0}; // 實際裝飾珠, 總和裝飾珠
+		
 		int compareValue = isBetterWhenSameDecro(this,anotherEquipment);
 		if(this.totalDecor>anotherEquipment.totalDecor) { // {0,0,3} , {1,0,0}
 			if(compareValue==-1) // {0,0,3} , {1,0,0}
-				score[1] = 0;
+				score[0] = 0;
 			else // {0,2,0} , {0,1,0}
-				score[1] = 1;
+				score[0] = 1;
 		}
 		else if(this.totalDecor==anotherEquipment.totalDecor) // {0,0,3} , {1,1,1}
-			score[1] = compareValue;
+			score[0] = compareValue;
 		else if(this.totalDecor<anotherEquipment.totalDecor) { // {1,0,0} , {0,0,3}
 			if(compareValue==1) // {1,0,0} , {0,0,3}
-				score[1] = 0;
+				score[0] = 0;
 			else // {0,1,0} , {0,2,0}
-				score[1] = -1;
+				score[0] = -1;
 		}
 
 		compareValue = isBetterWhenSameCombinedDecro(this,anotherEquipment);
 		if(this.totalCombinedDecor>anotherEquipment.totalCombinedDecor) { // {0,0,3} , {1,0,0}
 			if(compareValue==-1) // {0,0,3} , {1,0,0}
-				score[2] = 0;
+				score[1] = 0;
 			else // {0,2,0} , {0,1,0}
-				score[2] = 1;
+				score[1] = 1;
 		}
 		else if(this.totalCombinedDecor==anotherEquipment.totalCombinedDecor)
-			score[2] = compareValue;
+			score[1] = compareValue;
 		else if(this.totalCombinedDecor<anotherEquipment.totalCombinedDecor) { // {1,0,0} , {0,0,3}
 			if(compareValue==1) // {1,0,0} , {0,0,3}
-				score[2] = 0;
+				score[1] = 0;
 			else // {0,1,0} , {0,2,0}
-				score[2] = -1;
+				score[1] = -1;
 		}
+		//System.out.println(score[0] + " " + score[1]);
 
-		int thisIsBetterFlag = score[0];
-		for(int i=1;i<=score.length-1;i++) {
-			if(thisIsBetterFlag==1) {
-				if(score[i]==-1)
-					return 0;
-			}
-			else if(thisIsBetterFlag==0)
-				thisIsBetterFlag = score[i];
-			else if(thisIsBetterFlag==-1) {
-				if(score[i]==1)
-					return 0;
-			}
+		int sum = 0;
+		for(int i=0;i<=score.length-1;i++) {
+			sum+=score[i];
 		}
-
-		return thisIsBetterFlag;
+		
+		//System.out.println((sum==score.length) + " " + (this.defense>=anotherEquipment.defense));
+		//System.out.println((sum==-score.length) + " " + (this.defense<=anotherEquipment.defense));
+		
+		if((sum==score.length) && (this.defense>=anotherEquipment.defense))
+			return 1;
+		else if((sum==-score.length) && (this.defense<=anotherEquipment.defense))
+			return -1;
+		else
+			return 0;
 	}
 
 	private static int isBetterWhenSameDecro(Equipment e1, Equipment e2) {
@@ -166,7 +159,7 @@ public class Equipment {
 		else
 			return -1;
 	}
-	
+
 	private static int isBetterWhenSameCombinedDecro(Equipment e1, Equipment e2) {
 		int e1Score = e1.combinedDecor3*100+e1.combinedDecor2*10+e1.combinedDecor1;
 		int e2Score = e2.combinedDecor3*100+e2.combinedDecor2*10+e2.combinedDecor1;
