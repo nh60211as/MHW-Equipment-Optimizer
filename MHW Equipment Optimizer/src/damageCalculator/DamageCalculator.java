@@ -60,7 +60,7 @@ public class DamageCalculator {
 
 		damageList.add((double) 0);
 		damageListIndex.add(new ArrayList<Integer>());
-		int sortSize = 130;
+		int sortSize = 10;
 
 		for(int weapon=0;weapon<=baseStat.length-1;weapon++) 
 			for(int skill0=0;skill0<=skill[0].length-1;skill0++) 
@@ -97,6 +97,9 @@ public class DamageCalculator {
 								index.add((int) attackNow);
 								index.add((int) (criticalNow*100));
 
+								if(criticalNow<1)
+									continue;
+								
 								for(int i=0;i<=Math.min(damageList.size()-1, sortSize-1);i++) {
 									if(weaponDamage>=damageList.get(i)) {
 										damageList.add(i, weaponDamage);

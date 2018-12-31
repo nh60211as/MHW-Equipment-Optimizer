@@ -3,7 +3,7 @@ package damageCalculator;
 public class SingleUseDamageCalculator {
 
 	public static void main(String[] args) {
-		DamageBoost baseStat = new DamageBoost(230*1.1,-0.30);
+		DamageBoost baseStat = new DamageBoost(190*1.0,0);
 
 		//技能
 		DamageBoost[][] skill = new DamageBoost[4][];
@@ -47,10 +47,10 @@ public class SingleUseDamageCalculator {
 		double baseMinusCriticalDamage = 0.75;
 
 		int skill0 = 3;
-		int skill1 = 3;
-		int skill2 = 5;
-		int skill3 = 2;
-		int criticalEyeLevel = 0;
+		int skill1 = 1;
+		int skill2 = 4;
+		int skill3 = 6;
+		int criticalEyeLevel = 3;
 
 		DamageBoost DamageBoostNow = new DamageBoost(0,0);
 		DamageBoostNow.add(baseStat);
