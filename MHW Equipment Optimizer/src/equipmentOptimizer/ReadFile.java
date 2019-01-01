@@ -7,23 +7,40 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 
 public class ReadFile {
-	private static final int DEFAULT_READ_FLAG = -4;
-	private static final int SET_BONUS_READ_FLAG = -3;
-	private static final int SKILL_INCLUSION_READ_FLAG = -2;
-	private static final int SKILL_EXCLUSION_READ_FLAG = -1;
+	private static final int DEFAULT_READ_FLAG = -5;
+	private static final int SET_BONUS_READ_FLAG = -4;
+	private static final int SKILL_INCLUSION_READ_FLAG = -3;
+	private static final int SKILL_EXCLUSION_READ_FLAG = -2;
+	private static final int WEAPON_READ_FLAG = -1;
 
 
 	private static int changeReadFlag(String currentLine){
 		if(currentLine.equals("系列需求：")) return SET_BONUS_READ_FLAG;
 		else if(currentLine.equals("需求：")) return SKILL_INCLUSION_READ_FLAG;
 		else if(currentLine.equals("排除：")) return SKILL_EXCLUSION_READ_FLAG;
-		else if(currentLine.equals("武器：")) return EquipmentList.WEAPON;
-		else if(currentLine.equals("頭：")) return EquipmentList.HEAD;
-		else if(currentLine.equals("身：")) return EquipmentList.BODY;
-		else if(currentLine.equals("腕：")) return EquipmentList.HAND;
-		else if(currentLine.equals("腰：")) return EquipmentList.BELT;
-		else if(currentLine.equals("腳：")) return EquipmentList.FEET;
-		else if(currentLine.equals("護石：")) return EquipmentList.CHARM;
+		else if(currentLine.equals("武器：")) return WEAPON_READ_FLAG;
+
+		else if(currentLine.equals("大劍：")) return WeaponList.GREATSWORD;
+		else if(currentLine.equals("太刀：")) return WeaponList.LONGSWORD;
+		else if(currentLine.equals("單手劍：")) return WeaponList.SWORDNSHIELD;
+		else if(currentLine.equals("雙劍：")) return WeaponList.DUALBLADES;
+		else if(currentLine.equals("大錘：")) return WeaponList.HAMMER;
+		else if(currentLine.equals("狩獵笛：")) return WeaponList.HUNTINGHORN;
+		else if(currentLine.equals("長槍：")) return WeaponList.LANCE;
+		else if(currentLine.equals("銃槍：")) return WeaponList.GUNLANCE;
+		else if(currentLine.equals("斬擊斧：")) return WeaponList.SWITCHAXE;
+		else if(currentLine.equals("充能斧：")) return WeaponList.CHARGEBLADE;
+		else if(currentLine.equals("操蟲棍：")) return WeaponList.INSECTGLAIVE;
+		else if(currentLine.equals("輕弩槍：")) return WeaponList.LIGHTBOWGUN;
+		else if(currentLine.equals("重弩槍：")) return WeaponList.HEAVYBOWGUN;
+		else if(currentLine.equals("弓：")) return WeaponList.BOW;
+
+		else if(currentLine.equals("頭：")) return ArmorList.HEAD;
+		else if(currentLine.equals("身：")) return ArmorList.BODY;
+		else if(currentLine.equals("腕：")) return ArmorList.HANDS;
+		else if(currentLine.equals("腰：")) return ArmorList.BELT;
+		else if(currentLine.equals("腳：")) return ArmorList.FEET;
+		else if(currentLine.equals("護石：")) return ArmorList.CHARM;
 
 		return DEFAULT_READ_FLAG;
 	}
@@ -72,14 +89,14 @@ public class ReadFile {
 		return decorationList;
 	}
 
-	public static EquipmentList readArmorFile(String equipmentFileDirectory, String[] equipmentFileName) {
-		EquipmentList equipmentList = new EquipmentList();
+	public static WeaponList readWeaponFile(String equipmentFileDirectory, String[] weaponFileNames) {
+		WeaponList weaponList = new WeaponList();
 
-		for(String stringNow:equipmentFileName) {
+		for(String fileName:weaponFileNames) {
 			Reader reader = null;
 			BufferedReader br = null;
 			try {
-				reader = new InputStreamReader(new FileInputStream(equipmentFileDirectory+stringNow),"UTF-8");
+				reader = new InputStreamReader(new FileInputStream(equipmentFileDirectory+fileName),"UTF-8");
 				br = new BufferedReader(reader);
 
 				//開始閱讀檔案
@@ -93,14 +110,11 @@ public class ReadFile {
 					if(currentLine.substring(0, 1).contentEquals("#"))
 						continue;
 
-					currentFlag = changeReadFlag(currentLine); // currentFlag 只能為DEFAULT_READ_FLAG或是0~6
+					currentFlag = changeReadFlag(currentLine); // currentFlag 只能為DEFAULT_READ_FLAG或是WeaponList的數值
 					if(currentFlag!=DEFAULT_READ_FLAG)
 						readFlag = currentFlag;
 					else {
-						if(readFlag==EquipmentList.WEAPON)
-							equipmentList.get(readFlag).add(new Weapon(currentLine));
-						else
-							equipmentList.get(readFlag).add(new Armor(currentLine));
+						weaponList.get(readFlag).add(new Weapon(currentLine));
 					}
 				}
 			} catch (IOException e) {
@@ -116,18 +130,17 @@ public class ReadFile {
 				}
 			}
 		}
-
-		return equipmentList;
+		return weaponList;
 	}
-	
-	public static EquipmentList readWeaponFile(String equipmentFileDirectory, String[] equipmentFileName) {
-		EquipmentList equipmentList = new EquipmentList();
 
-		for(String stringNow:equipmentFileName) {
+	public static ArmorList readArmorFile(String equipmentFileDirectory, String[] armorFileNames) {
+		ArmorList armorList = new ArmorList();
+
+		for(String fileName:armorFileNames) {
 			Reader reader = null;
 			BufferedReader br = null;
 			try {
-				reader = new InputStreamReader(new FileInputStream(equipmentFileDirectory+stringNow),"UTF-8");
+				reader = new InputStreamReader(new FileInputStream(equipmentFileDirectory+fileName),"UTF-8");
 				br = new BufferedReader(reader);
 
 				//開始閱讀檔案
@@ -141,14 +154,11 @@ public class ReadFile {
 					if(currentLine.substring(0, 1).contentEquals("#"))
 						continue;
 
-					currentFlag = changeReadFlag(currentLine); // currentFlag 只能為DEFAULT_READ_FLAG或是0~6
+					currentFlag = changeReadFlag(currentLine); // currentFlag 只能為DEFAULT_READ_FLAG或是ArmorList的數值
 					if(currentFlag!=DEFAULT_READ_FLAG)
 						readFlag = currentFlag;
 					else {
-						if(readFlag==EquipmentList.WEAPON)
-							equipmentList.get(readFlag).add(new Weapon(currentLine));
-						else
-							equipmentList.get(readFlag).add(new Armor(currentLine));
+						armorList.get(readFlag).add(new Armor(currentLine));
 					}
 				}
 			} catch (IOException e) {
@@ -164,14 +174,13 @@ public class ReadFile {
 				}
 			}
 		}
-
-		return equipmentList;
+		return armorList;
 	}
 
 	public static void readRequirementFile(String fileName,
-			DecorationList decorationList ,EquipmentList equipmentList,
+			DecorationList decorationList ,WeaponList weaponList, ArmorList armorList,
 			SetBonusList setBouns,DecorationList includedSkill, DecorationList excludedSkill,
-			EquipmentList includedEquipmentList) {
+			WeaponList includedWeaponList, ArmorList includedArmorList) {
 		Reader reader = null;
 		BufferedReader br = null;
 		try {
@@ -227,15 +236,24 @@ public class ReadFile {
 							}
 						}
 					}
-					else{
+					else if(readFlag==WEAPON_READ_FLAG){
+						for(String readWeapon:stringBlock) {
+							if(!includedWeaponList.add(weaponList.get(readWeapon))) {
+								System.out.println("警告：自動捨棄重複武器-" + readWeapon);
+							}
+						}
+					}
+					else {
 						// stringBlock = {礦石鎧甲α,礦石鎧甲β}
-						for(String readEquipment:stringBlock) {
-							int indexOfReadEquipment = equipmentList.indexOf(readFlag, readEquipment);
+						for(String readArmor:stringBlock) {
+							int indexOfReadEquipment = armorList.indexOf(readFlag, readArmor);
 							if(indexOfReadEquipment!=-1) {
-								includedEquipmentList.add(readFlag,equipmentList.get(readFlag,indexOfReadEquipment));
+								if(!includedArmorList.add(readFlag,armorList.get(readFlag,indexOfReadEquipment))) {
+									System.out.println("警告：自動捨棄重複防具-" + readArmor);
+								}
 							}
 							else {
-								System.out.println("警告：找不到裝備-" + stringBlock[0]);
+								System.out.println("警告：找不到防具-" + readArmor);
 							}
 						}
 					}
