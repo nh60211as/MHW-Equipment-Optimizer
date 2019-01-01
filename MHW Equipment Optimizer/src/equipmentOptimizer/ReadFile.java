@@ -5,8 +5,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.List;
-import java.util.Map;
 
 public class ReadFile {
 	private static final int DEFAULT_READ_FLAG = -4;
@@ -19,20 +17,20 @@ public class ReadFile {
 		if(currentLine.equals("系列需求：")) return SET_BONUS_READ_FLAG;
 		else if(currentLine.equals("需求：")) return SKILL_INCLUSION_READ_FLAG;
 		else if(currentLine.equals("排除：")) return SKILL_EXCLUSION_READ_FLAG;
-		else if(currentLine.equals("武器：")) return 0;
-		else if(currentLine.equals("頭：")) return 1;
-		else if(currentLine.equals("身：")) return 2;
-		else if(currentLine.equals("腕：")) return 3;
-		else if(currentLine.equals("腰：")) return 4;
-		else if(currentLine.equals("腳：")) return 5;
-		else if(currentLine.equals("護石：")) return 6;
+		else if(currentLine.equals("武器：")) return EquipmentList.WEAPON;
+		else if(currentLine.equals("頭：")) return EquipmentList.HEAD;
+		else if(currentLine.equals("身：")) return EquipmentList.BODY;
+		else if(currentLine.equals("腕：")) return EquipmentList.HAND;
+		else if(currentLine.equals("腰：")) return EquipmentList.BELT;
+		else if(currentLine.equals("腳：")) return EquipmentList.FEET;
+		else if(currentLine.equals("護石：")) return EquipmentList.CHARM;
 
 		return DEFAULT_READ_FLAG;
 	}
-	
+
 	public static DecorationList readDecorationFile(String equipmentFileDirectory, String decorationFileName) {
 		DecorationList decorationList = new DecorationList();
-		
+
 		Reader reader = null;
 		BufferedReader br = null;
 		try {
@@ -70,13 +68,13 @@ public class ReadFile {
 				ex.printStackTrace();
 			}
 		}
-		
+
 		return decorationList;
 	}
-	
-	public static EquipmentList readEquipmentFile(String equipmentFileDirectory, String[] equipmentFileName) {
+
+	public static EquipmentList readArmorFile(String equipmentFileDirectory, String[] equipmentFileName) {
 		EquipmentList equipmentList = new EquipmentList();
-		
+
 		for(String stringNow:equipmentFileName) {
 			Reader reader = null;
 			BufferedReader br = null;
@@ -98,8 +96,12 @@ public class ReadFile {
 					currentFlag = changeReadFlag(currentLine); // currentFlag 只能為DEFAULT_READ_FLAG或是0~6
 					if(currentFlag!=DEFAULT_READ_FLAG)
 						readFlag = currentFlag;
-					else
-						equipmentList.get(readFlag).add(new Equipment(currentLine));
+					else {
+						if(readFlag==EquipmentList.WEAPON)
+							equipmentList.get(readFlag).add(new Weapon(currentLine));
+						else
+							equipmentList.get(readFlag).add(new Armor(currentLine));
+					}
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -114,7 +116,55 @@ public class ReadFile {
 				}
 			}
 		}
-		
+
+		return equipmentList;
+	}
+	
+	public static EquipmentList readWeaponFile(String equipmentFileDirectory, String[] equipmentFileName) {
+		EquipmentList equipmentList = new EquipmentList();
+
+		for(String stringNow:equipmentFileName) {
+			Reader reader = null;
+			BufferedReader br = null;
+			try {
+				reader = new InputStreamReader(new FileInputStream(equipmentFileDirectory+stringNow),"UTF-8");
+				br = new BufferedReader(reader);
+
+				//開始閱讀檔案
+				int readFlag = DEFAULT_READ_FLAG;
+				int currentFlag = DEFAULT_READ_FLAG;
+				String currentLine = "";
+
+				while ((currentLine = br.readLine()) != null) {
+					if(currentLine.length()==0)
+						continue;
+					if(currentLine.substring(0, 1).contentEquals("#"))
+						continue;
+
+					currentFlag = changeReadFlag(currentLine); // currentFlag 只能為DEFAULT_READ_FLAG或是0~6
+					if(currentFlag!=DEFAULT_READ_FLAG)
+						readFlag = currentFlag;
+					else {
+						if(readFlag==EquipmentList.WEAPON)
+							equipmentList.get(readFlag).add(new Weapon(currentLine));
+						else
+							equipmentList.get(readFlag).add(new Armor(currentLine));
+					}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				try {
+					if (br != null)
+						br.close();
+					if (reader != null)
+						reader.close();
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
+			}
+		}
+
 		return equipmentList;
 	}
 
@@ -149,12 +199,12 @@ public class ReadFile {
 					else if(readFlag==SKILL_INCLUSION_READ_FLAG){
 						String readSkill = stringBlock[0];
 						int readSkillRequirement = Integer.parseInt(stringBlock[1]);
-						
+
 						if(readSkillRequirement<=0) {
 							System.out.println("警告：自動忽略-" + currentLine);
 							continue;
 						}
-						
+
 						int indexOfReadSkill = decorationList.indexOf(readSkill);
 						if(indexOfReadSkill!=-1) {
 							Decoration temp = decorationList.get(indexOfReadSkill);

@@ -20,10 +20,13 @@ public class EquipmentOptimizer {
 		// 讀取裝備資訊和技能資訊
 		String equipmentFileDirectory = "裝備檔案/";
 		String decorationFileName = "_擁有裝飾珠.txt";
-		String[] equipmentFileName = {"_武器.txt", "_頭.txt", "_身.txt", "_腕.txt", "_腰.txt", "_腳.txt", "_護石.txt"};
+		String weaponFileName = "_武器.txt";
+		String[] equipmentFileName = {"_頭.txt", "_身.txt", "_腕.txt", "_腰.txt", "_腳.txt", "_護石.txt"};
 
 		// 所有裝飾珠的資料
 		decorationList = ReadFile.readDecorationFile(equipmentFileDirectory,decorationFileName);
+		// 所有武器的資料
+		
 		// 所有裝備的資料
 		EquipmentList equipmentList = ReadFile.readEquipmentFile(equipmentFileDirectory,equipmentFileName);
 
@@ -59,7 +62,7 @@ public class EquipmentOptimizer {
 				}
 				else { //若為頭、身、腕、腰、腳
 					for(int equipmentNow=0;equipmentNow<=equipmentList.get(bodyPartNow).size()-1;equipmentNow++) {
-						Equipment currentEquipment = equipmentList.get(bodyPartNow).get(equipmentNow);
+						Armor currentEquipment = (Armor) equipmentList.get(bodyPartNow).get(equipmentNow);
 						currentEquipment.setIsReplaceable(includedSkill,setBonusList);
 						if(currentEquipment.skillList.contains(excludedSkill))
 							continue;
@@ -70,7 +73,8 @@ public class EquipmentOptimizer {
 							boolean marked2add = false;
 							for(int includedEquipmentNow=0;includedEquipmentNow<=includedEquipmentList.get(bodyPartNow).size()-1;includedEquipmentNow++) {
 								if(includedEquipmentList.get(bodyPartNow).get(includedEquipmentNow).isReplaceable()) {
-									int isEquipmentNowBetter = includedEquipmentList.get(bodyPartNow).get(includedEquipmentNow).isBetter(currentEquipment);
+									Armor armorNow = (Armor) includedEquipmentList.get(bodyPartNow).get(includedEquipmentNow);
+									int isEquipmentNowBetter = armorNow.isBetter(currentEquipment);
 									//System.out.println(includedEquipmentList.get(bodyPartNow).get(includedEquipmentNow).equipmentName
 									//		+" "+isEquipmentNowBetter+" "+currentEquipment.equipmentName);
 									switch(isEquipmentNowBetter) {
@@ -147,8 +151,9 @@ public class EquipmentOptimizer {
 									for(int i=0;i<=skillNeed.length-1;i++)
 										skillNeed[i] = includedSkill.get(i).required;
 
-									for(int i=0;i<=currentEquipment.size()-1;i++){
-										currentSetBonusList.plus1(currentEquipment.get(i).setBonus);
+									for(int i=EquipmentList.HEAD;i<=EquipmentList.CHARM;i++){
+										Armor currentBodyPart = (Armor) currentEquipment.get(i);
+										currentSetBonusList.plus1(currentBodyPart.setBonus);
 									}
 									//檢查是否為套裝
 									if(!setBonusList.checkSetBonus(currentSetBonusList))
@@ -199,16 +204,21 @@ public class EquipmentOptimizer {
 									int defense = 1;
 									int elementalDef[] = new int[5];
 									for(int i=0;i<=currentEquipment.size()-1;i++){
-										defense += currentEquipment.get(i).defense;
-										elementalDef[0] += currentEquipment.get(i).fireDef;
-										elementalDef[1] += currentEquipment.get(i).waterDef;
-										elementalDef[2] += currentEquipment.get(i).thunderDef;
-										elementalDef[3] += currentEquipment.get(i).iceDef;
-										elementalDef[4] += currentEquipment.get(i).dragonDef;
-
+										Equipment equipmentNow = currentEquipment.get(i);
+										
+										defense += equipmentNow.defense;
 										numberOfHole[3] += currentEquipment.get(i).decor3;
 										numberOfHole[2] += currentEquipment.get(i).decor2;
 										numberOfHole[1] += currentEquipment.get(i).decor1;
+										
+										if(equipmentNow.getClass().getName().contentEquals("Armor")) {
+											Armor armorNow = (Armor) equipmentNow;
+											elementalDef[0] += armorNow.fireDef;
+											elementalDef[1] += armorNow.waterDef;
+											elementalDef[2] += armorNow.thunderDef;
+											elementalDef[3] += armorNow.iceDef;
+											elementalDef[4] += armorNow.dragonDef;
+										}
 									}
 									printEquipment(currentEquipment, defense, elementalDef, numberOfHole[0]);
 								}
