@@ -57,32 +57,33 @@ public class EquipmentOptimizer {
 		}
 
 		System.out.println("搜索合適裝備中...");
-		for(int bodyPartNow=ArmorList.HEAD;bodyPartNow<=ArmorList.CHARM;bodyPartNow++) {
-			if(includedArmorList.get(bodyPartNow).size()==0) {
-				if(bodyPartNow==ArmorList.CHARM) { //若裝備為護石
-					for(Armor equipmentNow:armorList.get(bodyPartNow)) {
-						for(Skill skillNow:includedSkill) {
-							if(equipmentNow.skillList.contains(skillNow.skillName)) {
-								includedArmorList.add(bodyPartNow, equipmentNow);
+		for(int currentBodyPart=ArmorList.HEAD;currentBodyPart<=ArmorList.CHARM;currentBodyPart++) {
+			List<Armor> currentInculdedArmorList = includedArmorList.get(currentBodyPart);
+			if(currentInculdedArmorList.size()==0) {
+				if(currentBodyPart==ArmorList.CHARM) { //若裝備為護石
+					for(Armor charmNow:armorList.get(currentBodyPart)) {
+						for(Skill currentIncludedSkill:includedSkill) {
+							if(charmNow.skillList.contains(currentIncludedSkill.skillName)) {
+								currentInculdedArmorList.add(charmNow);
 							}
 						}
 					}
 				}
-				else { //若為頭、身、腕、腰、腳
-					for(Armor currentEquipment:armorList.get(bodyPartNow)) {
-						if(currentEquipment.skillList.contains(excludedSkill))
+				else {
+					for(Armor currentAddedArmor:armorList.get(currentBodyPart)) {
+						if(currentAddedArmor.skillList.contains(excludedSkill))
 							continue;
-						
-						currentEquipment.setIsReplaceable(includedSkill,setBonusList);
-						if(!currentEquipment.isReplaceable() || includedArmorList.get(bodyPartNow).size()==0)
-							includedArmorList.get(bodyPartNow).add(currentEquipment);
+
+						currentAddedArmor.setIsReplaceable(includedSkill,setBonusList);
+						if(!currentAddedArmor.isReplaceable() || currentInculdedArmorList.size()==0)
+							currentInculdedArmorList.add(currentAddedArmor);
 						else {
 							List<Integer> marked2remove = new ArrayList<Integer>();
 							boolean marked2add = false;
-							for(int includedEquipmentNow=0;includedEquipmentNow<=includedArmorList.get(bodyPartNow).size()-1;includedEquipmentNow++) {
-								if(includedArmorList.get(bodyPartNow).get(includedEquipmentNow).isReplaceable()) {
-									Armor armorNow = (Armor) includedArmorList.get(bodyPartNow).get(includedEquipmentNow);
-									int isEquipmentNowBetter = armorNow.isBetter(currentEquipment);
+							for(int includedArmorIndex=0;includedArmorIndex<=currentInculdedArmorList.size()-1;includedArmorIndex++) {
+								if(currentInculdedArmorList.get(includedArmorIndex).isReplaceable()) {
+									Armor armorNow = (Armor) currentInculdedArmorList.get(includedArmorIndex);
+									int isEquipmentNowBetter = armorNow.isBetter(currentAddedArmor);
 									//System.out.println(includedEquipmentList.get(bodyPartNow).get(includedEquipmentNow).equipmentName
 									//		+" "+isEquipmentNowBetter+" "+currentEquipment.equipmentName);
 									switch(isEquipmentNowBetter) {
@@ -92,7 +93,7 @@ public class EquipmentOptimizer {
 										marked2add = true;
 										break;
 									case -1:
-										marked2remove.add(includedEquipmentNow);
+										marked2remove.add(includedArmorIndex);
 										marked2add = true;
 										break;
 									default:
@@ -104,11 +105,11 @@ public class EquipmentOptimizer {
 							//System.out.print("remove: ");
 							//System.out.println(marked2remove);
 							for(int i=marked2remove.size()-1;i>=0;i--) {
-								includedArmorList.get(bodyPartNow).remove((int)marked2remove.get(i));
+								currentInculdedArmorList.remove((int)marked2remove.get(i));
 							}
 							if(marked2add) {
 								//System.out.println("add: " + currentEquipment.equipmentName);
-								includedArmorList.get(bodyPartNow).add(currentEquipment);
+								currentInculdedArmorList.add(currentAddedArmor);
 							}
 						}
 					}

@@ -51,12 +51,12 @@ public class Armor extends Equipment{
 		isReplaceable = true;
 	}
 	
-	public void setIsReplaceable(SkillList skillRequirement, SetBonusList setBonusList) {
-		for(Skill skillNow:skillRequirement) {
-			int indexOfSkill = skillList.indexOf(skillNow.skillName);
+	public void setIsReplaceable(SkillList includedSkill, SetBonusList setBonusList) {
+		for(Skill includedSkillNow:includedSkill) {
+			int indexOfSkill = skillList.indexOf(includedSkillNow.skillName);
 			if(indexOfSkill!=-1) {
-				int skillLevel = skillList.getSkillLevel(skillNow.skillName);
-				switch(skillNow.levelOfDecor) {
+				int skillLevel = skillList.getSkillLevel(includedSkillNow.skillName);
+				switch(includedSkillNow.levelOfDecor) {
 				case 1:
 					combinedDecor1 += skillLevel;
 					break;
@@ -69,7 +69,7 @@ public class Armor extends Equipment{
 				default:
 					break;
 				}
-				if(!skillNow.isReplaceable)
+				if(!includedSkillNow.isReplaceable)
 					isReplaceable = false;
 			}
 		}
