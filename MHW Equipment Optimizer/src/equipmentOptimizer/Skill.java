@@ -1,6 +1,6 @@
 package equipmentOptimizer;
 
-public class Decoration{
+public class Skill{
 	String skillName;
 	int max;
 	int owned;
@@ -9,16 +9,16 @@ public class Decoration{
 	int required;
 	boolean isReplaceable;
 	
-	public Decoration(String[] stringBlock){
+	public Skill(String[] stringBlock){
 		Decoration_main(stringBlock);
 	}
 	
-	public Decoration(String input){
+	public Skill(String input){
 		String[] stringBlock = input.split(",");
 		Decoration_main(stringBlock);
 	}
 	
-	public Decoration(String[] stringBlock, int levelOfDecor){
+	public Skill(String[] stringBlock, int levelOfDecor){
 		this.skillName = stringBlock[0];
 		this.max = Integer.parseInt(stringBlock[1]);
 		this.owned = Integer.parseInt(stringBlock[2]);

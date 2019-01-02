@@ -45,8 +45,8 @@ public class ReadFile {
 		return DEFAULT_READ_FLAG;
 	}
 
-	public static DecorationList readDecorationFile(String equipmentFileDirectory, String decorationFileName) {
-		DecorationList decorationList = new DecorationList();
+	public static SkillList readDecorationFile(String equipmentFileDirectory, String decorationFileName) {
+		SkillList decorationList = new SkillList();
 
 		Reader reader = null;
 		BufferedReader br = null;
@@ -70,7 +70,7 @@ public class ReadFile {
 						levelOfDecoration = Integer.parseInt(stringBlock[1]);
 				}
 				else if(stringBlock.length==3) {
-					decorationList.add(new Decoration(stringBlock, levelOfDecoration));
+					decorationList.add(new Skill(stringBlock, levelOfDecoration));
 				}
 			}
 		} catch (IOException e) {
@@ -178,8 +178,8 @@ public class ReadFile {
 	}
 
 	public static void readRequirementFile(String fileName,
-			DecorationList decorationList ,WeaponList weaponList, ArmorList armorList,
-			SetBonusList setBouns,DecorationList includedSkill, DecorationList excludedSkill,
+			SkillList decorationList ,WeaponList weaponList, ArmorList armorList,
+			SetBonusList setBouns,SkillList includedSkill, SkillList excludedSkill,
 			WeaponList includedWeaponList, ArmorList includedArmorList) {
 		Reader reader = null;
 		BufferedReader br = null;
@@ -210,36 +210,42 @@ public class ReadFile {
 						int readSkillRequirement = Integer.parseInt(stringBlock[1]);
 
 						if(readSkillRequirement<=0) {
-							System.out.println("警告：自動忽略-" + currentLine);
+							PrintMessage.warning("自動忽略-" + currentLine);
 							continue;
 						}
 
 						int indexOfReadSkill = decorationList.indexOf(readSkill);
 						if(indexOfReadSkill!=-1) {
-							Decoration temp = decorationList.get(indexOfReadSkill);
+							Skill temp = decorationList.get(indexOfReadSkill);
 							temp.setRequired(readSkillRequirement);
 							includedSkill.add(temp);
 						}
 						else {
-							System.out.println("警告：找不到需求技能-" + stringBlock[0]);
+							PrintMessage.warning("找不到需求技能-" + stringBlock[0]);
 						}
 					}
 					else if(readFlag==SKILL_EXCLUSION_READ_FLAG){
 						for(String readSkill:stringBlock) {
 							int indexOfReadSkill = decorationList.indexOf(readSkill);
 							if(indexOfReadSkill!=-1) {
-								Decoration temp = decorationList.get(indexOfReadSkill);
+								Skill temp = decorationList.get(indexOfReadSkill);
 								excludedSkill.add(temp);
 							}
 							else {
-								System.out.println("警告：找不到排除技能-" + stringBlock[0]);
+								PrintMessage.warning("找不到排除技能-" + stringBlock[0]);
 							}
 						}
 					}
 					else if(readFlag==WEAPON_READ_FLAG){
 						for(String readWeapon:stringBlock) {
-							if(!includedWeaponList.add(weaponList.get(readWeapon))) {
-								System.out.println("警告：自動捨棄重複武器-" + readWeapon);
+							int[] indexOfReadWeapon = weaponList.indexOf(readWeapon);
+							if(indexOfReadWeapon[0]!=-1) {
+								if(!includedWeaponList.add(indexOfReadWeapon[0],weaponList.get(readWeapon))) {
+									PrintMessage.warning("自動捨棄重複武器-" + readWeapon);
+								}
+							}
+							else {
+								PrintMessage.warning("找不到武器-" + readWeapon);
 							}
 						}
 					}
@@ -249,11 +255,11 @@ public class ReadFile {
 							int indexOfReadEquipment = armorList.indexOf(readFlag, readArmor);
 							if(indexOfReadEquipment!=-1) {
 								if(!includedArmorList.add(readFlag,armorList.get(readFlag,indexOfReadEquipment))) {
-									System.out.println("警告：自動捨棄重複防具-" + readArmor);
+									PrintMessage.warning("自動捨棄重複防具-" + readArmor);
 								}
 							}
 							else {
-								System.out.println("警告：找不到防具-" + readArmor);
+								PrintMessage.warning("找不到防具-" + readArmor);
 							}
 						}
 					}

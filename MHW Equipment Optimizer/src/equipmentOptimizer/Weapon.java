@@ -39,13 +39,34 @@ public class Weapon extends Equipment{
 		totalDecor = decor3+decor2+decor1;
 
 		// 加速再生,1
-		skillList = new SkillList();
+		skillList = new EquipmentSkillList();
 
 		if(stringBlock.length==6) {
 			String[] skillBlock = stringBlock[5].split(",");
 			for(int i=0;i<=skillBlock.length-1;i+=2)
 				skillList.add(skillBlock[i+0], Integer.parseInt(skillBlock[i+1]));
 		}
+
+		isReplaceable = true;
+	}
+	
+	public Weapon() {
+		equipmentName = "(未指定武器)";
+
+		rawAttack = 0;
+		sharpness = 0;
+		affinity = 0.00;
+
+		elementalDamageList = new ElementalDamageList();
+
+		defense = 0;
+
+		decor3 = 0;
+		decor2 = 0;
+		decor1 = 0;
+		totalDecor = decor3+decor2+decor1;
+
+		skillList = new EquipmentSkillList();
 
 		isReplaceable = true;
 	}

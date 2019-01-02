@@ -15,7 +15,7 @@ public abstract class Equipment {
 	int combinedDecor1;
 	int totalCombinedDecor;
 	
-	SkillList skillList;
+	EquipmentSkillList skillList;
 
 	boolean isReplaceable;
 

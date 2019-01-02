@@ -35,18 +35,6 @@ public class WeaponList extends ArrayList<List<Weapon>>{
 		return true;
 	}
 
-	public boolean add(Weapon addedWeapon) {
-		for(List<Weapon> weaponTypeNow:this) {
-			for(Weapon weaponNow:weaponTypeNow) {
-				if(weaponNow.equipmentName.contentEquals(addedWeapon.equipmentName)) {
-					return false;
-				}
-			}
-		}
-		this.get(0).add(addedWeapon);
-		return true;
-	}
-
 	public Equipment get(int bodyPart, int index) {
 		return this.get(bodyPart).get(index);
 	}
@@ -85,9 +73,12 @@ public class WeaponList extends ArrayList<List<Weapon>>{
 		return index;
 	}
 
-	public void printBodyPart(int bodyPart) {
-		for(Equipment eq:this.get(bodyPart))
-			System.out.print(eq.equipmentName + ",");
-		System.out.println();
+	public boolean isEmptyWeaponList() {
+		for(List<Weapon> weaponTypeNow:this) {
+			if(weaponTypeNow.size()!=0) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

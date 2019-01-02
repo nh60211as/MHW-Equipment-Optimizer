@@ -44,15 +44,15 @@ public class Armor extends Equipment{
 		// (無)
 		setBonus = skillBlock[0];
 
-		skillList = new SkillList();
+		skillList = new EquipmentSkillList();
 		for(int i=1;i<=skillBlock.length-1;i+=2)
 			skillList.add(skillBlock[i], Integer.parseInt(skillBlock[i+1]));
 
 		isReplaceable = true;
 	}
 	
-	public void setIsReplaceable(DecorationList skillRequirement, SetBonusList setBonusList) {
-		for(Decoration skillNow:skillRequirement) {
+	public void setIsReplaceable(SkillList skillRequirement, SetBonusList setBonusList) {
+		for(Skill skillNow:skillRequirement) {
 			int indexOfSkill = skillList.indexOf(skillNow.skillName);
 			if(indexOfSkill!=-1) {
 				int skillLevel = skillList.getSkillLevel(skillNow.skillName);
