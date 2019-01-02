@@ -16,7 +16,7 @@ public class EquipmentOptimizer {
 	// 包含裝備的資料
 	private WeaponList includedWeaponList;
 	private ArmorList includedArmorList;
-	private WeaponList excludedWeaponList; // 尚未實做
+	private WeaponList excludedWeaponList; // TODO
 
 	public EquipmentOptimizer() {
 		// 初始化函數
@@ -56,7 +56,7 @@ public class EquipmentOptimizer {
 			includedWeaponList.add(WeaponList.GREATSWORD, new Weapon());
 		}
 
-		System.out.println("搜索合適裝備中...");
+		//System.out.println("搜索合適裝備中...");
 		for(int currentBodyPart=ArmorList.HEAD;currentBodyPart<=ArmorList.CHARM;currentBodyPart++) {
 			List<Armor> currentInculdedArmorList = includedArmorList.get(currentBodyPart);
 			if(currentInculdedArmorList.size()==0) {
@@ -83,17 +83,20 @@ public class EquipmentOptimizer {
 							for(int includedArmorIndex=0;includedArmorIndex<=currentInculdedArmorList.size()-1;includedArmorIndex++) {
 								if(currentInculdedArmorList.get(includedArmorIndex).isReplaceable()) {
 									Armor armorNow = (Armor) currentInculdedArmorList.get(includedArmorIndex);
-									int isEquipmentNowBetter = armorNow.isBetter(currentAddedArmor);
+									int isArmorNowBetter = armorNow.isBetter(currentAddedArmor);
 									//System.out.println(includedEquipmentList.get(bodyPartNow).get(includedEquipmentNow).equipmentName
 									//		+" "+isEquipmentNowBetter+" "+currentEquipment.equipmentName);
-									switch(isEquipmentNowBetter) {
-									case 1:
-										break;
+									switch(isArmorNowBetter) {
 									case 0:
+										break;
+									case 1:
 										marked2add = true;
 										break;
-									case -1:
+									case 2:
 										marked2remove.add(includedArmorIndex);
+										marked2add = true;
+										break;
+									case 3:
 										marked2add = true;
 										break;
 									default:
@@ -118,7 +121,7 @@ public class EquipmentOptimizer {
 			else
 				continue;
 		}
-		System.out.println("搜索完成");
+		//System.out.println("搜索完成");
 		//		System.out.println(requirements.size());
 		//		for(int i=0;i<=equipmentLists.size()-1;i++)
 		//			System.out.println(equipmentLists.get(i).size());
@@ -131,14 +134,13 @@ public class EquipmentOptimizer {
 
 	private void findAndPrintMatchingEquipmentList() {
 		for(List<Weapon> weaponType:includedWeaponList)
-			for(Equipment e1:weaponType)
-				for(Equipment e2:includedArmorList.get(0))
-					for(Equipment e3:includedArmorList.get(1))
-						for(Equipment e4:includedArmorList.get(2))
-							for(Equipment e5:includedArmorList.get(3))
-								for(Equipment e6:includedArmorList.get(4))
-									for(Equipment e7:includedArmorList.get(5)){
-										List<Equipment> currentEquipment = new ArrayList<Equipment>();
+			for(Weapon weapon:weaponType)
+				for(Armor head:includedArmorList.get(ArmorList.HEAD))
+					for(Armor body:includedArmorList.get(ArmorList.BODY))
+						for(Armor hands:includedArmorList.get(ArmorList.HANDS))
+							for(Armor belt:includedArmorList.get(ArmorList.BELT))
+								for(Armor feet:includedArmorList.get(ArmorList.FEET))
+									for(Armor charm:includedArmorList.get(ArmorList.CHARM)){
 										//									currentEquipment.add(0, includedEquipmentList.get(0).get(0));
 										//									currentEquipment.add(1, includedEquipmentList.get(1).get(5));
 										//									currentEquipment.add(2, includedEquipmentList.get(2).get(1));
@@ -147,35 +149,26 @@ public class EquipmentOptimizer {
 										//									currentEquipment.add(5, includedEquipmentList.get(5).get(0));
 										//									currentEquipment.add(6, includedEquipmentList.get(6).get(7));
 
-										currentEquipment.add(0, e1); // 武器
-										currentEquipment.add(ArmorList.HEAD+1, e2);
-										currentEquipment.add(ArmorList.BODY+1, e3);
-										currentEquipment.add(ArmorList.HANDS+1, e4);
-										currentEquipment.add(ArmorList.BELT+1, e5);
-										currentEquipment.add(ArmorList.FEET+1, e6);
-										currentEquipment.add(ArmorList.CHARM+1, e7);
+										EquipmentList currentEquipmentList = 
+												new EquipmentList(weapon,head,body,hands,belt,feet,charm);
 
-										SetBonusList currentSetBonusList = new SetBonusList();
 										int numberOfHole[] = new int[4];
 										int skillHave[] = new int[includedSkill.size()];
 										int skillNeed[] = new int[includedSkill.size()];
 										for(int i=0;i<=skillNeed.length-1;i++)
 											skillNeed[i] = includedSkill.get(i).required;
 
-										for(int i=ArmorList.HEAD+1;i<=ArmorList.CHARM+1;i++){
-											Armor currentBodyPart = (Armor) currentEquipment.get(i);
-											currentSetBonusList.plus1(currentBodyPart.setBonus);
-										}
 										//檢查是否為套裝
-										if(!setBonusList.checkSetBonus(currentSetBonusList))
+										if(!setBonusList.checkSetBonus(currentEquipmentList.setBonusList))
 											continue;
 
-										for(int i=0;i<=currentEquipment.size()-1;i++){
-											numberOfHole[3] += currentEquipment.get(i).decor3;
-											numberOfHole[2] += currentEquipment.get(i).decor2;
-											numberOfHole[1] += currentEquipment.get(i).decor1;
+										numberOfHole[3] = currentEquipmentList.decor3;
+										numberOfHole[2] = currentEquipmentList.decor2;
+										numberOfHole[1] = currentEquipmentList.decor1;
+										numberOfHole[0] = 0;
 
-											EquipmentSkillList skill = currentEquipment.get(i).skillList;
+										for(Armor currentArmor:currentEquipmentList.armors){
+											EquipmentSkillList skill = currentArmor.skillList;
 											for(int j=0;j<=includedSkill.size()-1;j++){
 												String currentSkillName = includedSkill.get(j).skillName;
 												if(skill.contains(currentSkillName))
@@ -212,83 +205,38 @@ public class EquipmentOptimizer {
 										if(!success)
 											continue;
 
-										int defense = 1;
-										int elementalDef[] = new int[5];
-										for(int i=0;i<=currentEquipment.size()-1;i++){
-											Equipment equipmentNow = currentEquipment.get(i);
-
-											defense += equipmentNow.defense;
-											numberOfHole[3] += currentEquipment.get(i).decor3;
-											numberOfHole[2] += currentEquipment.get(i).decor2;
-											numberOfHole[1] += currentEquipment.get(i).decor1;
-
-											if(equipmentNow.getClass().getName().contentEquals("Armor")) {
-												Armor armorNow = (Armor) equipmentNow;
-												elementalDef[0] += armorNow.fireDef;
-												elementalDef[1] += armorNow.waterDef;
-												elementalDef[2] += armorNow.thunderDef;
-												elementalDef[3] += armorNow.iceDef;
-												elementalDef[4] += armorNow.dragonDef;
-											}
-										}
-										printEquipment(currentEquipment, defense, elementalDef, numberOfHole[0]);
+										printEquipment(currentEquipmentList, numberOfHole[0]);
 									}
 	}
 
-	private void printEquipment(List<Equipment> currentEquipment, int defense, int elementalDef[], int remainDecroSlot) {
-		for(int i=0;i<=currentEquipment.size()-2;i++)
-			System.out.print(currentEquipment.get(i).equipmentName + ", ");
-		System.out.println(currentEquipment.get(currentEquipment.size()-1).equipmentName);
+	private void printEquipment(EquipmentList currentEquipmentList, int remainDecroSlot) {
+		currentEquipmentList.setAdditionalInformation();
+		// 印出裝備名稱
+		System.out.println(currentEquipmentList.toString());
 
-		EquipmentSkillList skill = new EquipmentSkillList();
-		for(Equipment equipmentNow:currentEquipment) {
-			for (String skillNameNow : equipmentNow.skillList.skillName()) {
-				skill.plus(skillNameNow, equipmentNow.skillList.getSkillLevel(skillNameNow));
-			}
+		// 印出裝備技能名稱和等級
+		EquipmentSkillList skillListWithDecoration = currentEquipmentList.equipmentSkillList;
+		for(Skill currentIncludedSkill:includedSkill) {
+			skillListWithDecoration.set(currentIncludedSkill.skillName, 
+					Math.max(currentIncludedSkill.required, skillListWithDecoration.getSkillLevel(currentIncludedSkill.skillName)));
 		}
-		for(Skill skillRequirementNow:includedSkill) {
-			skill.set(skillRequirementNow.skillName, Math.max(skillRequirementNow.required, skill.getSkillLevel(skillRequirementNow.skillName)));
-		}
-
-		List<String> skillNameList = skill.skillName();
-		for(int i=0;i<=skill.size()-1;i++) {
+		List<String> skillNameList = skillListWithDecoration.skillName();
+		for(int i=0;i<=skillListWithDecoration.size()-1;i++) {
 			String skillNow = skillNameList.get(i);
 			int indexOfDecorationList = decorationList.indexOf(skillNow);
-			skill.setSkillLevel(i, Math.min(skill.getSkillLevel(i), decorationList.get(indexOfDecorationList).max));
+			skillListWithDecoration.setSkillLevel(i,
+					Math.min(skillListWithDecoration.getSkillLevel(i), decorationList.get(indexOfDecorationList).max));
 		}
-		skill.print();
+		currentEquipmentList.setEquipmentSkillList(skillListWithDecoration);
+		System.out.println(skillListWithDecoration.toString());
 
-		String skillName = "防禦";
-		if(skill.contains(skillName)) {
-			int defBonus = skill.getSkillLevel(skillName);
-			defBonus = (defBonus>=8) ? 7 : defBonus; // 強制設定防禦技能至7以下
-			defense += defBonus*5;
-			if(defBonus>=4)
-				for(int i=0;i<=elementalDef.length-1;i++)
-					elementalDef[i] += 3;
-		}
-
-		String elementalDefPrefix[] = {"火","水","雷","冰","龍"};
-		for(int i=0;i<=elementalDef.length-1;i++) {
-			skillName = elementalDefPrefix[i]+"耐性";
-			if(skill.contains(skillName)) {
-				int elementaldefBonus = skill.getSkillLevel(skillName);
-				elementaldefBonus = (elementaldefBonus>=4) ? 3 : elementaldefBonus; // 強制設定耐性技能至3以下
-				elementalDef[i] += elementaldefBonus*6;
-				if(elementaldefBonus==3){
-					elementalDef[i] += 2;
-					defense += 10;
-				}
-			}
-		}
-
-		System.out.print("防禦力： " + defense + ", ");
-		System.out.print("屬性抗性：  ");
-		for(int i=0;i<=elementalDef.length-1;i++) {
-			if(elementalDef[i]>=0)
-				System.out.print("+" + elementalDef[i] + ",");
+		System.out.print("防禦力： " + currentEquipmentList.defense + ", ");
+		System.out.print("屬性抗性： ");
+		for(int i=0;i<=currentEquipmentList.elementalResistance.length-1;i++) {
+			if(currentEquipmentList.elementalResistance[i]>=0)
+				System.out.print("+" + currentEquipmentList.elementalResistance[i] + ",");
 			else
-				System.out.print(elementalDef[i] + ",");
+				System.out.print(currentEquipmentList.elementalResistance[i] + ", ");
 		}
 		System.out.println(" 剩餘鑲嵌槽： " + remainDecroSlot);
 	}

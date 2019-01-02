@@ -27,7 +27,20 @@ public class EquipmentSkillList {
 			_skillLevel.set(indexOfSkill, _skillLevel.get(indexOfSkill)+skillLevel);
 		}
 	}
-	
+
+	public void plus(EquipmentSkillList addedSkillList) {
+		for(String currentSkillName:addedSkillList.skillName()) {
+			int indexOfSkill = indexOf(currentSkillName);
+			if(indexOfSkill==-1) {
+				_skillName.add(currentSkillName);
+				_skillLevel.add(addedSkillList.getSkillLevel(currentSkillName));
+			}
+			else {
+				_skillLevel.set(indexOfSkill,addedSkillList.getSkillLevel(currentSkillName));
+			}
+		}
+	}
+
 	public void set(String skillName, int skillLevel) {
 		int indexOfSkill = indexOf(skillName);
 		if(indexOfSkill==-1) {
@@ -38,7 +51,7 @@ public class EquipmentSkillList {
 			_skillLevel.set(indexOfSkill,skillLevel);
 		}
 	}
-	
+
 	public void setSkillLevel(int index, int skillLevel) {
 		_skillLevel.set(index,skillLevel);
 	}
@@ -68,7 +81,7 @@ public class EquipmentSkillList {
 		int indexOfSkill = indexOf(skillName);
 		return (indexOfSkill!=-1) ? _skillLevel.get(indexOfSkill) : 0;
 	}
-	
+
 	public int getSkillLevel(int index) {
 		return _skillLevel.get(index);
 	}
@@ -76,15 +89,17 @@ public class EquipmentSkillList {
 	public List<String> skillName(){
 		return _skillName;
 	}
-	
+
 	public int size() {
 		return _skillName.size();
 	}
-	
-	public void print() {
+
+	public String toString() {
+		String output = "";
 		for(int i=0;i<=_skillName.size()-2;i++) {
-			System.out.print(_skillName.get(i)+"="+_skillLevel.get(i)+", ");
+			output += _skillName.get(i)+"="+_skillLevel.get(i)+", ";
 		}
-		System.out.println(_skillName.get(_skillName.size()-1)+"="+_skillLevel.get(_skillName.size()-1));
+		output += _skillName.get(_skillName.size()-1)+"="+_skillLevel.get(_skillName.size()-1);
+		return output;
 	}
 }
