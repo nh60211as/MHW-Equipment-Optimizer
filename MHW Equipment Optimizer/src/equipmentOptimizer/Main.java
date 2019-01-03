@@ -2,7 +2,7 @@ package equipmentOptimizer;
 
 public class Main {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws CloneNotSupportedException{
 		//System.out.println("讀取檔案中...");
 		EquipmentOptimizer equipmentOptimizer = new EquipmentOptimizer();
 		//System.out.println("讀取完成");
