@@ -197,24 +197,46 @@ class EquipmentOptimizer {
 										if (!success)
 											continue;
 
-										for (int i = numberOfHoleHave.length - 1; i >= 1; i--) {
-											if (numberOfHoleHave[i] < numberOfHoleNeed[i]) {
+										boolean finished = true;
+										for (int i = 0; i <= numberOfHoleHave.length - 1; i++) {
+											numberOfHoleHave[i] -= numberOfHoleNeed[i];
+											if (numberOfHoleHave[i] < 0) {
+												finished = false;
+											}
+										}
+
+										while (!finished) {
+											finished = true;
+											if (numberOfHoleHave[numberOfHoleHave.length - 1] < 0) {
 												success = false;
 												break;
 											}
-											numberOfHoleHave[i - 1] += numberOfHoleHave[i] - numberOfHoleNeed[i];
+
+											for (int i = numberOfHoleHave.length - 2; i >= 1; i--) {
+												if (numberOfHoleHave[i] < 0) {
+													numberOfHoleHave[i + 1] += numberOfHoleHave[i];
+													numberOfHoleHave[i] += -numberOfHoleHave[i];
+												}
+											}
+
+											for (int i = 0; i <= numberOfHoleHave.length - 1; i++) {
+												if (numberOfHoleHave[i] < 0) {
+													finished = false;
+												}
+											}
 										}
+
 										if (!success)
 											continue;
 
-										printEquipment(currentEquipmentList, numberOfHoleHave[0]);
+										printEquipment(currentEquipmentList, numberOfHoleHave);
 									}
 				}
 
 		System.out.format("已搜尋:%f%%\n", 100.0);
 	}
 
-	private void printEquipment(EquipmentList currentEquipmentList, int remainDecorSlot) {
+	private void printEquipment(EquipmentList currentEquipmentList, int[] remainDecorSlot) {
 		currentEquipmentList.setAdditionalInformation();
 		// 印出裝備名稱
 		System.out.println(currentEquipmentList.toString());
@@ -236,6 +258,7 @@ class EquipmentOptimizer {
 		System.out.println(skillListWithDecoration.toAdditionalString(decorationList));
 
 		System.out.print("防禦力： " + currentEquipmentList.defense + ", ");
+
 		System.out.print("屬性抗性： ");
 		for (int i = 0; i <= currentEquipmentList.elementalResistance.length - 1; i++) {
 			if (currentEquipmentList.elementalResistance[i] >= 0)
@@ -243,7 +266,13 @@ class EquipmentOptimizer {
 			else
 				System.out.print(currentEquipmentList.elementalResistance[i] + ",");
 		}
-		System.out.println(" 剩餘鑲嵌槽： " + remainDecorSlot);
+
+		System.out.print(" 剩餘鑲嵌槽： ");
+		for (int i = 1; i <= remainDecorSlot.length - 2; i++) {
+			System.out.print(remainDecorSlot[i] + ",");
+		}
+		System.out.print(remainDecorSlot[remainDecorSlot.length - 1]);
+
 		System.out.println();
 	}
 }
