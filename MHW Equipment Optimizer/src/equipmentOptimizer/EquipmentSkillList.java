@@ -102,7 +102,6 @@ public class EquipmentSkillList {
 		output.append(_skillName.get(_skillName.size() - 1));
 		output.append("=");
 		output.append(_skillLevel.get(_skillName.size() - 1));
-		output.append(", ");
 		return output.toString();
 	}
 

@@ -4,19 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EquipmentList {
-	private Weapon weapon;
 	List<Armor> armors;
-
 	int defense;
-
 	int decor3; // 這項會在建構式出現
 	int decor2; // 這項會在建構式出現
 	int decor1; // 這項會在建構式出現
-
+	int combinedDecor3;
+	int combinedDecor2;
+	int combinedDecor1;
+	int totalCombinedDecor;
 	int[] elementalResistance;
-
 	SetBonusList setBonusList; // 這項會在建構式出現
 	EquipmentSkillList equipmentSkillList;
+	private Weapon weapon;
 
 	EquipmentList(Weapon weapon, Armor head, Armor body, Armor hands, Armor belt, Armor feet, Armor charm) {
 		this.weapon = weapon;
@@ -29,15 +29,20 @@ public class EquipmentList {
 		armors.add(feet);
 		armors.add(charm);
 
+		setBonusList = new SetBonusList();
+		for (Armor currentArmor : armors) {
+			setBonusList.plus1(currentArmor.setBonus);
+		}
+	}
+
+	void setDecorationSlot() {
 		decor3 = this.weapon.decor3;
 		decor2 = this.weapon.decor2;
 		decor1 = this.weapon.decor1;
-		setBonusList = new SetBonusList();
 		for (Armor currentArmor : armors) {
 			decor3 += currentArmor.decor3;
 			decor2 += currentArmor.decor2;
 			decor1 += currentArmor.decor1;
-			setBonusList.plus1(currentArmor.setBonus);
 		}
 	}
 
@@ -99,7 +104,6 @@ public class EquipmentList {
 			output.append(",");
 		}
 		output.append(armors.get(armors.size() - 1).equipmentName);
-		output.append(",");
 		return output.toString();
 	}
 
