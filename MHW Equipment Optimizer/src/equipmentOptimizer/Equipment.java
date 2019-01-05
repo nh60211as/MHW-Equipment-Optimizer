@@ -1,6 +1,6 @@
 package equipmentOptimizer;
 
-public abstract class Equipment {
+abstract class Equipment {
 	String equipmentName;
 	int defense;
 
@@ -20,10 +20,6 @@ public abstract class Equipment {
 	boolean isReplaceable;
 
 
-	public Equipment(){
-	}
-
-	public boolean isReplaceable() {
-		return isReplaceable;
+	Equipment() {
 	}
 }
