@@ -161,17 +161,18 @@ class EquipmentOptimizer {
 										if (!setBonusList.checkSetBonus(currentEquipmentList.setBonusList))
 											continue;
 
-										int[] numberOfHole = new int[4];
+										int[] numberOfHoleHave = new int[4];
+										int[] numberOfHoleNeed = new int[4];
 										int[] skillHave = new int[includedSkill.size()]; // 目前裝備擁有的技能
 										int[] skillNeed = new int[includedSkill.size()]; // 目前裝備需要的技能
 										for (int i = 0; i <= skillNeed.length - 1; i++)
 											skillNeed[i] = includedSkill.get(i).required;
 
 										currentEquipmentList.setDecorationSlot();
-										numberOfHole[3] = currentEquipmentList.decor3;
-										numberOfHole[2] = currentEquipmentList.decor2;
-										numberOfHole[1] = currentEquipmentList.decor1;
-										numberOfHole[0] = 0;
+										numberOfHoleHave[3] = currentEquipmentList.decor3;
+										numberOfHoleHave[2] = currentEquipmentList.decor2;
+										numberOfHoleHave[1] = currentEquipmentList.decor1;
+										numberOfHoleHave[0] = 0;
 
 										for (Armor currentArmor : currentEquipmentList.armors) {
 											List<String> currentArmorSkillList = currentArmor.skillList.skillName();
@@ -183,35 +184,30 @@ class EquipmentOptimizer {
 										}
 
 										boolean success = true;
-
 										for (int i = 0; i <= skillNeed.length - 1; i++) {
-											int gemNeed = skillNeed[i] - skillHave[i];
-											if (gemNeed >= 1)
-												if (gemNeed > includedSkill.get(i).owned) {
+											int decorationNeed = skillNeed[i] - skillHave[i];
+											if (decorationNeed >= 1) {
+												if (decorationNeed > includedSkill.get(i).owned) {
 													success = false;
 													break;
 												}
-										}
-
-										int[] numberOfHoleNeed = new int[4];
-										for (int i = 0; i <= skillNeed.length - 1; i++) {
-											int temp = skillNeed[i] - skillHave[i];
-											if (temp >= 1)
-												numberOfHoleNeed[includedSkill.get(i).levelOfDecor] += temp;
-										}
-
-										for (int i = 3; i >= 1; i--) {
-											if (numberOfHole[i] < numberOfHoleNeed[i]) {
-												success = false;
-												break;
+												numberOfHoleNeed[includedSkill.get(i).levelOfDecor] += decorationNeed;
 											}
-											numberOfHole[i - 1] += numberOfHole[i] - numberOfHoleNeed[i];
 										}
-
 										if (!success)
 											continue;
 
-										printEquipment(currentEquipmentList, numberOfHole[0]);
+										for (int i = numberOfHoleHave.length - 1; i >= 1; i--) {
+											if (numberOfHoleHave[i] < numberOfHoleNeed[i]) {
+												success = false;
+												break;
+											}
+											numberOfHoleHave[i - 1] += numberOfHoleHave[i] - numberOfHoleNeed[i];
+										}
+										if (!success)
+											continue;
+
+										printEquipment(currentEquipmentList, numberOfHoleHave[0]);
 									}
 				}
 
