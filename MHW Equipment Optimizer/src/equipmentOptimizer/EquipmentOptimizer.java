@@ -129,9 +129,20 @@ class EquipmentOptimizer {
 	}
 
 	private void findAndPrintMatchingEquipmentList() {
+		int weaponSize = includedWeaponList.totalSize();
+		int armorSize = includedArmorList.iterationSize();
+
+		double lastPrint = 0;
+		int searchCount = 0;
 		for (List<Weapon> weaponType : includedWeaponList)
 			for (Weapon weapon : weaponType)
-				for (Armor head : includedArmorList.get(ArmorList.HEAD))
+				for (Armor head : includedArmorList.get(ArmorList.HEAD)) {
+					double currentPrint = searchCount * 100.0 / (weaponSize * armorSize);
+					if (lastPrint <= currentPrint - 10) {
+						lastPrint = currentPrint;
+						System.out.format("已搜尋:%f%%\n", currentPrint);
+						System.out.println();
+					}
 					for (Armor body : includedArmorList.get(ArmorList.BODY))
 						for (Armor hands : includedArmorList.get(ArmorList.HANDS))
 							for (Armor belt : includedArmorList.get(ArmorList.BELT))
@@ -144,6 +155,7 @@ class EquipmentOptimizer {
 										//									currentEquipment.add(4, includedEquipmentList.get(4).get(7));
 										//									currentEquipment.add(5, includedEquipmentList.get(5).get(0));
 										//									currentEquipment.add(6, includedEquipmentList.get(6).get(7));
+										searchCount++;
 
 										EquipmentList currentEquipmentList =
 												new EquipmentList(weapon, head, body, hands, belt, feet, charm);
@@ -203,9 +215,12 @@ class EquipmentOptimizer {
 
 										printEquipment(currentEquipmentList, numberOfHole[0]);
 									}
+				}
+
+		System.out.format("已搜尋:%f%%\n", 100.0);
 	}
 
-	private void printEquipment(EquipmentList currentEquipmentList, int remainDecroSlot) {
+	private void printEquipment(EquipmentList currentEquipmentList, int remainDecorSlot) {
 		currentEquipmentList.setAdditionalInformation();
 		// 印出裝備名稱
 		System.out.println(currentEquipmentList.toString());
@@ -224,7 +239,7 @@ class EquipmentOptimizer {
 					Math.min(skillListWithDecoration.getSkillLevel(i), decorationList.get(indexOfDecorationList).max));
 		}
 		currentEquipmentList.setEquipmentSkillList(skillListWithDecoration);
-		System.out.println(skillListWithDecoration.toString());
+		System.out.println(skillListWithDecoration.toAdditionalString(decorationList));
 
 		System.out.print("防禦力： " + currentEquipmentList.defense + ", ");
 		System.out.print("屬性抗性： ");
@@ -234,7 +249,7 @@ class EquipmentOptimizer {
 			else
 				System.out.print(currentEquipmentList.elementalResistance[i] + ", ");
 		}
-		System.out.println(" 剩餘鑲嵌槽： " + remainDecroSlot);
+		System.out.println(" 剩餘鑲嵌槽： " + remainDecorSlot);
 		System.out.println();
 	}
 }
