@@ -176,11 +176,12 @@ class Armor extends Equipment {
 		}
 
 		if (thisIrreplaceableSkill.contains(true) && anotherIrreplaceableSkill.contains(true)) {
-			for (int i = 0; i <= thisIrreplaceableSkill.size() - 1; i++) {
-				if (thisIrreplaceableSkill.get(i) != anotherIrreplaceableSkill.get(i)) {
-					return MAYBE;
-				}
-			}
+//			for (int i = 0; i <= thisIrreplaceableSkill.size() - 1; i++) {
+//				if (thisIrreplaceableSkill.get(i) != anotherIrreplaceableSkill.get(i)) {
+//					return MAYBE;
+//				}
+//			}
+			return MAYBE;
 		}
 
 		if (thisIrreplaceableSkill.contains(true) && !anotherIrreplaceableSkill.contains(true)) {

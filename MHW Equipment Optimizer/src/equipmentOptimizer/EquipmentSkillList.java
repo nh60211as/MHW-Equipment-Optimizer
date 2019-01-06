@@ -34,7 +34,7 @@ public class EquipmentSkillList {
 				_skillName.add(currentSkillName);
 				_skillLevel.add(addedSkillList.getSkillLevel(currentSkillName));
 			} else {
-				_skillLevel.set(indexOfSkill, addedSkillList.getSkillLevel(currentSkillName));
+				_skillLevel.set(indexOfSkill, _skillLevel.get(indexOfSkill) + addedSkillList.getSkillLevel(currentSkillName));
 			}
 		}
 	}
