@@ -1,6 +1,6 @@
 package equipmentOptimizer;
 
-public class Skill {
+class Skill {
 	String skillName;
 	int max;
 	int owned;
@@ -9,7 +9,7 @@ public class Skill {
 	int required;
 	boolean isReplaceable;
 
-	public Skill(String[] stringBlock) {
+	Skill(String[] stringBlock) {
 		Decoration_main(stringBlock);
 	}
 

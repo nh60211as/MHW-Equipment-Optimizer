@@ -85,6 +85,11 @@ class EquipmentOptimizer {
 						boolean marked2add = false;
 						for (int includedArmorIndex = 0; includedArmorIndex <= currentIncludedArmorList.size() - 1; includedArmorIndex++) {
 							Armor armorNow = currentIncludedArmorList.get(includedArmorIndex);
+
+							if (armorNow.containsSetBonus(setBonusList)) {
+								continue;
+							}
+
 							int isCurrentArmorBetter = armorNow.isBetter(currentAddedArmor, includedSkill);
 //							System.out.println(armorNow.equipmentName + " " +
 //									isCurrentArmorBetter + " " +
@@ -137,8 +142,8 @@ class EquipmentOptimizer {
 					double currentPrint = searchCount * 100.0 / (weaponSize * armorSize);
 					if (lastPrint <= currentPrint - 10) {
 						lastPrint = currentPrint;
-						System.out.format("已搜尋:%f%%\n", currentPrint);
-						System.out.println();
+						//System.out.format("已搜尋:%.2f%%\n", currentPrint);
+						//System.out.println();
 					}
 					for (Armor body : includedArmorList.get(ArmorList.BODY))
 						for (Armor hands : includedArmorList.get(ArmorList.HANDS))
@@ -168,12 +173,14 @@ class EquipmentOptimizer {
 										for (int i = 0; i <= skillNeed.length - 1; i++)
 											skillNeed[i] = includedSkill.get(i).required;
 
+										// 計算目前裝備的鑲嵌槽數量
 										currentEquipmentList.setDecorationSlot();
 										numberOfHoleHave[3] = currentEquipmentList.decor3;
 										numberOfHoleHave[2] = currentEquipmentList.decor2;
 										numberOfHoleHave[1] = currentEquipmentList.decor1;
 										numberOfHoleHave[0] = 0;
 
+										// 計算目前裝備的技能列表
 										for (Armor currentArmor : currentEquipmentList.armors) {
 											List<String> currentArmorSkillList = currentArmor.skillList.skillName();
 											for (int currentArmorSkillIndex = 0; currentArmorSkillIndex <= currentArmor.skillList.size() - 1; currentArmorSkillIndex++) {
@@ -183,6 +190,7 @@ class EquipmentOptimizer {
 											}
 										}
 
+										// 計算仍然需要的技能數量
 										boolean success = true;
 										for (int i = 0; i <= skillNeed.length - 1; i++) {
 											int decorationNeed = skillNeed[i] - skillHave[i];
@@ -232,8 +240,7 @@ class EquipmentOptimizer {
 										printEquipment(currentEquipmentList, numberOfHoleHave);
 									}
 				}
-
-		System.out.format("已搜尋:%f%%\n", 100.0);
+		System.out.format("已搜尋:%.2f%%\n", 100.0);
 	}
 
 	private void printEquipment(EquipmentList currentEquipmentList, int[] remainDecorSlot) {
@@ -259,20 +266,18 @@ class EquipmentOptimizer {
 
 		System.out.print("防禦力： " + currentEquipmentList.defense + ", ");
 
-		System.out.print("屬性抗性： ");
+		System.out.print("屬性抗性：");
 		for (int i = 0; i <= currentEquipmentList.elementalResistance.length - 1; i++) {
-			if (currentEquipmentList.elementalResistance[i] >= 0)
-				System.out.print("+" + currentEquipmentList.elementalResistance[i] + ",");
-			else
-				System.out.print(currentEquipmentList.elementalResistance[i] + ",");
+			System.out.print(String.format("%+3d,", currentEquipmentList.elementalResistance[i]));
 		}
 
-		System.out.print(" 剩餘鑲嵌槽： ");
+		System.out.print(" 剩餘鑲嵌槽：");
 		for (int i = 1; i <= remainDecorSlot.length - 2; i++) {
-			System.out.print(remainDecorSlot[i] + ",");
+			System.out.print(String.format("%2d,", remainDecorSlot[i]));
 		}
-		System.out.print(remainDecorSlot[remainDecorSlot.length - 1]);
+		System.out.print(String.format("%2d", remainDecorSlot[remainDecorSlot.length - 1]));
 
+		System.out.println();
 		System.out.println();
 	}
 }

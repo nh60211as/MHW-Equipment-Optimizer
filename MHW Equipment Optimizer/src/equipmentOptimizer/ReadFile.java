@@ -199,7 +199,7 @@ class ReadFile {
 
 	static void readRequirementFile(String fileName,
 									SkillList decorationList, WeaponList weaponList, ArmorList armorList,
-									SetBonusList setBouns, SkillList includedSkill, SkillList excludedSkill,
+									SetBonusList setBonus, SkillList includedSkill, SkillList excludedSkill,
 									WeaponList includedWeaponList, ArmorList includedArmorList) throws CloneNotSupportedException {
 		Reader reader = null;
 		BufferedReader br = null;
@@ -223,9 +223,15 @@ class ReadFile {
 					readFlag = currentFlag;
 				else {
 					String[] stringBlock = currentLine.split(",");
-					if (readFlag == SET_BONUS_READ_FLAG)
-						setBouns.add(stringBlock[0], Integer.parseInt(stringBlock[1]));
-					else if (readFlag == SKILL_INCLUSION_READ_FLAG) {
+					if (readFlag == SET_BONUS_READ_FLAG) {
+						String setBonusName = stringBlock[0];
+						int setBonusLevel = Integer.parseInt(stringBlock[1]);
+						if (setBonusLevel >= 1) {
+							setBonus.add(setBonusName, setBonusLevel);
+						} else {
+							PrintMessage.warning("自動忽略-" + currentLine);
+						}
+					} else if (readFlag == SKILL_INCLUSION_READ_FLAG) {
 						String readSkill = stringBlock[0];
 						int readSkillRequirement = Integer.parseInt(stringBlock[1]);
 

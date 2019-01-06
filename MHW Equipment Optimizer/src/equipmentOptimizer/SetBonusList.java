@@ -18,12 +18,14 @@ class SetBonusList {
 	}
 
 	void plus1(String setBonusName) {
-		int indexOfSetBonus = indexOf(setBonusName);
-		if (indexOfSetBonus == -1) {
-			_setBonusName.add(setBonusName);
-			_setBonusRequirement.add(1);
-		} else
-			_setBonusRequirement.set(indexOfSetBonus, _setBonusRequirement.get(indexOfSetBonus) + 1);
+		if (!setBonusName.isEmpty()) {
+			int indexOfSetBonus = indexOf(setBonusName);
+			if (indexOfSetBonus == -1) {
+				_setBonusName.add(setBonusName);
+				_setBonusRequirement.add(1);
+			} else
+				_setBonusRequirement.set(indexOfSetBonus, _setBonusRequirement.get(indexOfSetBonus) + 1);
+		}
 	}
 
 	private int indexOf(String setBonusName) {

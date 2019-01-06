@@ -4,15 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Armor extends Equipment {
-	int[] elementalResistance;
-
-	String setBonus;
-
 	// 用於比較防具
 	static int BETTER = 0;
 	static int SAME = 1;
 	static int WORSE = 2;
 	static int MAYBE = 3;
+	int[] elementalResistance;
+	String setBonus;
 
 	Armor(String input) {
 		// 巨蜂頭盔α;76;-2,+1,+1,+1,+2;0,0,0;(無),收刀術,1,麻痺屬性強化,1
@@ -45,7 +43,10 @@ class Armor extends Equipment {
 		// (無),收刀術,1,麻痺屬性強化,1
 		String[] skillBlock = stringBlock[4].split(",");
 		// (無)
-		setBonus = skillBlock[0];
+		if (skillBlock[0].contentEquals("(無)"))
+			setBonus = "";
+		else
+			setBonus = skillBlock[0];
 
 		skillList = new EquipmentSkillList();
 		for (int i = 1; i <= skillBlock.length - 1; i += 2)
