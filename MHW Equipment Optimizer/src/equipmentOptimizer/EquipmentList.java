@@ -47,19 +47,10 @@ public class EquipmentList {
 	}
 
 	void setAdditionalInformation() {
-		defense = this.weapon.defense + 1;
-		elementalResistance = new int[5];
-		for (int i = 0; i <= elementalResistance.length - 1; i++)
-			elementalResistance[i] = 0;
 		setBonusList = new SetBonusList();
 		equipmentSkillList = new EquipmentSkillList();
 
 		for (Armor currentArmor : armors) {
-			defense += currentArmor.defense;
-
-			for (int i = 0; i <= elementalResistance.length - 1; i++)
-				elementalResistance[i] += currentArmor.elementalResistance[i];
-
 			equipmentSkillList.plus(currentArmor.skillList);
 		}
 		updateDefenseAndElementalResistance();
@@ -71,6 +62,19 @@ public class EquipmentList {
 	}
 
 	private void updateDefenseAndElementalResistance() {
+		defense = this.weapon.defense + 1;
+		elementalResistance = new int[5];
+
+		for (int i = 0; i <= elementalResistance.length - 1; i++)
+			elementalResistance[i] = 0;
+
+		for (Armor currentArmor : armors) {
+			defense += currentArmor.defense;
+
+			for (int i = 0; i <= elementalResistance.length - 1; i++)
+				elementalResistance[i] += currentArmor.elementalResistance[i];
+		}
+
 		String skillName = "防禦";
 		if (equipmentSkillList.contains(skillName)) {
 			int defBonus = equipmentSkillList.getSkillLevel(skillName);
