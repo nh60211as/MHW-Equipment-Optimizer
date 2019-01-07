@@ -150,14 +150,16 @@ class EquipmentOptimizer {
 							for (Armor belt : includedArmorList.get(ArmorList.BELT))
 								for (Armor feet : includedArmorList.get(ArmorList.FEET))
 									for (Armor charm : includedArmorList.get(ArmorList.CHARM)) {
-										//									currentEquipment.add(0, includedEquipmentList.get(0).get(0));
-										//									currentEquipment.add(1, includedEquipmentList.get(1).get(5));
-										//									currentEquipment.add(2, includedEquipmentList.get(2).get(1));
-										//									currentEquipment.add(3, includedEquipmentList.get(3).get(8));
-										//									currentEquipment.add(4, includedEquipmentList.get(4).get(7));
-										//									currentEquipment.add(5, includedEquipmentList.get(5).get(0));
-										//									currentEquipment.add(6, includedEquipmentList.get(6).get(7));
 										searchCount++;
+
+//										EquipmentList currentEquipmentList =
+//												new EquipmentList(weapon,
+//														includedArmorList.get(ArmorList.HEAD).get(1),
+//														includedArmorList.get(ArmorList.BODY).get(8),
+//														includedArmorList.get(ArmorList.HANDS).get(0),
+//														includedArmorList.get(ArmorList.BELT).get(7),
+//														includedArmorList.get(ArmorList.FEET).get(5),
+//														includedArmorList.get(ArmorList.CHARM).get(5));
 
 										EquipmentList currentEquipmentList =
 												new EquipmentList(weapon, head, body, hands, belt, feet, charm);
