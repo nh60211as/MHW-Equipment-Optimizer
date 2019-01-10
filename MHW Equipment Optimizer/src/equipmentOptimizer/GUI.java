@@ -5,7 +5,7 @@ import javax.swing.*;
 public class GUI {
 	private static final int MAJORVERSION = 2;
 	private static final int MINORVERSION = 0;
-	private static final int FIXVERSION = 0;
+	private static final int FIXVERSION = 1;
 
 	private JPanel mainPanel;
 	private JButton chooseFileButton;
@@ -22,8 +22,6 @@ public class GUI {
 		resultTextArea.setEditable(false);
 		eventLabel.setText("MHW Equipment Optimizer");
 
-		equipmentOptimizer = new EquipmentOptimizer(resultTextArea, eventLabel);
-
 		fileChooser = new JFileChooser();
 		fileChooser.setCurrentDirectory(new java.io.File("."));
 		fileChooser.setMultiSelectionEnabled(false);
@@ -36,6 +34,7 @@ public class GUI {
 				eventLabel.setText("目前選擇檔案：" + fileName);
 
 				try {
+					equipmentOptimizer = new EquipmentOptimizer(resultTextArea, eventLabel);
 					startMatchingButton.setEnabled(true);
 					equipmentOptimizer.readRequirement(fileName);
 					equipmentOptimizer.generateIncludedEquipmentList();
