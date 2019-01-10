@@ -15,7 +15,7 @@
         <properties>
           <horizontalAlignment value="0"/>
           <horizontalTextPosition value="0"/>
-          <text value="MHW Equipment Optimizer Version 2.0"/>
+          <text value=""/>
         </properties>
       </component>
       <component id="f7fc2" class="javax.swing.JButton" binding="chooseFileButton">

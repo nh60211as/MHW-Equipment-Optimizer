@@ -3,6 +3,10 @@ package equipmentOptimizer;
 import javax.swing.*;
 
 public class GUI {
+	private static final int MAJORVERSION = 2;
+	private static final int MINORVERSION = 0;
+	private static final int FIXVERSION = 0;
+
 	private JPanel mainPanel;
 	private JButton chooseFileButton;
 	private JButton startMatchingButton;
@@ -16,6 +20,7 @@ public class GUI {
 	private GUI() {
 		startMatchingButton.setEnabled(false);
 		resultTextArea.setEditable(false);
+		eventLabel.setText("MHW Equipment Optimizer");
 
 		equipmentOptimizer = new EquipmentOptimizer(resultTextArea, eventLabel);
 
@@ -54,7 +59,7 @@ public class GUI {
 
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(() -> {
-			JFrame frame = new JFrame("MHW Equipment Optimizer by nh60211as");
+			JFrame frame = new JFrame(String.format("MHW Equipment Optimizer Version %d.%d.%d by nh60211as", MAJORVERSION, MINORVERSION, FIXVERSION));
 			frame.setContentPane(new GUI().mainPanel);
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			frame.pack();
