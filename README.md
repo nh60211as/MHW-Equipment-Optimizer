@@ -78,14 +78,17 @@ https://github.com/nh60211as/MHW-Equipment-Optimizer/releases
 * 以下為可選輸入，如果有輸入的話就會強制選取那些裝備來配對，沒有的話會自動從已有裝備中搜尋\
 "頭："、"身："、"腕："、"腰："、"腳："、"護石："同上，
 
-### 輸入方式：
+### v2.0.0輸入方式：
+直接點擊MHW-Equipment-Optimizer-GUI.jar即可
+
+### v1.8.3(無使用者介面)輸入方式：
 Windows 7、Windows 10 命令提示字元：
 ```
 cd <MHW-Equipment-Optimizer.jar 的目錄>
 java -jar MHW-Equipment-Optimizer.jar <需求檔案名稱.txt>
 ```
 
-### 輸出範例：
+### v1.8.3(無使用者介面)輸出範例：
 ```
 java -jar MHW-Equipment-Optimizer.jar 大劍.txt
 符合 大劍.txt 條件的裝備：
@@ -104,5 +107,4 @@ java -jar MHW-Equipment-Optimizer.jar 大劍.txt
 
 ## 未來實作功能：
 * 顯示目前攻擊力、會心率
-* 實作使用者介面
 * 英語支援
