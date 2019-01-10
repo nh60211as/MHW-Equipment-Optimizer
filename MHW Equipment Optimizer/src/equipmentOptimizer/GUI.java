@@ -4,23 +4,33 @@ import javax.swing.*;
 
 public class GUI {
 	private EquipmentOptimizer equipmentOptimizer;
+	private JFileChooser fileChooser;
 	private JPanel mainPanel;
 	private JTextArea resultTextArea;
-	private JButton testStartButton;
+	private JButton chooseFileButton;
 
 	private GUI() {
 		resultTextArea.setEditable(false);
 		equipmentOptimizer = new EquipmentOptimizer(resultTextArea);
 
-		testStartButton.addActionListener(e -> {
+		fileChooser = new JFileChooser();
+		fileChooser.setCurrentDirectory(new java.io.File("."));
+		fileChooser.setMultiSelectionEnabled(false);
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
-			String fileName = "雙劍_麻痺.txt";
-			try {
-				equipmentOptimizer.readRequirement(fileName);
-				equipmentOptimizer.generateIncludedEquipmentList();
-				equipmentOptimizer.findAndPrintMatchingEquipmentList();
-			} catch (CloneNotSupportedException cse) {
-				System.out.println(cse.getMessage());
+
+		chooseFileButton.addActionListener(e -> {
+			String fileName;
+			if (fileChooser.showOpenDialog(mainPanel) == JFileChooser.APPROVE_OPTION) {
+				fileName = fileChooser.getSelectedFile().getAbsolutePath();
+
+				try {
+					equipmentOptimizer.readRequirement(fileName);
+					equipmentOptimizer.generateIncludedEquipmentList();
+					equipmentOptimizer.findAndPrintMatchingEquipmentList();
+				} catch (CloneNotSupportedException cse) {
+					System.out.println(cse.getMessage());
+				}
 			}
 		});
 	}

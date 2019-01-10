@@ -230,14 +230,14 @@ class ReadFile {
 						if (setBonusLevel >= 1) {
 							setBonus.add(setBonusName, setBonusLevel);
 						} else {
-							PrintMessage.warning(textArea, "自動忽略-" + currentLine);
+							PrintMessage.warning(textArea, "自動忽略系列技能-" + currentLine);
 						}
 					} else if (readFlag == SKILL_INCLUSION_READ_FLAG) {
 						String readSkill = stringBlock[0];
 						int readSkillRequirement = Integer.parseInt(stringBlock[1]);
 
 						if (readSkillRequirement <= 0) {
-							PrintMessage.warning(textArea, "自動忽略-" + currentLine);
+							PrintMessage.warning(textArea, "自動忽略需求技能-" + currentLine);
 							continue;
 						}
 
@@ -272,11 +272,11 @@ class ReadFile {
 								Weapon boostedWeapon = (Weapon) weaponList.get(readWeapon).clone();
 								boostedWeapon.setBoost(attackBoost, affinityBoost, defenseBoost, decorationSlotBoost, leechBoost);
 								if (!includedWeaponList.add(indexOfReadWeapon[0], boostedWeapon)) {
-									PrintMessage.warning(textArea, "自動捨棄重複武器-" + readWeapon);
+									PrintMessage.warning(textArea, "自動跳過重複武器-" + readWeapon);
 								}
 							} else {
 								if (!includedWeaponList.add(indexOfReadWeapon[0], weaponList.get(readWeapon))) {
-									PrintMessage.warning(textArea, "自動捨棄重複武器-" + readWeapon);
+									PrintMessage.warning(textArea, "自動跳過重複武器-" + readWeapon);
 								}
 							}
 						} else {
@@ -288,7 +288,7 @@ class ReadFile {
 							int indexOfReadEquipment = armorList.indexOf(readFlag, readArmor);
 							if (indexOfReadEquipment != -1) {
 								if (!includedArmorList.add(readFlag, armorList.get(readFlag, indexOfReadEquipment))) {
-									PrintMessage.warning(textArea, "自動捨棄重複防具-" + readArmor);
+									PrintMessage.warning(textArea, "自動跳過重複防具-" + readArmor);
 								}
 							} else {
 								PrintMessage.warning(textArea, "找不到防具-" + readArmor);

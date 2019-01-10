@@ -11,17 +11,17 @@
       <component id="14f02" class="javax.swing.JTextArea" binding="resultTextArea">
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
-            <preferred-size width="150" height="50"/>
+            <preferred-size width="750" height="500"/>
           </grid>
         </constraints>
         <properties/>
       </component>
-      <component id="f7fc2" class="javax.swing.JButton" binding="testStartButton">
+      <component id="f7fc2" class="javax.swing.JButton" binding="chooseFileButton">
         <constraints>
           <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Button"/>
+          <text value="選擇需求檔案"/>
         </properties>
       </component>
     </children>
