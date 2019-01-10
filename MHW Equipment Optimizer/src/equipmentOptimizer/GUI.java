@@ -17,7 +17,7 @@ public class GUI {
 		startMatchingButton.setEnabled(false);
 		resultTextArea.setEditable(false);
 
-		equipmentOptimizer = new EquipmentOptimizer(resultTextArea);
+		equipmentOptimizer = new EquipmentOptimizer(resultTextArea, eventLabel);
 
 		fileChooser = new JFileChooser();
 		fileChooser.setCurrentDirectory(new java.io.File("."));
@@ -41,8 +41,10 @@ public class GUI {
 			}
 		});
 		startMatchingButton.addActionListener(e -> {
+			resultTextArea.setText("");
 			try {
-				equipmentOptimizer.findAndPrintMatchingEquipmentList();
+				Thread thread = new Thread(() -> equipmentOptimizer.findAndPrintMatchingEquipmentList());
+				thread.start();
 			} catch (Exception e1) {
 				startMatchingButton.setEnabled(false);
 				eventLabel.setText("未知錯誤");
@@ -51,10 +53,12 @@ public class GUI {
 	}
 
 	public static void main(String[] args) {
-		JFrame frame = new JFrame("MHW Equipment Optimizer by nh60211as");
-		frame.setContentPane(new GUI().mainPanel);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.pack();
-		frame.setVisible(true);
+		SwingUtilities.invokeLater(() -> {
+			JFrame frame = new JFrame("MHW Equipment Optimizer by nh60211as");
+			frame.setContentPane(new GUI().mainPanel);
+			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			frame.pack();
+			frame.setVisible(true);
+		});
 	}
 }

@@ -2,9 +2,9 @@ package equipmentOptimizer;
 
 import javax.swing.*;
 
-public class PrintMessage {
+class PrintMessage {
 	static void print(JTextArea textArea, String message) {
-		textArea.append(message);
+		updateTextArea(textArea, message);
 		System.out.print(message);
 	}
 
@@ -13,8 +13,17 @@ public class PrintMessage {
 		stringBuilder.append("警告：");
 		stringBuilder.append(message);
 		stringBuilder.append("\n");
-		textArea.append(stringBuilder.toString());
+
+		updateTextArea(textArea, stringBuilder.toString());
 		System.out.print(stringBuilder.toString());
 	}
 
+	private static void updateTextArea(JTextArea textArea, String message) {
+		SwingUtilities.invokeLater(() -> textArea.append(message));
+	}
+
+	static void updateEventLabel(JLabel label, String message) {
+		SwingUtilities.invokeLater(() -> label.setText(message));
+		System.out.print(message);
+	}
 }

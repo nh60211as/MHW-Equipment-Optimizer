@@ -21,10 +21,12 @@ class EquipmentOptimizer {
 
 	private String requirementFileName;
 	private JTextArea textArea;
+	private JLabel eventLabel;
 
-	EquipmentOptimizer(JTextArea textArea) {
+	EquipmentOptimizer(JTextArea textArea, JLabel eventLabel) {
 		// 初始化函數
 		this.textArea = textArea;
+		this.eventLabel = eventLabel;
 
 		// 讀取裝備資訊和技能資訊
 		final String equipmentFileDirectory = "裝備檔案/";
@@ -147,6 +149,7 @@ class EquipmentOptimizer {
 					double currentPrint = searchCount * 100.0 / (weaponSize * armorSize);
 					if (lastPrint <= currentPrint - 10) {
 						lastPrint = currentPrint;
+						PrintMessage.updateEventLabel(eventLabel, String.format("已搜尋:%.2f%%\n\n", currentPrint));
 						//System.out.format("已搜尋:%.2f%%\n", currentPrint);
 						//System.out.println();
 					}
@@ -247,7 +250,7 @@ class EquipmentOptimizer {
 										printEquipment(currentEquipmentList, numberOfHoleHave);
 									}
 				}
-		System.out.format("已搜尋:%.2f%%\n", 100.0);
+		PrintMessage.updateEventLabel(eventLabel, String.format("已搜尋:%.2f%%\n\n", 100.0));
 	}
 
 	private void printEquipment(EquipmentList currentEquipmentList, int[] remainDecorSlot) {
@@ -272,7 +275,7 @@ class EquipmentOptimizer {
 		PrintMessage.print(textArea, skillListWithDecoration.toAdditionalString(decorationList) + "\n");
 
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("防禦力： " + currentEquipmentList.defense + ", ");
+		stringBuilder.append(String.format("防禦力： %d,", currentEquipmentList.defense));
 
 		stringBuilder.append("屬性抗性：");
 		for (int i = 0; i <= currentEquipmentList.elementalResistance.length - 1; i++) {
