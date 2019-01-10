@@ -2,6 +2,7 @@ package equipmentOptimizer;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.function.Consumer;
 
 class ReadFile {
 	private static final int DEFAULT_READ_FLAG = -5;
@@ -197,7 +198,7 @@ class ReadFile {
 		return armorList;
 	}
 
-	static void readRequirementFile(String fileName,
+	static void readRequirementFile(String fileName, Consumer consumer,
 									SkillList decorationList, WeaponList weaponList, ArmorList armorList,
 									SetBonusList setBonus, SkillList includedSkill, SkillList excludedSkill,
 									WeaponList includedWeaponList, ArmorList includedArmorList) throws CloneNotSupportedException {
@@ -229,14 +230,14 @@ class ReadFile {
 						if (setBonusLevel >= 1) {
 							setBonus.add(setBonusName, setBonusLevel);
 						} else {
-							PrintMessage.warning("自動忽略-" + currentLine);
+							PrintMessage.warning(consumer, "自動忽略-" + currentLine);
 						}
 					} else if (readFlag == SKILL_INCLUSION_READ_FLAG) {
 						String readSkill = stringBlock[0];
 						int readSkillRequirement = Integer.parseInt(stringBlock[1]);
 
 						if (readSkillRequirement <= 0) {
-							PrintMessage.warning("自動忽略-" + currentLine);
+							PrintMessage.warning(consumer, "自動忽略-" + currentLine);
 							continue;
 						}
 
@@ -246,7 +247,7 @@ class ReadFile {
 							temp.setRequired(readSkillRequirement);
 							includedSkill.add(temp);
 						} else {
-							PrintMessage.warning("找不到需求技能-" + stringBlock[0]);
+							PrintMessage.warning(consumer, "找不到需求技能-" + stringBlock[0]);
 						}
 					} else if (readFlag == SKILL_EXCLUSION_READ_FLAG) {
 						for (String readSkill : stringBlock) {
@@ -255,7 +256,7 @@ class ReadFile {
 								Skill temp = decorationList.get(indexOfReadSkill);
 								excludedSkill.add(temp);
 							} else {
-								PrintMessage.warning("找不到排除技能-" + stringBlock[0]);
+								PrintMessage.warning(consumer, "找不到排除技能-" + stringBlock[0]);
 							}
 						}
 					} else if (readFlag == WEAPON_READ_FLAG) {
@@ -271,15 +272,15 @@ class ReadFile {
 								Weapon boostedWeapon = (Weapon) weaponList.get(readWeapon).clone();
 								boostedWeapon.setBoost(attackBoost, affinityBoost, defenseBoost, decorationSlotBoost, leechBoost);
 								if (!includedWeaponList.add(indexOfReadWeapon[0], boostedWeapon)) {
-									PrintMessage.warning("自動捨棄重複武器-" + readWeapon);
+									PrintMessage.warning(consumer, "自動捨棄重複武器-" + readWeapon);
 								}
 							} else {
 								if (!includedWeaponList.add(indexOfReadWeapon[0], weaponList.get(readWeapon))) {
-									PrintMessage.warning("自動捨棄重複武器-" + readWeapon);
+									PrintMessage.warning(consumer, "自動捨棄重複武器-" + readWeapon);
 								}
 							}
 						} else {
-							PrintMessage.warning("找不到武器-" + readWeapon);
+							PrintMessage.warning(consumer, "找不到武器-" + readWeapon);
 						}
 					} else {
 						// stringBlock = {礦石鎧甲α,礦石鎧甲β}
@@ -287,10 +288,10 @@ class ReadFile {
 							int indexOfReadEquipment = armorList.indexOf(readFlag, readArmor);
 							if (indexOfReadEquipment != -1) {
 								if (!includedArmorList.add(readFlag, armorList.get(readFlag, indexOfReadEquipment))) {
-									PrintMessage.warning("自動捨棄重複防具-" + readArmor);
+									PrintMessage.warning(consumer, "自動捨棄重複防具-" + readArmor);
 								}
 							} else {
-								PrintMessage.warning("找不到防具-" + readArmor);
+								PrintMessage.warning(consumer, "找不到防具-" + readArmor);
 							}
 						}
 					}

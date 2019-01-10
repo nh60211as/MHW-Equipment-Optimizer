@@ -2,6 +2,7 @@ package equipmentOptimizer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 class EquipmentOptimizer {
 	// 基本資料
@@ -18,8 +19,12 @@ class EquipmentOptimizer {
 	private ArmorList includedArmorList;
 	private WeaponList excludedWeaponList; // TODO
 
-	EquipmentOptimizer() {
+	private String requirementFileName;
+	private Consumer consumer;
+
+	EquipmentOptimizer(Consumer consumer) {
 		// 初始化函數
+		this.consumer = consumer;
 
 		// 讀取裝備資訊和技能資訊
 		final String equipmentFileDirectory = "裝備檔案/";
@@ -37,7 +42,9 @@ class EquipmentOptimizer {
 		// 結束初始化函數
 	}
 
-	boolean readAndFindMatchingEquipmentList(String requirementFileName) throws CloneNotSupportedException {
+	void readRequirement(String requirementFileName) throws CloneNotSupportedException {
+		this.requirementFileName = requirementFileName;
+
 		setBonusList = new SetBonusList();
 		includedSkill = new SkillList();
 		excludedSkill = new SkillList();
@@ -46,13 +53,15 @@ class EquipmentOptimizer {
 		includedArmorList = new ArmorList();
 
 		// 讀取技能、裝備需求檔案
-		ReadFile.readRequirementFile(requirementFileName,
+		ReadFile.readRequirementFile(requirementFileName, consumer,
 				decorationList, weaponList, armorList,
 				setBonusList, includedSkill, excludedSkill,
 				includedWeaponList, includedArmorList);
+	}
 
+	void generateIncludedEquipmentList() {
 		if (includedWeaponList.isEmptyWeaponList()) {
-			PrintMessage.warning("未指定武器");
+			PrintMessage.warning(consumer, "未指定武器");
 			includedWeaponList.add(WeaponList.GREATSWORD, new Weapon());
 		}
 
@@ -122,15 +131,12 @@ class EquipmentOptimizer {
 			}
 		}
 		//System.out.println("搜索完成");
-
-		System.out.println("符合 " + requirementFileName + " 條件的裝備：");
-		System.out.println();
-		//開始配對裝備
-		findAndPrintMatchingEquipmentList();
-		return true;
 	}
 
-	private void findAndPrintMatchingEquipmentList() {
+	void findAndPrintMatchingEquipmentList() {
+		System.out.println("符合 " + requirementFileName + " 條件的裝備：");
+		System.out.println();
+
 		int weaponSize = includedWeaponList.totalSize();
 		int armorSize = includedArmorList.iterationSize();
 
