@@ -1,18 +1,20 @@
 package equipmentOptimizer;
 
-import java.util.function.Consumer;
+import javax.swing.*;
 
 public class PrintMessage {
-	static void print(Consumer consumer, String message) {
-		consumer.accept(message);
+	static void print(JTextArea textArea, String message) {
+		textArea.append(message);
+		System.out.print(message);
 	}
 
-	static void warning(Consumer consumer, String message) {
-		consumer.accept("警告：" + message);
+	static void warning(JTextArea textArea, String message) {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("警告：");
+		stringBuilder.append(message);
+		stringBuilder.append("\n");
+		textArea.append(stringBuilder.toString());
+		System.out.print(stringBuilder.toString());
 	}
 
-//	Consumer consumer = PrintMessage::printNames;
-//	private static void printNames(String name) {
-//		System.out.println(name);
-//	}
 }

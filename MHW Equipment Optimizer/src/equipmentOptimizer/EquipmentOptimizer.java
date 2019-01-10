@@ -1,8 +1,8 @@
 package equipmentOptimizer;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 class EquipmentOptimizer {
 	// 基本資料
@@ -20,11 +20,11 @@ class EquipmentOptimizer {
 	private WeaponList excludedWeaponList; // TODO
 
 	private String requirementFileName;
-	private Consumer consumer;
+	private JTextArea textArea;
 
-	EquipmentOptimizer(Consumer consumer) {
+	EquipmentOptimizer(JTextArea textArea) {
 		// 初始化函數
-		this.consumer = consumer;
+		this.textArea = textArea;
 
 		// 讀取裝備資訊和技能資訊
 		final String equipmentFileDirectory = "裝備檔案/";
@@ -53,7 +53,7 @@ class EquipmentOptimizer {
 		includedArmorList = new ArmorList();
 
 		// 讀取技能、裝備需求檔案
-		ReadFile.readRequirementFile(requirementFileName, consumer,
+		ReadFile.readRequirementFile(requirementFileName, textArea,
 				decorationList, weaponList, armorList,
 				setBonusList, includedSkill, excludedSkill,
 				includedWeaponList, includedArmorList);
@@ -61,7 +61,7 @@ class EquipmentOptimizer {
 
 	void generateIncludedEquipmentList() {
 		if (includedWeaponList.isEmptyWeaponList()) {
-			PrintMessage.warning(consumer, "未指定武器");
+			PrintMessage.warning(textArea, "未指定武器");
 			includedWeaponList.add(WeaponList.GREATSWORD, new Weapon());
 		}
 
@@ -134,8 +134,7 @@ class EquipmentOptimizer {
 	}
 
 	void findAndPrintMatchingEquipmentList() {
-		System.out.println("符合 " + requirementFileName + " 條件的裝備：");
-		System.out.println();
+		PrintMessage.print(textArea, "符合 " + requirementFileName + " 條件的裝備：\n\n");
 
 		int weaponSize = includedWeaponList.totalSize();
 		int armorSize = includedArmorList.iterationSize();
@@ -254,7 +253,7 @@ class EquipmentOptimizer {
 	private void printEquipment(EquipmentList currentEquipmentList, int[] remainDecorSlot) {
 		currentEquipmentList.setAdditionalInformation();
 		// 印出裝備名稱
-		System.out.println(currentEquipmentList.toString());
+		PrintMessage.print(textArea, currentEquipmentList.toString() + "\n");
 
 		// 印出裝備技能名稱和等級
 		EquipmentSkillList skillListWithDecoration = currentEquipmentList.equipmentSkillList;
@@ -270,22 +269,23 @@ class EquipmentOptimizer {
 					Math.min(skillListWithDecoration.getSkillLevel(i), decorationList.get(indexOfDecorationList).max));
 		}
 		currentEquipmentList.setEquipmentSkillList(skillListWithDecoration);
-		System.out.println(skillListWithDecoration.toAdditionalString(decorationList));
+		PrintMessage.print(textArea, skillListWithDecoration.toAdditionalString(decorationList) + "\n");
 
-		System.out.print("防禦力： " + currentEquipmentList.defense + ", ");
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("防禦力： " + currentEquipmentList.defense + ", ");
 
-		System.out.print("屬性抗性：");
+		stringBuilder.append("屬性抗性：");
 		for (int i = 0; i <= currentEquipmentList.elementalResistance.length - 1; i++) {
-			System.out.print(String.format("%+3d,", currentEquipmentList.elementalResistance[i]));
+			stringBuilder.append(String.format("%+3d,", currentEquipmentList.elementalResistance[i]));
 		}
 
-		System.out.print(" 剩餘鑲嵌槽：");
+		stringBuilder.append(" 剩餘鑲嵌槽：");
 		for (int i = 1; i <= remainDecorSlot.length - 2; i++) {
-			System.out.print(String.format("%2d,", remainDecorSlot[i]));
+			stringBuilder.append(String.format("%2d,", remainDecorSlot[i]));
 		}
-		System.out.print(String.format("%2d", remainDecorSlot[remainDecorSlot.length - 1]));
+		stringBuilder.append(String.format("%2d", remainDecorSlot[remainDecorSlot.length - 1]));
 
-		System.out.println();
-		System.out.println();
+		stringBuilder.append("\n\n");
+		PrintMessage.print(textArea, stringBuilder.toString());
 	}
 }

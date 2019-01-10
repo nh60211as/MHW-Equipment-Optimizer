@@ -1,8 +1,6 @@
 package equipmentOptimizer;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class GUI {
 	private EquipmentOptimizer equipmentOptimizer;
@@ -11,21 +9,18 @@ public class GUI {
 	private JButton testStartButton;
 
 	private GUI() {
-		equipmentOptimizer = new EquipmentOptimizer(resultTextArea::append);
-		resultTextArea.setFocusable(false);
+		resultTextArea.setEditable(false);
+		equipmentOptimizer = new EquipmentOptimizer(resultTextArea);
 
-		testStartButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
+		testStartButton.addActionListener(e -> {
 
-				String fileName = "大劍.txt";
-				try {
-					equipmentOptimizer.readRequirement(fileName);
-					equipmentOptimizer.generateIncludedEquipmentList();
-					equipmentOptimizer.findAndPrintMatchingEquipmentList();
-				} catch (CloneNotSupportedException cse) {
-					System.out.println(cse.getMessage());
-				}
+			String fileName = "雙劍_麻痺.txt";
+			try {
+				equipmentOptimizer.readRequirement(fileName);
+				equipmentOptimizer.generateIncludedEquipmentList();
+				equipmentOptimizer.findAndPrintMatchingEquipmentList();
+			} catch (CloneNotSupportedException cse) {
+				System.out.println(cse.getMessage());
 			}
 		});
 	}
