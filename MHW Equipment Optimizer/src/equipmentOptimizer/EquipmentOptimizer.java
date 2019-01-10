@@ -35,11 +35,11 @@ class EquipmentOptimizer {
 		final String[] armorFileNames = {"_頭.txt", "_身.txt", "_腕.txt", "_腰.txt", "_腳.txt", "_護石.txt"};
 
 		// 所有裝飾珠的資料
-		decorationList = ReadFile.readDecorationFile(equipmentFileDirectory, decorationFileName);
+		decorationList = ReadFile.readDecorationFile(equipmentFileDirectory, decorationFileName, eventLabel);
 		// 所有武器的資料
-		weaponList = ReadFile.readWeaponFile(equipmentFileDirectory, weaponFileNames);
+		weaponList = ReadFile.readWeaponFile(equipmentFileDirectory, weaponFileNames, eventLabel);
 		// 所有裝備的資料
-		armorList = ReadFile.readArmorFile(equipmentFileDirectory, armorFileNames);
+		armorList = ReadFile.readArmorFile(equipmentFileDirectory, armorFileNames, eventLabel);
 
 		// 結束初始化函數
 	}
@@ -55,7 +55,7 @@ class EquipmentOptimizer {
 		includedArmorList = new ArmorList();
 
 		// 讀取技能、裝備需求檔案
-		ReadFile.readRequirementFile(requirementFileName, textArea,
+		ReadFile.readRequirementFile(requirementFileName, textArea, eventLabel,
 				decorationList, weaponList, armorList,
 				setBonusList, includedSkill, excludedSkill,
 				includedWeaponList, includedArmorList);

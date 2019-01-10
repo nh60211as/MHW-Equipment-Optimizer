@@ -67,7 +67,7 @@ class ReadFile {
 		return DEFAULT_READ_FLAG;
 	}
 
-	static SkillList readDecorationFile(String equipmentFileDirectory, String decorationFileName) {
+	static SkillList readDecorationFile(String equipmentFileDirectory, String decorationFileName, JLabel eventLabel) {
 		SkillList decorationList = new SkillList();
 
 		Reader reader = null;
@@ -95,7 +95,7 @@ class ReadFile {
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			PrintMessage.updateEventLabelError(eventLabel, equipmentFileDirectory + decorationFileName + "讀取錯誤");
 		} finally {
 			try {
 				if (br != null)
@@ -110,7 +110,7 @@ class ReadFile {
 		return decorationList;
 	}
 
-	static WeaponList readWeaponFile(String equipmentFileDirectory, String[] weaponFileNames) {
+	static WeaponList readWeaponFile(String equipmentFileDirectory, String[] weaponFileNames, JLabel eventLabel) {
 		WeaponList weaponList = new WeaponList();
 
 		for (String fileName : weaponFileNames) {
@@ -139,7 +139,7 @@ class ReadFile {
 					}
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				PrintMessage.updateEventLabelError(eventLabel, "武器相關檔案讀取錯誤");
 			} finally {
 				try {
 					if (br != null)
@@ -154,7 +154,7 @@ class ReadFile {
 		return weaponList;
 	}
 
-	static ArmorList readArmorFile(String equipmentFileDirectory, String[] armorFileNames) {
+	static ArmorList readArmorFile(String equipmentFileDirectory, String[] armorFileNames, JLabel eventLabel) {
 		ArmorList armorList = new ArmorList();
 
 		for (String fileName : armorFileNames) {
@@ -183,7 +183,7 @@ class ReadFile {
 					}
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				PrintMessage.updateEventLabelError(eventLabel, "'防具相關檔案讀取錯誤");
 			} finally {
 				try {
 					if (br != null)
@@ -198,7 +198,7 @@ class ReadFile {
 		return armorList;
 	}
 
-	static void readRequirementFile(String fileName, JTextArea textArea,
+	static void readRequirementFile(String fileName, JTextArea textArea, JLabel eventLabel,
 									SkillList decorationList, WeaponList weaponList, ArmorList armorList,
 									SetBonusList setBonus, SkillList includedSkill, SkillList excludedSkill,
 									WeaponList includedWeaponList, ArmorList includedArmorList) throws CloneNotSupportedException {
@@ -298,7 +298,7 @@ class ReadFile {
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			PrintMessage.updateEventLabel(eventLabel, "'需求檔案讀取錯誤");
 		} finally {
 			try {
 				if (br != null)
