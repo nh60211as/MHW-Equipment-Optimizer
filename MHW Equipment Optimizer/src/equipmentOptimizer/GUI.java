@@ -22,6 +22,8 @@ public class GUI {
 		resultTextArea.setEditable(false);
 		eventLabel.setText("MHW Equipment Optimizer");
 
+		equipmentOptimizer = new EquipmentOptimizer(resultTextArea, eventLabel);
+
 		fileChooser = new JFileChooser();
 		fileChooser.setCurrentDirectory(new java.io.File("."));
 		fileChooser.setMultiSelectionEnabled(false);
@@ -32,22 +34,27 @@ public class GUI {
 			if (fileChooser.showOpenDialog(mainPanel) == JFileChooser.APPROVE_OPTION) {
 				fileName = fileChooser.getSelectedFile().getAbsolutePath();
 				eventLabel.setText("目前選擇檔案：" + fileName);
+				startMatchingButton.setEnabled(true);
+			}
+		});
 
+		startMatchingButton.addActionListener(e -> {
+			chooseFileButton.setEnabled(false);
+			startMatchingButton.setEnabled(false);
+			resultTextArea.setText("");
+			try {
 				try {
-					equipmentOptimizer = new EquipmentOptimizer(resultTextArea, eventLabel);
-					startMatchingButton.setEnabled(true);
 					equipmentOptimizer.readRequirement(fileName);
 					equipmentOptimizer.generateIncludedEquipmentList();
 				} catch (Exception e1) {
 					startMatchingButton.setEnabled(false);
 					eventLabel.setText("檔案格式錯誤");
 				}
-			}
-		});
-		startMatchingButton.addActionListener(e -> {
-			resultTextArea.setText("");
-			try {
-				Thread thread = new Thread(() -> equipmentOptimizer.findAndPrintMatchingEquipmentList());
+				Thread thread = new Thread(() -> {
+					equipmentOptimizer.findAndPrintMatchingEquipmentList();
+					chooseFileButton.setEnabled(true);
+					startMatchingButton.setEnabled(true);
+				});
 				thread.start();
 			} catch (Exception e1) {
 				startMatchingButton.setEnabled(false);

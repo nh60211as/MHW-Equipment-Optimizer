@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="MHW Equipment Optimizer:jar2">
-    <output-path>$PROJECT_DIR$/out/artifacts/MHW_Equipment_Optimizer_jar2</output-path>
+  <artifact type="jar" name="GUI">
+    <output-path>$PROJECT_DIR$</output-path>
     <root id="archive" name="MHW-Equipment-Optimizer-GUI.jar">
       <element id="directory" name="META-INF">
         <element id="file-copy" path="$PROJECT_DIR$/manifests/GUI/META-INF/MANIFEST.MF" />

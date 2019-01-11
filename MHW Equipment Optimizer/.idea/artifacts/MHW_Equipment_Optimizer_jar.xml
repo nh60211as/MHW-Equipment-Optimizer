@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="MHW Equipment Optimizer:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/MHW_Equipment_Optimizer_jar</output-path>
-    <root id="archive" name="MHW-Equipment-Optimizer.jar">
-      <element id="module-output" name="MHW Equipment Optimizer" />
-    </root>
-  </artifact>
-</component>

@@ -29,8 +29,10 @@ class PrintMessage {
 	}
 
 	static void updateEventLabelError(JLabel label, String message) {
-		SwingUtilities.invokeLater(() -> label.setForeground(Color.RED));
-		SwingUtilities.invokeLater(() -> label.setText(message));
+		SwingUtilities.invokeLater(() -> {
+			label.setForeground(Color.RED);
+			label.setText(message);
+		});
 		System.out.print(message);
 	}
 }
