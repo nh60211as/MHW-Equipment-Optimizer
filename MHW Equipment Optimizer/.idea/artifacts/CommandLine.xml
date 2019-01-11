@@ -5,6 +5,7 @@
       <element id="directory" name="META-INF">
         <element id="file-copy" path="$PROJECT_DIR$/manifests/CommandLine/META-INF/MANIFEST.MF" />
       </element>
+      <element id="module-output" name="MHW Equipment Optimizer" />
     </root>
   </artifact>
 </component>
