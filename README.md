@@ -78,7 +78,7 @@ https://github.com/nh60211as/MHW-Equipment-Optimizer/releases
 * 以下為可選輸入，如果有輸入的話就會強制選取那些裝備來配對，沒有的話會自動從已有裝備中搜尋\
 "頭："、"身："、"腕："、"腰："、"腳："、"護石："同上，
 
-### v2.0.0輸入方式：
+### v2.x.x輸入方式：
 直接點擊MHW-Equipment-Optimizer-GUI.jar即可
 
 ### v1.8.3(無使用者介面)輸入方式：
