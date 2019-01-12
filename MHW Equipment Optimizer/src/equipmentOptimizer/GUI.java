@@ -22,8 +22,6 @@ public class GUI {
 		resultTextArea.setEditable(false);
 		eventLabel.setText("MHW Equipment Optimizer");
 
-		equipmentOptimizer = new EquipmentOptimizer(resultTextArea, eventLabel);
-
 		fileChooser = new JFileChooser();
 		fileChooser.setCurrentDirectory(new java.io.File("."));
 		fileChooser.setMultiSelectionEnabled(false);
@@ -43,6 +41,7 @@ public class GUI {
 			startMatchingButton.setEnabled(false);
 			resultTextArea.setText("");
 			try {
+				equipmentOptimizer = new EquipmentOptimizer(resultTextArea, eventLabel);
 				try {
 					equipmentOptimizer.readRequirement(fileName);
 					equipmentOptimizer.generateIncludedEquipmentList();
