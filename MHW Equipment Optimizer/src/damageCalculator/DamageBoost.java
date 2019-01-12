@@ -1,6 +1,6 @@
 package damageCalculator;
 
-public class DamageBoost {
+class DamageBoost {
 	double attack;
 	double critical;
 	

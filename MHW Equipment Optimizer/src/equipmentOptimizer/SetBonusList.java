@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 class SetBonusList {
-	private List<String> _setBonusName;
-	private List<Integer> _setBonusRequirement;
+	private final List<String> _setBonusName;
+	private final List<Integer> _setBonusRequirement;
 
 	SetBonusList() {
 		_setBonusName = new ArrayList<>();

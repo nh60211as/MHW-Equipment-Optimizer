@@ -2,10 +2,10 @@ package equipmentOptimizer;
 
 public class Weapon extends Equipment implements Cloneable {
 	private int rawAttack;
-	private int sharpness;
+	private final int sharpness;
 	private double affinity;
 
-	private ElementalDamageList elementalDamageList;
+	private final ElementalDamageList elementalDamageList;
 
 	Weapon(String input) {
 		// 冰炎劍維爾瑪閃焰;180,0,0.10;冰,240,否,爆,240,否;0;0,1,0;加速再生,1

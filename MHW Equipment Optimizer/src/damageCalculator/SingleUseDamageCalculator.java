@@ -1,6 +1,6 @@
 package damageCalculator;
 
-public class SingleUseDamageCalculator {
+class SingleUseDamageCalculator {
 
 	public static void main(String[] args) {
 		DamageBoost baseStat = new DamageBoost(190*1.0,0);

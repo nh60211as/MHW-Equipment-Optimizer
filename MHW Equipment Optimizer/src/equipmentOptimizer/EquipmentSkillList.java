@@ -3,9 +3,9 @@ package equipmentOptimizer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EquipmentSkillList {
-	private List<String> _skillName;
-	private List<Integer> _skillLevel;
+class EquipmentSkillList {
+	private final List<String> _skillName;
+	private final List<Integer> _skillLevel;
 
 	EquipmentSkillList() {
 		_skillName = new ArrayList<>();

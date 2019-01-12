@@ -3,8 +3,9 @@ package equipmentOptimizer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EquipmentList {
-	List<Armor> armors;
+class EquipmentList {
+	final List<Armor> armors;
+	private final Weapon weapon;
 	int defense;
 	int decor3; // 這項會在建構式出現
 	int decor2; // 這項會在建構式出現
@@ -16,7 +17,6 @@ public class EquipmentList {
 	int[] elementalResistance;
 	SetBonusList setBonusList; // 這項會在建構式出現
 	EquipmentSkillList equipmentSkillList;
-	private Weapon weapon;
 
 	EquipmentList(Weapon weapon, Armor head, Armor body, Armor hands, Armor belt, Armor feet, Armor charm) {
 		this.weapon = weapon;

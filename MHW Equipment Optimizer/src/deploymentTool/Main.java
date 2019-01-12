@@ -7,7 +7,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Main {
+class Main {
 	public static void main(String[] args) throws IOException {
 		final int MAJORVERSION = Integer.parseInt(args[0]);
 		final int MINORVERSION = Integer.parseInt(args[1]);

@@ -1,6 +1,6 @@
 package equipmentOptimizer;
 
-public class Main {
+class Main {
 
 	public static void main(String[] args) throws CloneNotSupportedException {
 		//System.out.println("讀取檔案中...");

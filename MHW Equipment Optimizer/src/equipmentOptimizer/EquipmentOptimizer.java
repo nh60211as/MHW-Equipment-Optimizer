@@ -5,10 +5,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 class EquipmentOptimizer {
+	// 檔案路徑
+	private static final String equipmentFileDirectory = "裝備檔案/";
+	private static final String decorationFileName = "_擁有裝飾珠.txt";
+	private static final String[] weaponFileNames = {"_武器.txt"};
+	private static final String[] armorFileNames = {"_頭.txt", "_身.txt", "_腕.txt", "_腰.txt", "_腳.txt", "_護石.txt"};
+
 	// 基本資料
-	private SkillList decorationList;
-	private WeaponList weaponList;
-	private ArmorList armorList;
+	private final SkillList decorationList;
+	private final WeaponList weaponList;
+	private final ArmorList armorList;
 
 	// 需求技能的資料
 	private SetBonusList setBonusList;
@@ -20,19 +26,13 @@ class EquipmentOptimizer {
 	private WeaponList excludedWeaponList; // TODO
 
 	private String requirementFileName;
-	private JTextArea textArea;
-	private JLabel eventLabel;
+	private final JTextArea textArea;
+	private final JLabel eventLabel;
 
 	EquipmentOptimizer(JTextArea textArea, JLabel eventLabel) {
 		// 初始化函數
 		this.textArea = textArea;
 		this.eventLabel = eventLabel;
-
-		// 讀取裝備資訊和技能資訊
-		final String equipmentFileDirectory = "裝備檔案/";
-		final String decorationFileName = "_擁有裝飾珠.txt";
-		final String[] weaponFileNames = {"_武器.txt"};
-		final String[] armorFileNames = {"_頭.txt", "_身.txt", "_腕.txt", "_腰.txt", "_腳.txt", "_護石.txt"};
 
 		// 所有裝飾珠的資料
 		decorationList = ReadFile.readDecorationFile(equipmentFileDirectory, decorationFileName, eventLabel);

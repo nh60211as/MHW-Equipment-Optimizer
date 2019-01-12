@@ -5,12 +5,12 @@ import java.util.List;
 
 class Armor extends Equipment {
 	// 用於比較防具
-	static int BETTER = 0;
-	static int SAME = 1;
-	static int WORSE = 2;
-	static int MAYBE = 3;
-	int[] elementalResistance;
-	String setBonus;
+	static final int BETTER = 0;
+	static final int SAME = 1;
+	static final int WORSE = 2;
+	static final int MAYBE = 3;
+	final int[] elementalResistance;
+	final String setBonus;
 
 	Armor(String input) {
 		// 巨蜂頭盔α;76;-2,+1,+1,+1,+2;0,0,0;(無),收刀術,1,麻痺屬性強化,1
@@ -59,21 +59,8 @@ class Armor extends Equipment {
 		int e1Score = e1.decor3 * 100 + e1.decor2 * 10 + e1.decor1;
 		int e2Score = e2.decor3 * 100 + e2.decor2 * 10 + e2.decor1;
 
-		int decorationLevelScore = MAYBE;
-		if (e1Score > e2Score)
-			decorationLevelScore = BETTER;
-		else if (e1Score == e2Score)
-			decorationLevelScore = SAME;
-		else if (e1Score < e2Score)
-			decorationLevelScore = WORSE;
-
-		int decorationNumberScore = MAYBE;
-		if (e1.totalDecor > e2.totalDecor)
-			decorationNumberScore = BETTER;
-		else if (e1.totalDecor == e2.totalDecor)
-			decorationNumberScore = SAME;
-		else if (e1.totalDecor < e2.totalDecor)
-			decorationNumberScore = WORSE;
+		int decorationLevelScore = decorationScore(e1Score, e2Score);
+		int decorationNumberScore = decorationScore(e1.totalDecor, e2.totalDecor);
 
 		return compare(decorationLevelScore, decorationNumberScore);
 	}
@@ -82,23 +69,21 @@ class Armor extends Equipment {
 		int e1Score = e1.combinedDecor3 * 100 + e1.combinedDecor2 * 10 + e1.combinedDecor1;
 		int e2Score = e2.combinedDecor3 * 100 + e2.combinedDecor2 * 10 + e2.combinedDecor1;
 
-		int decorationLevelScore = MAYBE;
-		if (e1Score > e2Score)
-			decorationLevelScore = BETTER;
-		else if (e1Score == e2Score)
-			decorationLevelScore = SAME;
-		else if (e1Score < e2Score)
-			decorationLevelScore = WORSE;
-
-		int decorationNumberScore = MAYBE;
-		if (e1.totalCombinedDecor > e2.totalCombinedDecor)
-			decorationNumberScore = BETTER;
-		else if (e1.totalCombinedDecor == e2.totalCombinedDecor)
-			decorationNumberScore = SAME;
-		else if (e1.totalCombinedDecor < e2.totalCombinedDecor)
-			decorationNumberScore = WORSE;
+		int decorationLevelScore = decorationScore(e1Score, e2Score);
+		int decorationNumberScore = decorationScore(e1.totalCombinedDecor, e2.totalCombinedDecor);
 
 		return compare(decorationLevelScore, decorationNumberScore);
+	}
+
+	private static int decorationScore(int e1Score, int e2Score) {
+		if (e1Score > e2Score)
+			return BETTER;
+		else if (e1Score == e2Score)
+			return SAME;
+		else if (e1Score < e2Score)
+			return WORSE;
+
+		return MAYBE;
 	}
 
 	private static int compare(int decorationLevelScore, int decorationNumberScore) {
@@ -165,8 +150,8 @@ class Armor extends Equipment {
 		int SAMEHERE = SAME;
 		int WORSEHERE = WORSE;
 
-		List thisIrreplaceableSkill = new ArrayList<Boolean>();
-		List anotherIrreplaceableSkill = new ArrayList<Boolean>();
+		List<Boolean> thisIrreplaceableSkill = new ArrayList<>();
+		List<Boolean> anotherIrreplaceableSkill = new ArrayList<>();
 		for (Skill currentSkill : includedSkill) {
 			if (!currentSkill.isReplaceable) {
 				String currentSkillName = currentSkill.skillName;

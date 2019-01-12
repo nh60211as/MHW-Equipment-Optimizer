@@ -3,7 +3,7 @@ package damageCalculator;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-public class DamageCalculator {
+class DamageCalculator {
 	public static void main(String[] args) {
 		DamageBoost[] baseStat = new DamageBoost[6];
 		baseStat[0] = new DamageBoost(190*1.1,0);
@@ -55,11 +55,11 @@ public class DamageCalculator {
 		double baseMinusCriticalDamage = 0.75;
 
 
-		LinkedList<Double> damageList = new LinkedList<Double>();
-		LinkedList<ArrayList<Integer>> damageListIndex = new LinkedList<ArrayList<Integer>>();
+		LinkedList<Double> damageList = new LinkedList<>();
+		LinkedList<ArrayList<Integer>> damageListIndex = new LinkedList<>();
 
 		damageList.add((double) 0);
-		damageListIndex.add(new ArrayList<Integer>());
+		damageListIndex.add(new ArrayList<>());
 		int sortSize = 10;
 
 		for(int weapon=0;weapon<=baseStat.length-1;weapon++) 
@@ -87,7 +87,7 @@ public class DamageCalculator {
 									criticalNow = 1;
 
 								double weaponDamage = attackNow * ( criticalNow*criticalEyeNow + (1-criticalNow)*1 );
-								ArrayList<Integer> index = new ArrayList<Integer>();
+								ArrayList<Integer> index = new ArrayList<>();
 								index.add(weapon);
 								index.add(skill0);
 								index.add(skill1);

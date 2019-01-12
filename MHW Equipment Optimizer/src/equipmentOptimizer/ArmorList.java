@@ -3,7 +3,7 @@ package equipmentOptimizer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArmorList extends ArrayList<List<Armor>> {
+class ArmorList extends ArrayList<List<Armor>> {
 	static final int HEAD = 0;
 	static final int BODY = 1;
 	static final int HANDS = 2;

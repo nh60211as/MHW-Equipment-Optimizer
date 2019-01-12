@@ -76,7 +76,7 @@ class ReadFile {
 			reader = new InputStreamReader(new FileInputStream(equipmentFileDirectory + decorationFileName), StandardCharsets.UTF_8);
 			br = new BufferedReader(reader);
 
-			//開始閱讀檔案
+			// 開始閱讀檔案
 			int levelOfDecoration = 0;
 			String currentLine;
 
@@ -120,7 +120,7 @@ class ReadFile {
 				reader = new InputStreamReader(new FileInputStream(equipmentFileDirectory + fileName), StandardCharsets.UTF_8);
 				br = new BufferedReader(reader);
 
-				//開始閱讀檔案
+				// 開始閱讀檔案
 				int readFlag = DEFAULT_READ_FLAG;
 				int currentFlag;
 				String currentLine;

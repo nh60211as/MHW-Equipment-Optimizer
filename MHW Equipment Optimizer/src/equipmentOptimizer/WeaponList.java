@@ -3,7 +3,7 @@ package equipmentOptimizer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WeaponList extends ArrayList<List<Weapon>> {
+class WeaponList extends ArrayList<List<Weapon>> {
 	static final int GREATSWORD = 0;
 	static final int LONGSWORD = 1;
 	static final int SWORDNSHIELD = 2;
