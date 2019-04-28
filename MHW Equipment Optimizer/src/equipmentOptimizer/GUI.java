@@ -4,8 +4,8 @@ import javax.swing.*;
 
 class GUI {
 	private static final int MAJORVERSION = 2;
-	private static final int MINORVERSION = 0;
-	private static final int FIXVERSION = 3;
+	private static final int MINORVERSION = 1;
+	private static final int FIXVERSION = 0;
 
 	private JPanel mainPanel;
 	private JButton chooseFileButton;

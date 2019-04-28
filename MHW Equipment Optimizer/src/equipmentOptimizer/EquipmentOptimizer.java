@@ -76,6 +76,7 @@ class EquipmentOptimizer {
 						for (Skill currentIncludedSkill : includedSkill) {
 							if (charmNow.skillList.contains(currentIncludedSkill.skillName)) {
 								currentIncludedArmorList.add(charmNow);
+								break;
 							}
 						}
 					}
