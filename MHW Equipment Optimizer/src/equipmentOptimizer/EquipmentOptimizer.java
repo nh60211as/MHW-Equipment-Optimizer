@@ -403,10 +403,10 @@ class EquipmentOptimizer {
 		}
 
 		stringBuilder.append(" 剩餘鑲嵌槽：");
-		for (int i = remainDecorSlot.length - 2; i >= 1; i--) {
+		for (int i = remainDecorSlot.length - 1; i >= 2; i--) {
 			stringBuilder.append(String.format("%2d,", remainDecorSlot[i]));
 		}
-		stringBuilder.append(String.format("%2d", remainDecorSlot[remainDecorSlot.length - 1]));
+		stringBuilder.append(String.format("%2d", remainDecorSlot[1]));
 
 		stringBuilder.append("\n\n");
 		PrintMessage.print(textArea, stringBuilder.toString());
