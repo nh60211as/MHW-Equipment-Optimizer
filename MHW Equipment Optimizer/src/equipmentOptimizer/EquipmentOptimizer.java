@@ -9,12 +9,15 @@ class EquipmentOptimizer {
 	private static final String equipmentFileDirectory = "裝備檔案/";
 	private static final String decorationFileName = "_擁有裝飾珠.txt";
 	private static final String[] weaponFileNames = {"_武器.txt"};
-	private static final String[] armorFileNames = {"_頭.txt", "_身.txt", "_腕.txt", "_腰.txt", "_腳.txt", "_護石.txt"};
+	private static final String[] armorFileNames = {"_頭.txt", "_身.txt", "_腕.txt", "_腰.txt", "_腳.txt"};
+	private static final String[] armorSetFileNames = {"_整套防具.txt"}; // TODO
+	private static final String[] charmFileNames = {"_護石.txt"};
 
 	// 基本資料
 	private final SkillList decorationList;
 	private final WeaponList weaponList;
 	private final ArmorList armorList;
+	private final CharmList charmList;
 
 	// 需求技能的資料
 	private SetBonusList setBonusList;
@@ -24,22 +27,25 @@ class EquipmentOptimizer {
 	private WeaponList includedWeaponList;
 	private ArmorList includedArmorList;
 	private WeaponList excludedWeaponList; // TODO
+	private CharmList includedCharmList;
 
 	private String requirementFileName;
 	private final JTextArea textArea;
 	private final JLabel eventLabel;
 
 	EquipmentOptimizer(JTextArea textArea, JLabel eventLabel) {
-		// 初始化函數
+		// 初始化變數
 		this.textArea = textArea;
 		this.eventLabel = eventLabel;
 
-		// 所有裝飾珠的資料
+		// 所有裝飾珠/技能的資料
 		decorationList = ReadFile.readDecorationFile(equipmentFileDirectory, decorationFileName, eventLabel);
 		// 所有武器的資料
 		weaponList = ReadFile.readWeaponFile(equipmentFileDirectory, weaponFileNames, eventLabel);
-		// 所有裝備的資料
+		// 所有防具的資料
 		armorList = ReadFile.readArmorFile(equipmentFileDirectory, armorFileNames, eventLabel);
+		// 所有護石的資料
+		charmList = ReadFile.readCharmFile(equipmentFileDirectory, charmFileNames, eventLabel);
 
 		// 結束初始化函數
 	}
@@ -53,6 +59,7 @@ class EquipmentOptimizer {
 
 		includedWeaponList = new WeaponList();
 		includedArmorList = new ArmorList();
+		includedCharmList = new CharmList();
 
 		// 讀取技能、裝備需求檔案
 		ReadFile.readRequirementFile(requirementFileName, textArea, eventLabel,
@@ -62,74 +69,75 @@ class EquipmentOptimizer {
 	}
 
 	void generateIncludedEquipmentList() {
+		// 加入要搜尋的武器
 		if (includedWeaponList.isEmptyWeaponList()) {
 			PrintMessage.warning(textArea, "未指定武器");
 			includedWeaponList.add(WeaponList.GREATSWORD, new Weapon());
 		}
 
+		// 加入要搜尋的護石
+		for (Charm charmNow : charmList) {
+			for (Skill currentIncludedSkill : includedSkill) {
+				if (charmNow.skillList.contains(currentIncludedSkill.skillName)) {
+					includedCharmList.add(charmNow);
+					break;
+				}
+			}
+		}
+
 		//System.out.println("搜索合適裝備中...");
-		for (int currentBodyPart = ArmorList.HEAD; currentBodyPart <= ArmorList.CHARM; currentBodyPart++) {
+		// 加入要搜尋的防具
+		for (int currentBodyPart = ArmorList.HEAD; currentBodyPart <= ArmorList.FEET; currentBodyPart++) {
 			List<Armor> currentIncludedArmorList = includedArmorList.get(currentBodyPart);
 			if (currentIncludedArmorList.size() == 0) {
-				if (currentBodyPart == ArmorList.CHARM) { //若裝備為護石
-					for (Armor charmNow : armorList.get(currentBodyPart)) {
-						for (Skill currentIncludedSkill : includedSkill) {
-							if (charmNow.skillList.contains(currentIncludedSkill.skillName)) {
-								currentIncludedArmorList.add(charmNow);
-								break;
-							}
-						}
+				for (Armor currentAddedArmor : armorList.get(currentBodyPart)) {
+					//includedArmorList.printBodyPart(currentBodyPart);
+					if (currentAddedArmor.skillList.contains(excludedSkill))
+						continue;
+
+					currentAddedArmor.setCombinedDecoration(includedSkill);
+
+					if (currentAddedArmor.containsSetBonus(setBonusList) || currentIncludedArmorList.size() == 0) {
+						currentIncludedArmorList.add(currentAddedArmor);
+						continue;
 					}
-				} else {
-					for (Armor currentAddedArmor : armorList.get(currentBodyPart)) {
-						//includedArmorList.printBodyPart(currentBodyPart);
-						if (currentAddedArmor.skillList.contains(excludedSkill))
-							continue;
 
-						currentAddedArmor.setCombinedDecoration(includedSkill);
+					List<Integer> marked2remove = new ArrayList<>();
+					boolean marked2add = false;
+					for (int includedArmorIndex = 0; includedArmorIndex <= currentIncludedArmorList.size() - 1; includedArmorIndex++) {
+						Armor armorNow = currentIncludedArmorList.get(includedArmorIndex);
 
-						if (currentAddedArmor.containsSetBonus(setBonusList) || currentIncludedArmorList.size() == 0) {
-							currentIncludedArmorList.add(currentAddedArmor);
+						if (armorNow.containsSetBonus(setBonusList)) {
 							continue;
 						}
 
-						List<Integer> marked2remove = new ArrayList<>();
-						boolean marked2add = false;
-						for (int includedArmorIndex = 0; includedArmorIndex <= currentIncludedArmorList.size() - 1; includedArmorIndex++) {
-							Armor armorNow = currentIncludedArmorList.get(includedArmorIndex);
-
-							if (armorNow.containsSetBonus(setBonusList)) {
-								continue;
-							}
-
-							int isCurrentArmorBetter = armorNow.isBetter(currentAddedArmor, includedSkill);
+						int isCurrentArmorBetter = armorNow.isBetter(currentAddedArmor, includedSkill);
 //							System.out.println(armorNow.equipmentName + " " +
 //									isCurrentArmorBetter + " " +
 //									currentAddedArmor.equipmentName);
-							if (isCurrentArmorBetter == Armor.BETTER) {
-								break;
-							} else if (isCurrentArmorBetter == Armor.SAME) {
-								marked2add = true;
-							} else if (isCurrentArmorBetter == Armor.WORSE) {
-								marked2remove.add(includedArmorIndex);
-								marked2add = true;
-							} else if (isCurrentArmorBetter == Armor.MAYBE) {
-								marked2add = true;
-							}
+						if (isCurrentArmorBetter == Armor.BETTER) {
+							break;
+						} else if (isCurrentArmorBetter == Armor.SAME) {
+							marked2add = true;
+						} else if (isCurrentArmorBetter == Armor.WORSE) {
+							marked2remove.add(includedArmorIndex);
+							marked2add = true;
+						} else if (isCurrentArmorBetter == Armor.MAYBE) {
+							marked2add = true;
 						}
-						//includedEquipmentList.printBodyPart(bodyPartNow);
-						//System.out.print("remove: ");
-						//System.out.println(marked2remove);
-						for (int i = marked2remove.size() - 1; i >= 0; i--) {
-							currentIncludedArmorList.remove((int) marked2remove.get(i));
-						}
-						if (marked2add) {
-							//System.out.println("add: " + currentEquipment.equipmentName);
-							currentIncludedArmorList.add(currentAddedArmor);
-						}
-						//includedArmorList.printBodyPart(currentBodyPart);
-						//System.out.println();
 					}
+					//includedEquipmentList.printBodyPart(bodyPartNow);
+					//System.out.print("remove: ");
+					//System.out.println(marked2remove);
+					for (int i = marked2remove.size() - 1; i >= 0; i--) {
+						currentIncludedArmorList.remove((int) marked2remove.get(i));
+					}
+					if (marked2add) {
+						//System.out.println("add: " + currentEquipment.equipmentName);
+						currentIncludedArmorList.add(currentAddedArmor);
+					}
+					//includedArmorList.printBodyPart(currentBodyPart);
+					//System.out.println();
 				}
 			}
 		}
@@ -139,26 +147,27 @@ class EquipmentOptimizer {
 	void findAndPrintMatchingEquipmentList() {
 		PrintMessage.print(textArea, "符合 " + requirementFileName + " 條件的裝備：\n\n");
 
-		int weaponSize = includedWeaponList.totalSize();
-		int armorSize = includedArmorList.iterationSize();
+		long weaponSize = includedWeaponList.totalSize();
+		long armorSize = includedArmorList.iterationSize();
+		long totalSize = weaponSize * armorSize;
 
 		double lastPrint = 0;
 		int searchCount = 0;
 		for (List<Weapon> weaponType : includedWeaponList)
 			for (Weapon weapon : weaponType)
 				for (Armor head : includedArmorList.get(ArmorList.HEAD)) {
-					double currentPrint = searchCount * 100.0 / (weaponSize * armorSize);
+					double currentPrint = searchCount * 100.0 / (totalSize);
 					if (lastPrint <= currentPrint - 10) {
 						lastPrint = currentPrint;
 						PrintMessage.updateEventLabel(eventLabel, String.format("已搜尋:%.2f%%\n\n", currentPrint));
 						//System.out.format("已搜尋:%.2f%%\n", currentPrint);
 						//System.out.println();
 					}
-					for (Armor body : includedArmorList.get(ArmorList.BODY))
-						for (Armor hands : includedArmorList.get(ArmorList.HANDS))
-							for (Armor belt : includedArmorList.get(ArmorList.BELT))
-								for (Armor feet : includedArmorList.get(ArmorList.FEET))
-									for (Armor charm : includedArmorList.get(ArmorList.CHARM)) {
+					for (Charm charm : includedCharmList)
+						for (Armor body : includedArmorList.get(ArmorList.BODY))
+							for (Armor hands : includedArmorList.get(ArmorList.HANDS))
+								for (Armor belt : includedArmorList.get(ArmorList.BELT))
+									for (Armor feet : includedArmorList.get(ArmorList.FEET)) {
 										searchCount++;
 
 //										EquipmentList currentEquipmentList =
@@ -199,6 +208,11 @@ class EquipmentOptimizer {
 												if (indexOfIncludedSkill != -1)
 													skillHave[indexOfIncludedSkill] += currentArmor.skillList.getSkillLevel(currentArmorSkillIndex);
 											}
+										}
+										for (int currentCharmSkillIndex = 0; currentCharmSkillIndex <= charm.skillList.size() - 1; currentCharmSkillIndex++) {
+											int indexOfIncludedSkill = includedSkill.indexOf(charm.skillList.skillName().get(currentCharmSkillIndex));
+											if (indexOfIncludedSkill != -1)
+												skillHave[indexOfIncludedSkill] += charm.skillList.getSkillLevel(currentCharmSkillIndex);
 										}
 
 										// 計算仍然需要的技能數量

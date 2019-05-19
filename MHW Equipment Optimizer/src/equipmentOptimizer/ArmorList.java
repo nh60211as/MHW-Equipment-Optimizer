@@ -9,10 +9,9 @@ class ArmorList extends ArrayList<List<Armor>> {
 	static final int HANDS = 2;
 	static final int BELT = 3;
 	static final int FEET = 4;
-	static final int CHARM = 5;
 
 	ArmorList() {
-		for (int i = HEAD; i <= CHARM; i++)
+		for (int i = HEAD; i <= FEET; i++)
 			this.add(new ArrayList<>());
 	}
 

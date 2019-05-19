@@ -4,7 +4,7 @@ import javax.swing.*;
 
 class GUI {
 	private static final int MAJORVERSION = 2;
-	private static final int MINORVERSION = 1;
+	private static final int MINORVERSION = 2;
 	private static final int FIXVERSION = 0;
 
 	private JPanel mainPanel;

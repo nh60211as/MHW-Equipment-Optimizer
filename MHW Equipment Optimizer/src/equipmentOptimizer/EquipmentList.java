@@ -3,13 +3,16 @@ package equipmentOptimizer;
 import java.util.ArrayList;
 import java.util.List;
 
+// TODO
+// This part need a code clean up
 class EquipmentList {
+	final Charm charm;
 	final List<Armor> armors;
 	private final Weapon weapon;
 	int defense;
-	int decor3; // 這項會在建構式出現
-	int decor2; // 這項會在建構式出現
-	int decor1; // 這項會在建構式出現
+	int decor3;
+	int decor2;
+	int decor1;
 	int combinedDecor3;
 	int combinedDecor2;
 	int combinedDecor1;
@@ -18,7 +21,7 @@ class EquipmentList {
 	SetBonusList setBonusList; // 這項會在建構式出現
 	EquipmentSkillList equipmentSkillList;
 
-	EquipmentList(Weapon weapon, Armor head, Armor body, Armor hands, Armor belt, Armor feet, Armor charm) {
+	EquipmentList(Weapon weapon, Armor head, Armor body, Armor hands, Armor belt, Armor feet, Charm charm) {
 		this.weapon = weapon;
 
 		armors = new ArrayList<>();
@@ -27,7 +30,8 @@ class EquipmentList {
 		armors.add(hands);
 		armors.add(belt);
 		armors.add(feet);
-		armors.add(charm);
+
+		this.charm = charm;
 
 		setBonusList = new SetBonusList();
 		for (Armor currentArmor : armors) {
@@ -44,15 +48,19 @@ class EquipmentList {
 			decor2 += currentArmor.decor2;
 			decor1 += currentArmor.decor1;
 		}
+		decor3 += charm.decor3;
+		decor2 += charm.decor2;
+		decor1 += charm.decor1;
 	}
 
 	void setAdditionalInformation() {
 		setBonusList = new SetBonusList();
 		equipmentSkillList = new EquipmentSkillList();
 
-		for (Armor currentArmor : armors) {
+		equipmentSkillList.plus(weapon.skillList);
+		for (Armor currentArmor : armors)
 			equipmentSkillList.plus(currentArmor.skillList);
-		}
+		equipmentSkillList.plus(charm.skillList);
 		updateDefenseAndElementalResistance();
 	}
 
@@ -74,6 +82,9 @@ class EquipmentList {
 			for (int i = 0; i <= elementalResistance.length - 1; i++)
 				elementalResistance[i] += currentArmor.elementalResistance[i];
 		}
+		defense += charm.defense;
+		for (int i = 0; i <= elementalResistance.length - 1; i++)
+			elementalResistance[i] += charm.elementalResistance[i];
 
 		String skillName = "防禦";
 		if (equipmentSkillList.contains(skillName)) {
@@ -107,7 +118,7 @@ class EquipmentList {
 			output.append(armors.get(currentArmorIndex).equipmentName);
 			output.append(",");
 		}
-		output.append(armors.get(armors.size() - 1).equipmentName);
+		output.append(charm.equipmentName);
 		return output.toString();
 	}
 

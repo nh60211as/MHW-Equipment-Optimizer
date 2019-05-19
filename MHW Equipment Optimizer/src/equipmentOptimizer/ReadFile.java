@@ -61,7 +61,7 @@ class ReadFile {
 			case "腳：":
 				return ArmorList.FEET;
 			case "護石：":
-				return ArmorList.CHARM;
+				return CharmList.CHARM;
 		}
 
 		return DEFAULT_READ_FLAG;
@@ -196,6 +196,50 @@ class ReadFile {
 			}
 		}
 		return armorList;
+	}
+
+	static CharmList readCharmFile(String equipmentFileDirectory, String[] charmFileNames, JLabel eventLabel) {
+		CharmList charmList = new CharmList();
+
+		for (String fileName : charmFileNames) {
+			Reader reader = null;
+			BufferedReader br = null;
+			try {
+				reader = new InputStreamReader(new FileInputStream(equipmentFileDirectory + fileName), StandardCharsets.UTF_8);
+				br = new BufferedReader(reader);
+
+				//開始閱讀檔案
+				int readFlag = DEFAULT_READ_FLAG;
+				int currentFlag;
+				String currentLine;
+
+				while ((currentLine = br.readLine()) != null) {
+					if (currentLine.length() == 0)
+						continue;
+					if (currentLine.substring(0, 1).contentEquals("#"))
+						continue;
+
+					currentFlag = changeReadFlag(currentLine); // currentFlag 只能為DEFAULT_READ_FLAG或是charmList的數值
+					if (currentFlag != DEFAULT_READ_FLAG)
+						readFlag = currentFlag;
+					else {
+						charmList.add(new Charm(currentLine));
+					}
+				}
+			} catch (IOException e) {
+				PrintMessage.updateEventLabelError(eventLabel, "'防具相關檔案讀取錯誤");
+			} finally {
+				try {
+					if (br != null)
+						br.close();
+					if (reader != null)
+						reader.close();
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
+			}
+		}
+		return charmList;
 	}
 
 	static void readRequirementFile(String fileName, JTextArea textArea, JLabel eventLabel,

@@ -19,7 +19,6 @@ abstract class Equipment {
 
 	boolean isReplaceable;
 
-
 	Equipment() {
 	}
 }
