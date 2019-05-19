@@ -3,6 +3,8 @@ package equipmentOptimizer;
 import javax.swing.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 class ReadFile {
 	private static final int DEFAULT_READ_FLAG = -5;
@@ -60,6 +62,8 @@ class ReadFile {
 				return ArmorList.BELT;
 			case "腳：":
 				return ArmorList.FEET;
+			case "整套防具：":
+				return 0;
 			case "護石：":
 				return CharmList.CHARM;
 		}
@@ -196,6 +200,50 @@ class ReadFile {
 			}
 		}
 		return armorList;
+	}
+
+	static List<Armor> readArmorSetsFile(String equipmentFileDirectory, String[] armorSetFileNames, JLabel eventLabel) {
+		List<Armor> armorSetsList = new ArrayList();
+
+		for (String fileName : armorSetFileNames) {
+			Reader reader = null;
+			BufferedReader br = null;
+			try {
+				reader = new InputStreamReader(new FileInputStream(equipmentFileDirectory + fileName), StandardCharsets.UTF_8);
+				br = new BufferedReader(reader);
+
+				//開始閱讀檔案
+				int readFlag = DEFAULT_READ_FLAG;
+				int currentFlag;
+				String currentLine;
+
+				while ((currentLine = br.readLine()) != null) {
+					if (currentLine.length() == 0)
+						continue;
+					if (currentLine.substring(0, 1).contentEquals("#"))
+						continue;
+
+					currentFlag = changeReadFlag(currentLine);
+					if (currentFlag != DEFAULT_READ_FLAG)
+						readFlag = currentFlag;
+					else {
+						armorSetsList.add(new Armor(currentLine));
+					}
+				}
+			} catch (IOException e) {
+				PrintMessage.updateEventLabelError(eventLabel, "'防具相關檔案讀取錯誤");
+			} finally {
+				try {
+					if (br != null)
+						br.close();
+					if (reader != null)
+						reader.close();
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
+			}
+		}
+		return armorSetsList;
 	}
 
 	static CharmList readCharmFile(String equipmentFileDirectory, String[] charmFileNames, JLabel eventLabel) {

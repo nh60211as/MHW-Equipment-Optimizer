@@ -10,13 +10,14 @@ class EquipmentOptimizer {
 	private static final String decorationFileName = "_擁有裝飾珠.txt";
 	private static final String[] weaponFileNames = {"_武器.txt"};
 	private static final String[] armorFileNames = {"_頭.txt", "_身.txt", "_腕.txt", "_腰.txt", "_腳.txt"};
-	private static final String[] armorSetFileNames = {"_整套防具.txt"}; // TODO
+	private static final String[] armorSetsFileNames = {"_整套防具.txt"}; // TODO
 	private static final String[] charmFileNames = {"_護石.txt"};
 
 	// 基本資料
 	private final SkillList decorationList;
 	private final WeaponList weaponList;
 	private final ArmorList armorList;
+	private List<Armor> armorSetsList;
 	private final CharmList charmList;
 
 	// 需求技能的資料
@@ -27,6 +28,7 @@ class EquipmentOptimizer {
 	private WeaponList includedWeaponList;
 	private ArmorList includedArmorList;
 	private WeaponList excludedWeaponList; // TODO
+	private List<Armor> includedArmorSetsList; // TODO
 	private CharmList includedCharmList;
 
 	private String requirementFileName;
@@ -44,6 +46,9 @@ class EquipmentOptimizer {
 		weaponList = ReadFile.readWeaponFile(equipmentFileDirectory, weaponFileNames, eventLabel);
 		// 所有防具的資料
 		armorList = ReadFile.readArmorFile(equipmentFileDirectory, armorFileNames, eventLabel);
+		// 所有整套防具的資料
+		armorSetsList = ReadFile.readArmorSetsFile(equipmentFileDirectory, armorSetsFileNames, eventLabel);
+		includedArmorSetsList = armorSetsList;
 		// 所有護石的資料
 		charmList = ReadFile.readCharmFile(equipmentFileDirectory, charmFileNames, eventLabel);
 
@@ -149,21 +154,119 @@ class EquipmentOptimizer {
 
 		long weaponSize = includedWeaponList.totalSize();
 		long armorSize = includedArmorList.iterationSize();
-		long totalSize = weaponSize * armorSize;
+		long armorSetSize = includedArmorSetsList.size();
+		long charmSize = includedCharmList.size();
+		long totalSize = weaponSize * (armorSize + armorSetSize) * charmSize;
 
 		double lastPrint = 0;
 		int searchCount = 0;
 		for (List<Weapon> weaponType : includedWeaponList)
-			for (Weapon weapon : weaponType)
-				for (Armor head : includedArmorList.get(ArmorList.HEAD)) {
-					double currentPrint = searchCount * 100.0 / (totalSize);
-					if (lastPrint <= currentPrint - 10) {
-						lastPrint = currentPrint;
-						PrintMessage.updateEventLabel(eventLabel, String.format("已搜尋:%.2f%%\n\n", currentPrint));
-						//System.out.format("已搜尋:%.2f%%\n", currentPrint);
-						//System.out.println();
+			for (Weapon weapon : weaponType) {
+				for (Charm charm : includedCharmList) {
+					// 搜尋整套防具
+					for (Armor armorSet : includedArmorSetsList) {
+						searchCount++;
+						double currentPrint = searchCount * 100.0 / (totalSize);
+						if (lastPrint <= currentPrint - 10) {
+							lastPrint = currentPrint;
+							PrintMessage.updateEventLabel(eventLabel, String.format("已搜尋:%.2f%%\n\n", currentPrint));
+							//System.out.format("已搜尋:%.2f%%\n", currentPrint);
+							//System.out.println();
+						}
+
+						EquipmentList currentEquipmentList = new EquipmentList(weapon, armorSet, charm);
+
+						//檢查是否為套裝
+						if (!setBonusList.checkSetBonus(currentEquipmentList.setBonusList))
+							continue;
+
+						int[] numberOfHoleHave = new int[4];
+						int[] numberOfHoleNeed = new int[4];
+						int[] skillHave = new int[includedSkill.size()]; // 目前裝備擁有的技能
+						int[] skillNeed = new int[includedSkill.size()]; // 目前裝備需要的技能
+						for (int i = 0; i <= skillNeed.length - 1; i++)
+							skillNeed[i] = includedSkill.get(i).required;
+
+						// 計算目前裝備的鑲嵌槽數量
+						currentEquipmentList.setDecorationSlot();
+						numberOfHoleHave[3] = currentEquipmentList.decor3;
+						numberOfHoleHave[2] = currentEquipmentList.decor2;
+						numberOfHoleHave[1] = currentEquipmentList.decor1;
+						numberOfHoleHave[0] = 0;
+
+						// 計算目前裝備的技能列表
+						for (Armor currentArmor : currentEquipmentList.armors) {
+							List<String> currentArmorSkillList = currentArmor.skillList.skillName();
+							for (int currentArmorSkillIndex = 0; currentArmorSkillIndex <= currentArmor.skillList.size() - 1; currentArmorSkillIndex++) {
+								int indexOfIncludedSkill = includedSkill.indexOf(currentArmorSkillList.get(currentArmorSkillIndex));
+								if (indexOfIncludedSkill != -1)
+									skillHave[indexOfIncludedSkill] += currentArmor.skillList.getSkillLevel(currentArmorSkillIndex);
+							}
+						}
+						for (int currentCharmSkillIndex = 0; currentCharmSkillIndex <= charm.skillList.size() - 1; currentCharmSkillIndex++) {
+							int indexOfIncludedSkill = includedSkill.indexOf(charm.skillList.skillName().get(currentCharmSkillIndex));
+							if (indexOfIncludedSkill != -1)
+								skillHave[indexOfIncludedSkill] += charm.skillList.getSkillLevel(currentCharmSkillIndex);
+						}
+
+						// 計算仍然需要的技能數量
+						boolean success = true;
+						for (int i = 0; i <= skillNeed.length - 1; i++) {
+							int decorationNeed = skillNeed[i] - skillHave[i];
+							if (decorationNeed >= 1) {
+								if (decorationNeed > includedSkill.get(i).owned) {
+									success = false;
+									break;
+								}
+								numberOfHoleNeed[includedSkill.get(i).levelOfDecor] += decorationNeed;
+							}
+						}
+						if (!success)
+							continue;
+
+						boolean finished = true;
+						for (int i = 0; i <= numberOfHoleHave.length - 1; i++) {
+							numberOfHoleHave[i] -= numberOfHoleNeed[i];
+							if (numberOfHoleHave[i] < 0) {
+								finished = false;
+							}
+						}
+
+						while (!finished) {
+							finished = true;
+							if (numberOfHoleHave[numberOfHoleHave.length - 1] < 0) {
+								success = false;
+								break;
+							}
+
+							for (int i = numberOfHoleHave.length - 2; i >= 1; i--) {
+								if (numberOfHoleHave[i] < 0) {
+									numberOfHoleHave[i + 1] += numberOfHoleHave[i];
+									numberOfHoleHave[i] += -numberOfHoleHave[i];
+								}
+							}
+
+							for (int i = 0; i <= numberOfHoleHave.length - 1; i++) {
+								if (numberOfHoleHave[i] < 0) {
+									finished = false;
+								}
+							}
+						}
+
+						if (!success)
+							continue;
+
+						printEquipment(currentEquipmentList, numberOfHoleHave);
 					}
-					for (Charm charm : includedCharmList)
+					// 搜尋個別防具
+					for (Armor head : includedArmorList.get(ArmorList.HEAD)) {
+						double currentPrint = searchCount * 100.0 / (totalSize);
+						if (lastPrint <= currentPrint - 10) {
+							lastPrint = currentPrint;
+							PrintMessage.updateEventLabel(eventLabel, String.format("已搜尋:%.2f%%\n\n", currentPrint));
+							//System.out.format("已搜尋:%.2f%%\n", currentPrint);
+							//System.out.println();
+						}
 						for (Armor body : includedArmorList.get(ArmorList.BODY))
 							for (Armor hands : includedArmorList.get(ArmorList.HANDS))
 								for (Armor belt : includedArmorList.get(ArmorList.BELT))
@@ -264,7 +367,9 @@ class EquipmentOptimizer {
 
 										printEquipment(currentEquipmentList, numberOfHoleHave);
 									}
+					}
 				}
+			}
 		PrintMessage.updateEventLabel(eventLabel, String.format("已搜尋:%.2f%%\n\n", 100.0));
 	}
 
@@ -298,7 +403,7 @@ class EquipmentOptimizer {
 		}
 
 		stringBuilder.append(" 剩餘鑲嵌槽：");
-		for (int i = 1; i <= remainDecorSlot.length - 2; i++) {
+		for (int i = remainDecorSlot.length - 2; i >= 1; i--) {
 			stringBuilder.append(String.format("%2d,", remainDecorSlot[i]));
 		}
 		stringBuilder.append(String.format("%2d", remainDecorSlot[remainDecorSlot.length - 1]));

@@ -21,6 +21,20 @@ class EquipmentList {
 	SetBonusList setBonusList; // 這項會在建構式出現
 	EquipmentSkillList equipmentSkillList;
 
+	EquipmentList(Weapon weapon, Armor armorSet, Charm charm) {
+		this.weapon = weapon;
+
+		armors = new ArrayList<>();
+		armors.add(armorSet);
+
+		this.charm = charm;
+
+		setBonusList = new SetBonusList();
+		for (Armor currentArmor : armors) {
+			setBonusList.plus1(currentArmor.setBonus);
+		}
+	}
+
 	EquipmentList(Weapon weapon, Armor head, Armor body, Armor hands, Armor belt, Armor feet, Charm charm) {
 		this.weapon = weapon;
 
@@ -114,7 +128,7 @@ class EquipmentList {
 		StringBuilder output = new StringBuilder();
 		output.append(weapon.equipmentName);
 		output.append(",");
-		for (int currentArmorIndex = 0; currentArmorIndex <= armors.size() - 2; currentArmorIndex++) {
+		for (int currentArmorIndex = 0; currentArmorIndex <= armors.size() - 1; currentArmorIndex++) {
 			output.append(armors.get(currentArmorIndex).equipmentName);
 			output.append(",");
 		}
