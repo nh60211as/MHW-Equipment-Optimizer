@@ -1,45 +1,18 @@
 package equipmentOptimizer;
 
-class Skill {
+public class Skill {
+	public int levelOfDecor; // TODO: dummy field
+	public boolean isReplaceable; // TODO: dummy field
+	public int required; // TODO: dummy field
+	public int owned; // TODO: dummy field
 	String skillName;
-	int max;
-	int owned;
-	int levelOfDecor;
+	int level;
 
-	int required;
-	boolean isReplaceable;
-
-	Skill(String[] stringBlock) {
-		Decoration_main(stringBlock);
+	public Skill(String skillName, int level) {
+		this.skillName = skillName;
+		this.level = level;
 	}
 
-	Skill(String input) {
-		String[] stringBlock = input.split(",");
-		Decoration_main(stringBlock);
-	}
-
-	Skill(String[] stringBlock, int levelOfDecor) {
-		this.skillName = stringBlock[0];
-		this.max = Integer.parseInt(stringBlock[1]);
-		this.owned = Integer.parseInt(stringBlock[2]);
-		this.levelOfDecor = levelOfDecor;
-
-		this.required = 0;
-		isReplaceable = true;
-	}
-
-	private void Decoration_main(String[] stringBlock) {
-		this.skillName = stringBlock[0];
-		this.max = Integer.parseInt(stringBlock[1]);
-		this.owned = Integer.parseInt(stringBlock[2]);
-		this.levelOfDecor = Integer.parseInt(stringBlock[3]);
-
-		this.required = 0;
-		isReplaceable = true;
-	}
-
-	void setRequired(int required) {
-		this.required = required;
-		isReplaceable = (this.required - this.owned) <= 0;
+	public void setRequired(int readSkillRequirement) {
 	}
 }

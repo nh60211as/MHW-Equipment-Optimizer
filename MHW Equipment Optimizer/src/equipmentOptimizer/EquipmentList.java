@@ -71,10 +71,10 @@ class EquipmentList {
 		setBonusList = new SetBonusList();
 		equipmentSkillList = new EquipmentSkillList();
 
-		equipmentSkillList.plus(weapon.skillList);
-		for (Armor currentArmor : armors)
-			equipmentSkillList.plus(currentArmor.skillList);
-		equipmentSkillList.plus(charm.skillList);
+//		equipmentSkillList.plus(weapon.skillList);
+//		for (Armor currentArmor : armors)
+//			equipmentSkillList.plus(currentArmor.skillList);
+//		equipmentSkillList.plus(charm.skillList);
 		updateDefenseAndElementalResistance();
 	}
 
@@ -126,13 +126,13 @@ class EquipmentList {
 
 	public String toString() {
 		StringBuilder output = new StringBuilder();
-		output.append(weapon.equipmentName);
-		output.append(",");
-		for (int currentArmorIndex = 0; currentArmorIndex <= armors.size() - 1; currentArmorIndex++) {
-			output.append(armors.get(currentArmorIndex).equipmentName);
-			output.append(",");
-		}
-		output.append(charm.equipmentName);
+//		output.append(weapon.equipmentName);
+//		output.append(",");
+//		for (int currentArmorIndex = 0; currentArmorIndex <= armors.size() - 1; currentArmorIndex++) {
+//			output.append(armors.get(currentArmorIndex).equipmentName);
+//			output.append(",");
+//		}
+//		output.append(charm.equipmentName);
 		return output.toString();
 	}
 

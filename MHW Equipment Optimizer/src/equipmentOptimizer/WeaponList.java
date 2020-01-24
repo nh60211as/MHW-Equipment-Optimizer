@@ -27,7 +27,7 @@ class WeaponList extends ArrayList<List<Weapon>> {
 	public boolean add(int weaponType, Weapon addedWeapon) {
 		List<Weapon> weaponTypeNow = this.get(weaponType);
 		for (Weapon weaponNow : weaponTypeNow) {
-			if (weaponNow.equipmentName.contentEquals(addedWeapon.equipmentName)) {
+			if (weaponNow.name.contentEquals(addedWeapon.name)) {
 				return false;
 			}
 		}
@@ -42,7 +42,7 @@ class WeaponList extends ArrayList<List<Weapon>> {
 	public Weapon get(String weaponName) {
 		for (List<Weapon> weaponTypeNow : this) {
 			for (Weapon weaponNow : weaponTypeNow) {
-				if (weaponName.contentEquals(weaponNow.equipmentName)) {
+				if (weaponName.contentEquals(weaponNow.name)) {
 					return weaponNow;
 				}
 			}
@@ -52,7 +52,7 @@ class WeaponList extends ArrayList<List<Weapon>> {
 
 	public int indexOf(int bodyPart, String equipmentName) {
 		for (int i = 0; i <= this.get(bodyPart).size() - 1; i++) {
-			if (this.get(bodyPart).get(i).equipmentName.contentEquals(equipmentName)) {
+			if (this.get(bodyPart).get(i).name.contentEquals(equipmentName)) {
 				return i;
 			}
 		}
@@ -63,7 +63,7 @@ class WeaponList extends ArrayList<List<Weapon>> {
 		int[] index = {-1, -1};
 		for (int weaponType = 0; weaponType <= this.size() - 1; weaponType++) {
 			for (int weaponNow = 0; weaponNow <= this.get(weaponType).size() - 1; weaponNow++) {
-				if (this.get(weaponType).get(weaponNow).equipmentName.contentEquals(equipmentName)) {
+				if (this.get(weaponType).get(weaponNow).name.contentEquals(equipmentName)) {
 					index[0] = weaponType;
 					index[1] = weaponNow;
 					return index;

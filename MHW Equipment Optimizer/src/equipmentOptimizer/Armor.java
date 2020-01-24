@@ -12,12 +12,12 @@ class Armor extends Equipment {
 	final int[] elementalResistance;
 	final String setBonus;
 
-	Armor(String input) {
-		// 巨蜂頭盔α;76;-2,+1,+1,+1,+2;0,0,0;(無),收刀術,1,麻痺屬性強化,1
-		String[] stringBlock = input.split(";");
+	Armor(final String input, final SkillHashMap skillHashMap) {
+		// 巨蜂頭盔α;76;-2,+1,+1,+1,+2;0,0,0,0;(無);收刀術,1,麻痺屬性強化,1
+		String[] stringBlock = input.split(";", -1);
 
 		// 巨蜂頭盔α
-		equipmentName = stringBlock[0];
+		name = stringBlock[0];
 
 		// 76
 		defense = Integer.parseInt(stringBlock[1]);
@@ -28,31 +28,19 @@ class Armor extends Equipment {
 		for (int i = 0; i <= elementalResistance.length - 1; i++)
 			elementalResistance[i] = Integer.parseInt(elementalDefBlock[i]);
 
-		// 0,0,0
+		// 0,0,0,0
 		String[] decorBlock = stringBlock[3].split(",");
-		decor3 = Integer.parseInt(decorBlock[0]);
-		decor2 = Integer.parseInt(decorBlock[1]);
-		decor1 = Integer.parseInt(decorBlock[2]);
-		totalDecor = decor3 + decor2 + decor1;
+		setDecor(decorBlock);
 
-		combinedDecor3 = decor3;
-		combinedDecor2 = decor2;
-		combinedDecor1 = decor1;
-		totalCombinedDecor = combinedDecor3 + combinedDecor2 + combinedDecor1;
-
-		// (無),收刀術,1,麻痺屬性強化,1
+		// (無);收刀術,1,麻痺屬性強化,1
 		String[] skillBlock = stringBlock[4].split(",");
 		// (無)
 		if (skillBlock[0].contentEquals("(無)"))
 			setBonus = "";
 		else
 			setBonus = skillBlock[0];
-
-		skillList = new EquipmentSkillList();
-		for (int i = 1; i <= skillBlock.length - 1; i += 2)
-			skillList.add(skillBlock[i], Integer.parseInt(skillBlock[i + 1]));
-
-		isReplaceable = true;
+		// 收刀術,1,麻痺屬性強化,1
+		skills = new ItemSkillList(stringBlock[5], skillHashMap);
 	}
 
 	private static int isBetterDecorationSlot(Armor e1, Armor e2) {
@@ -119,9 +107,9 @@ class Armor extends Equipment {
 
 	void setCombinedDecoration(SkillList includedSkill) {
 		for (Skill includedSkillNow : includedSkill) {
-			int indexOfSkill = skillList.indexOf(includedSkillNow.skillName);
+			int indexOfSkill = skills.get(includedSkillNow.skillName);
 			if (indexOfSkill != -1) {
-				int skillLevel = skillList.getSkillLevel(includedSkillNow.skillName);
+				int skillLevel = skills.get(includedSkillNow.skillName);
 				switch (includedSkillNow.levelOfDecor) {
 					case 1:
 						combinedDecor1 += skillLevel;
@@ -155,8 +143,8 @@ class Armor extends Equipment {
 		for (Skill currentSkill : includedSkill) {
 			if (!currentSkill.isReplaceable) {
 				String currentSkillName = currentSkill.skillName;
-				thisIrreplaceableSkill.add(this.skillList.contains(currentSkillName));
-				anotherIrreplaceableSkill.add(anotherArmor.skillList.contains(currentSkillName));
+				thisIrreplaceableSkill.add(this.skills.containsKey(currentSkillName));
+				anotherIrreplaceableSkill.add(anotherArmor.skills.containsKey(currentSkillName));
 			}
 		}
 

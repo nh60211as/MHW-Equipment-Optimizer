@@ -71,17 +71,18 @@ class ReadFile {
 		return DEFAULT_READ_FLAG;
 	}
 
-	static SkillList readDecorationFile(String equipmentFileDirectory, String decorationFileName, JLabel eventLabel) {
-		SkillList decorationList = new SkillList();
+	static SkillHashMap readSkillFile(final String equipmentFileDirectory, final String skillFileName, final JLabel eventLabel) {
+		SkillHashMap skillHashMap = new SkillHashMap();
 
 		Reader reader = null;
 		BufferedReader br = null;
 		try {
-			reader = new InputStreamReader(new FileInputStream(equipmentFileDirectory + decorationFileName), StandardCharsets.UTF_8);
+			reader = new InputStreamReader(new FileInputStream(equipmentFileDirectory + skillFileName), StandardCharsets.UTF_8);
 			br = new BufferedReader(reader);
 
 			// 開始閱讀檔案
-			int levelOfDecoration = 0;
+			int skillIndex = 0;
+			int jewelSlotLevel = 0;
 			String currentLine;
 
 			while ((currentLine = br.readLine()) != null) {
@@ -90,16 +91,24 @@ class ReadFile {
 				if (currentLine.substring(0, 1).contentEquals("#"))
 					continue;
 
-				String[] stringBlock = currentLine.split(",");
+				// 鑲嵌槽等級;1
+				// 攻擊珠;攻擊,1;7,5
+				String[] stringBlock = currentLine.split(";");
 				if (stringBlock.length == 2) {
+					// 鑲嵌槽等級;1
 					if (stringBlock[0].contentEquals("鑲嵌槽等級"))
-						levelOfDecoration = Integer.parseInt(stringBlock[1]);
-				} else if (stringBlock.length == 3) {
-					decorationList.add(new Skill(stringBlock, levelOfDecoration));
+						jewelSlotLevel = Integer.parseInt(stringBlock[1]);
+				} else if (jewelSlotLevel <= 3 && stringBlock.length == 3) {
+					// 攻擊
+					String skillName = stringBlock[1].split(",")[0];
+					// 7
+					int level = Integer.parseInt(stringBlock[2].split(",")[0]);
+					skillHashMap.put(skillIndex, new Skill(skillName, level));
+					skillIndex++;
 				}
 			}
 		} catch (IOException e) {
-			PrintMessage.updateEventLabelError(eventLabel, equipmentFileDirectory + decorationFileName + "讀取錯誤");
+			PrintMessage.updateEventLabelError(eventLabel, equipmentFileDirectory + skillFileName + "讀取錯誤");
 		} finally {
 			try {
 				if (br != null)
@@ -111,10 +120,10 @@ class ReadFile {
 			}
 		}
 
-		return decorationList;
+		return skillHashMap;
 	}
 
-	static WeaponList readWeaponFile(String equipmentFileDirectory, String[] weaponFileNames, JLabel eventLabel) {
+	static WeaponList readWeaponFile(final String equipmentFileDirectory, final String[] weaponFileNames, final SkillHashMap skillHashMap, final JLabel eventLabel) {
 		WeaponList weaponList = new WeaponList();
 
 		for (String fileName : weaponFileNames) {
@@ -139,7 +148,7 @@ class ReadFile {
 					if (currentFlag != DEFAULT_READ_FLAG)
 						readFlag = currentFlag;
 					else {
-						weaponList.get(readFlag).add(new Weapon(currentLine));
+						weaponList.get(readFlag).add(new Weapon(currentLine, skillHashMap));
 					}
 				}
 			} catch (IOException e) {
@@ -158,7 +167,7 @@ class ReadFile {
 		return weaponList;
 	}
 
-	static ArmorList readArmorFile(String equipmentFileDirectory, String[] armorFileNames, JLabel eventLabel) {
+	static ArmorList readArmorFile(final String equipmentFileDirectory, final String[] armorFileNames, final SkillHashMap skillHashMap, final JLabel eventLabel) {
 		ArmorList armorList = new ArmorList();
 
 		for (String fileName : armorFileNames) {
@@ -183,7 +192,7 @@ class ReadFile {
 					if (currentFlag != DEFAULT_READ_FLAG)
 						readFlag = currentFlag;
 					else {
-						armorList.get(readFlag).add(new Armor(currentLine));
+						armorList.get(readFlag).add(new Armor(currentLine, skillHashMap));
 					}
 				}
 			} catch (IOException e) {
@@ -202,7 +211,7 @@ class ReadFile {
 		return armorList;
 	}
 
-	static List<Armor> readArmorSetsFile(String equipmentFileDirectory, String[] armorSetFileNames, JLabel eventLabel) {
+	static List<Armor> readArmorSetsFile(final String equipmentFileDirectory, final String[] armorSetFileNames, final SkillHashMap skillHashMap, final JLabel eventLabel) {
 		List<Armor> armorSetsList = new ArrayList();
 
 		for (String fileName : armorSetFileNames) {
@@ -227,7 +236,7 @@ class ReadFile {
 					if (currentFlag != DEFAULT_READ_FLAG)
 						readFlag = currentFlag;
 					else {
-						armorSetsList.add(new Armor(currentLine));
+						armorSetsList.add(new Armor(currentLine, skillHashMap));
 					}
 				}
 			} catch (IOException e) {
@@ -246,7 +255,7 @@ class ReadFile {
 		return armorSetsList;
 	}
 
-	static CharmList readCharmFile(String equipmentFileDirectory, String[] charmFileNames, JLabel eventLabel) {
+	static CharmList readCharmFile(final String equipmentFileDirectory, final String[] charmFileNames, final SkillHashMap skillHashMap, final JLabel eventLabel) {
 		CharmList charmList = new CharmList();
 
 		for (String fileName : charmFileNames) {
@@ -271,7 +280,7 @@ class ReadFile {
 					if (currentFlag != DEFAULT_READ_FLAG)
 						readFlag = currentFlag;
 					else {
-						charmList.add(new Charm(currentLine));
+						charmList.add(new Charm(currentLine, skillHashMap));
 					}
 				}
 			} catch (IOException e) {
@@ -290,8 +299,52 @@ class ReadFile {
 		return charmList;
 	}
 
+	static JewelList readJewelFile(final String equipmentFileDirectory, final String jewelFileName, final SkillHashMap skillHashMap, final JLabel eventLabel) {
+		JewelList jewelList = new JewelList();
+
+		Reader reader = null;
+		BufferedReader br = null;
+		try {
+			reader = new InputStreamReader(new FileInputStream(equipmentFileDirectory + jewelFileName), StandardCharsets.UTF_8);
+			br = new BufferedReader(reader);
+
+			// 開始閱讀檔案
+			int jewelSlotLevel = 0;
+			String currentLine;
+
+			while ((currentLine = br.readLine()) != null) {
+				if (currentLine.length() == 0)
+					continue;
+				if (currentLine.substring(0, 1).contentEquals("#"))
+					continue;
+
+				String[] stringBlock = currentLine.split(";");
+				if (stringBlock.length == 2) {
+					// 鑲嵌槽等級;1
+					if (stringBlock[0].contentEquals("鑲嵌槽等級"))
+						jewelSlotLevel = Integer.parseInt(stringBlock[1]);
+				} else if (jewelSlotLevel >= 0 && stringBlock.length == 3) {
+					jewelList.add(new Jewel(currentLine, jewelSlotLevel, skillHashMap));
+				}
+			}
+		} catch (IOException e) {
+			PrintMessage.updateEventLabelError(eventLabel, equipmentFileDirectory + jewelFileName + "讀取錯誤");
+		} finally {
+			try {
+				if (br != null)
+					br.close();
+				if (reader != null)
+					reader.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+
+		return jewelList;
+	}
+
 	static void readRequirementFile(String fileName, JTextArea textArea, JLabel eventLabel,
-									SkillList decorationList, WeaponList weaponList, ArmorList armorList,
+									SkillHashMap skillHashMap, WeaponList weaponList, ArmorList armorList,
 									SetBonusList setBonus, SkillList includedSkill, SkillList excludedSkill,
 									WeaponList includedWeaponList, ArmorList includedArmorList) throws CloneNotSupportedException {
 		Reader reader = null;
@@ -333,9 +386,9 @@ class ReadFile {
 							continue;
 						}
 
-						int indexOfReadSkill = decorationList.indexOf(readSkill);
+						int indexOfReadSkill = skillHashMap.indexOf(readSkill);
 						if (indexOfReadSkill != -1) {
-							Skill temp = decorationList.get(indexOfReadSkill);
+							Skill temp = skillHashMap.get(indexOfReadSkill);
 							temp.setRequired(readSkillRequirement);
 							includedSkill.add(temp);
 						} else {
@@ -343,9 +396,9 @@ class ReadFile {
 						}
 					} else if (readFlag == SKILL_EXCLUSION_READ_FLAG) {
 						for (String readSkill : stringBlock) {
-							int indexOfReadSkill = decorationList.indexOf(readSkill);
+							int indexOfReadSkill = skillHashMap.indexOf(readSkill);
 							if (indexOfReadSkill != -1) {
-								Skill temp = decorationList.get(indexOfReadSkill);
+								Skill temp = skillHashMap.get(indexOfReadSkill);
 								excludedSkill.add(temp);
 							} else {
 								PrintMessage.warning(textArea, "找不到排除技能-" + stringBlock[0]);

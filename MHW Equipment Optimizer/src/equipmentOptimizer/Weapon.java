@@ -7,12 +7,12 @@ public class Weapon extends Equipment implements Cloneable {
 
 	private final ElementalDamageList elementalDamageList;
 
-	Weapon(String input) {
-		// 冰炎劍維爾瑪閃焰;180,0,0.10;冰,240,否,爆,240,否;0;0,1,0;加速再生,1
-		String[] stringBlock = input.split(";");
+	Weapon(final String input, final SkillHashMap skillHashMap) {
+		// 冰炎劍維爾瑪閃焰;180,0,0.10;冰,240,否,爆,240,否;0;0,0,1,0;加速再生,1
+		String[] stringBlock = input.split(";", -1);
 
 		// 冰炎劍維爾瑪閃焰
-		equipmentName = stringBlock[0];
+		name = stringBlock[0];
 
 		// 180,0,0.10
 		String[] attackBlock = stringBlock[1].split(",");
@@ -31,27 +31,16 @@ public class Weapon extends Equipment implements Cloneable {
 		// 0
 		defense = Integer.parseInt(stringBlock[3]);
 
-		// 0,1,0
+		// 0,0,1,0
 		String[] decorBlock = stringBlock[4].split(",");
-		decor3 = Integer.parseInt(decorBlock[0]);
-		decor2 = Integer.parseInt(decorBlock[1]);
-		decor1 = Integer.parseInt(decorBlock[2]);
-		totalDecor = decor3 + decor2 + decor1;
+		setDecor(decorBlock);
 
 		// 加速再生,1
-		skillList = new EquipmentSkillList();
-
-		if (stringBlock.length == 6) {
-			String[] skillBlock = stringBlock[5].split(",");
-			for (int i = 0; i <= skillBlock.length - 1; i += 2)
-				skillList.add(skillBlock[i], Integer.parseInt(skillBlock[i + 1]));
-		}
-
-		isReplaceable = true;
+		skills = new ItemSkillList(stringBlock[5], skillHashMap);
 	}
 
 	Weapon() {
-		equipmentName = "(未指定武器)";
+		name = "(未指定武器)";
 
 		rawAttack = 0;
 		sharpness = 0;
@@ -61,28 +50,23 @@ public class Weapon extends Equipment implements Cloneable {
 
 		defense = 0;
 
-		decor3 = 0;
-		decor2 = 0;
-		decor1 = 0;
-		totalDecor = decor3 + decor2 + decor1;
+		setDecorToDefault();
 
-		skillList = new EquipmentSkillList();
-
-		isReplaceable = true;
+		skills = new ItemSkillList();
 	}
 
 	void setBoost(int attackBoost, int affinityBoost, int defenseBoost, int decorationSlotBoost, int leechBoost) {
 		if (attackBoost == 0 && affinityBoost == 0 && defenseBoost == 0 && decorationSlotBoost == 0 && leechBoost == 0)
 			return;
 
-		equipmentName += "(";
-		equipmentName += (attackBoost >= 1) ? "攻擊強化" + attackBoost + "," : "";
-		equipmentName += (affinityBoost >= 1) ? "會心率強化" + affinityBoost + "," : "";
-		equipmentName += (defenseBoost >= 1) ? "防禦強化" + defenseBoost + "," : "";
-		equipmentName += (decorationSlotBoost >= 1) ? "鑲嵌槽強化" + decorationSlotBoost + "," : "";
-		equipmentName += (leechBoost >= 1) ? "吸血強化" + leechBoost + "," : "";
-		equipmentName = equipmentName.substring(0, equipmentName.length() - 1);
-		equipmentName += ")";
+		name += "(";
+		name += (attackBoost >= 1) ? "攻擊強化" + attackBoost + "," : "";
+		name += (affinityBoost >= 1) ? "會心率強化" + affinityBoost + "," : "";
+		name += (defenseBoost >= 1) ? "防禦強化" + defenseBoost + "," : "";
+		name += (decorationSlotBoost >= 1) ? "鑲嵌槽強化" + decorationSlotBoost + "," : "";
+		name += (leechBoost >= 1) ? "吸血強化" + leechBoost + "," : "";
+		name = name.substring(0, name.length() - 1);
+		name += ")";
 
 		rawAttack += 5 * attackBoost;
 
@@ -115,6 +99,9 @@ public class Weapon extends Equipment implements Cloneable {
 				break;
 			case 3:
 				decor3 += 1;
+				break;
+			case 4:
+				decor4 += 1;
 				break;
 			default:
 				break;

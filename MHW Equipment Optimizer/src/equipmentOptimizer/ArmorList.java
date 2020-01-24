@@ -18,7 +18,7 @@ class ArmorList extends ArrayList<List<Armor>> {
 	public boolean add(int bodyPart, Armor addedArmor) {
 		List<Armor> bodyPartNow = this.get(bodyPart);
 		for (Armor armorNow : bodyPartNow) {
-			if (armorNow.equipmentName.contentEquals(addedArmor.equipmentName)) {
+			if (armorNow.name.contentEquals(addedArmor.name)) {
 				return false;
 			}
 		}
@@ -32,7 +32,7 @@ class ArmorList extends ArrayList<List<Armor>> {
 
 	int indexOf(int bodyPart, String equipmentName) {
 		for (int i = 0; i <= this.get(bodyPart).size() - 1; i++) {
-			if (this.get(bodyPart).get(i).equipmentName.contentEquals(equipmentName)) {
+			if (this.get(bodyPart).get(i).name.contentEquals(equipmentName)) {
 				return i;
 			}
 		}
@@ -41,7 +41,7 @@ class ArmorList extends ArrayList<List<Armor>> {
 
 	public void printBodyPart(int bodyPart) {
 		for (Equipment eq : this.get(bodyPart))
-			System.out.print(eq.equipmentName + ",");
+			System.out.print(eq.name + ",");
 		System.out.println();
 	}
 

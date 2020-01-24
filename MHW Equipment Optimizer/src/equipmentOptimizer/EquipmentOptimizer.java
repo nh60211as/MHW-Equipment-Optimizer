@@ -7,18 +7,20 @@ import java.util.List;
 class EquipmentOptimizer {
 	// 檔案路徑
 	private static final String equipmentFileDirectory = "裝備檔案/";
-	private static final String decorationFileName = "_擁有裝飾珠.txt";
+	private static final String skillFileName = "_擁有裝飾珠.txt";
 	private static final String[] weaponFileNames = {"_武器.txt"};
 	private static final String[] armorFileNames = {"_頭.txt", "_身.txt", "_腕.txt", "_腰.txt", "_腳.txt"};
 	private static final String[] armorSetsFileNames = {"_整套防具.txt"}; // TODO
 	private static final String[] charmFileNames = {"_護石.txt"};
+	private static final String jewelFileName = "_擁有裝飾珠.txt";
 
 	// 基本資料
-	private final SkillList decorationList;
+	private final SkillHashMap skillHashMap;
 	private final WeaponList weaponList;
 	private final ArmorList armorList;
-	private List<Armor> armorSetsList;
+	private final JewelList jewelList;
 	private final CharmList charmList;
+	private List<Armor> armorSetList;
 
 	// 需求技能的資料
 	private SetBonusList setBonusList;
@@ -40,18 +42,20 @@ class EquipmentOptimizer {
 		this.textArea = textArea;
 		this.eventLabel = eventLabel;
 
-		// 所有裝飾珠/技能的資料
-		decorationList = ReadFile.readDecorationFile(equipmentFileDirectory, decorationFileName, eventLabel);
-		// 所有武器的資料
-		weaponList = ReadFile.readWeaponFile(equipmentFileDirectory, weaponFileNames, eventLabel);
-		// 所有防具的資料
-		armorList = ReadFile.readArmorFile(equipmentFileDirectory, armorFileNames, eventLabel);
-		// 所有整套防具的資料
-		armorSetsList = ReadFile.readArmorSetsFile(equipmentFileDirectory, armorSetsFileNames, eventLabel);
-		includedArmorSetsList = armorSetsList;
-		// 所有護石的資料
-		charmList = ReadFile.readCharmFile(equipmentFileDirectory, charmFileNames, eventLabel);
+		// 所有技能的資料
+		skillHashMap = ReadFile.readSkillFile(equipmentFileDirectory, skillFileName, eventLabel);
 
+		// 所有武器的資料
+		weaponList = ReadFile.readWeaponFile(equipmentFileDirectory, weaponFileNames, skillHashMap, eventLabel);
+		// 所有防具的資料
+		armorList = ReadFile.readArmorFile(equipmentFileDirectory, armorFileNames, skillHashMap, eventLabel);
+		// 所有整套防具的資料
+		armorSetList = ReadFile.readArmorSetsFile(equipmentFileDirectory, armorSetsFileNames, skillHashMap, eventLabel);
+		includedArmorSetsList = armorSetList;
+		// 所有護石的資料
+		charmList = ReadFile.readCharmFile(equipmentFileDirectory, charmFileNames, skillHashMap, eventLabel);
+		// 所有裝飾珠的資料
+		jewelList = ReadFile.readJewelFile(equipmentFileDirectory, jewelFileName, skillHashMap, eventLabel);
 		// 結束初始化函數
 	}
 
@@ -68,7 +72,7 @@ class EquipmentOptimizer {
 
 		// 讀取技能、裝備需求檔案
 		ReadFile.readRequirementFile(requirementFileName, textArea, eventLabel,
-				decorationList, weaponList, armorList,
+				skillHashMap, weaponList, armorList,
 				setBonusList, includedSkill, excludedSkill,
 				includedWeaponList, includedArmorList);
 	}
@@ -83,7 +87,7 @@ class EquipmentOptimizer {
 		// 加入要搜尋的護石
 		for (Charm charmNow : charmList) {
 			for (Skill currentIncludedSkill : includedSkill) {
-				if (charmNow.skillList.contains(currentIncludedSkill.skillName)) {
+				if (charmNow.skills.containsKey(currentIncludedSkill.skillName)) {
 					includedCharmList.add(charmNow);
 					break;
 				}
@@ -97,7 +101,7 @@ class EquipmentOptimizer {
 			if (currentIncludedArmorList.size() == 0) {
 				for (Armor currentAddedArmor : armorList.get(currentBodyPart)) {
 					//includedArmorList.printBodyPart(currentBodyPart);
-					if (currentAddedArmor.skillList.contains(excludedSkill))
+					if (currentAddedArmor.skills.containsValue(excludedSkill))
 						continue;
 
 					currentAddedArmor.setCombinedDecoration(includedSkill);
@@ -196,17 +200,17 @@ class EquipmentOptimizer {
 
 						// 計算目前裝備的技能列表
 						for (Armor currentArmor : currentEquipmentList.armors) {
-							List<String> currentArmorSkillList = currentArmor.skillList.skillName();
-							for (int currentArmorSkillIndex = 0; currentArmorSkillIndex <= currentArmor.skillList.size() - 1; currentArmorSkillIndex++) {
+							ArrayList<String> currentArmorSkillList = new ArrayList<>();
+							for (int currentArmorSkillIndex = 0; currentArmorSkillIndex <= currentArmor.skills.size() - 1; currentArmorSkillIndex++) {
 								int indexOfIncludedSkill = includedSkill.indexOf(currentArmorSkillList.get(currentArmorSkillIndex));
 								if (indexOfIncludedSkill != -1)
-									skillHave[indexOfIncludedSkill] += currentArmor.skillList.getSkillLevel(currentArmorSkillIndex);
+									skillHave[indexOfIncludedSkill] += currentArmor.skills.size();
 							}
 						}
-						for (int currentCharmSkillIndex = 0; currentCharmSkillIndex <= charm.skillList.size() - 1; currentCharmSkillIndex++) {
-							int indexOfIncludedSkill = includedSkill.indexOf(charm.skillList.skillName().get(currentCharmSkillIndex));
+						for (int currentCharmSkillIndex = 0; currentCharmSkillIndex <= charm.skills.size() - 1; currentCharmSkillIndex++) {
+							int indexOfIncludedSkill = includedSkill.indexOf(charm.skills.size());
 							if (indexOfIncludedSkill != -1)
-								skillHave[indexOfIncludedSkill] += charm.skillList.getSkillLevel(currentCharmSkillIndex);
+								skillHave[indexOfIncludedSkill] += charm.skills.size();
 						}
 
 						// 計算仍然需要的技能數量
@@ -305,17 +309,17 @@ class EquipmentOptimizer {
 
 										// 計算目前裝備的技能列表
 										for (Armor currentArmor : currentEquipmentList.armors) {
-											List<String> currentArmorSkillList = currentArmor.skillList.skillName();
-											for (int currentArmorSkillIndex = 0; currentArmorSkillIndex <= currentArmor.skillList.size() - 1; currentArmorSkillIndex++) {
+											ArrayList<String> currentArmorSkillList = new ArrayList<>();
+											for (int currentArmorSkillIndex = 0; currentArmorSkillIndex <= currentArmor.skills.size() - 1; currentArmorSkillIndex++) {
 												int indexOfIncludedSkill = includedSkill.indexOf(currentArmorSkillList.get(currentArmorSkillIndex));
 												if (indexOfIncludedSkill != -1)
-													skillHave[indexOfIncludedSkill] += currentArmor.skillList.getSkillLevel(currentArmorSkillIndex);
+													skillHave[indexOfIncludedSkill] += currentArmor.skills.size();
 											}
 										}
-										for (int currentCharmSkillIndex = 0; currentCharmSkillIndex <= charm.skillList.size() - 1; currentCharmSkillIndex++) {
-											int indexOfIncludedSkill = includedSkill.indexOf(charm.skillList.skillName().get(currentCharmSkillIndex));
+										for (int currentCharmSkillIndex = 0; currentCharmSkillIndex <= charm.skills.size() - 1; currentCharmSkillIndex++) {
+											int indexOfIncludedSkill = includedSkill.indexOf(charm.skills.size());
 											if (indexOfIncludedSkill != -1)
-												skillHave[indexOfIncludedSkill] += charm.skillList.getSkillLevel(currentCharmSkillIndex);
+												skillHave[indexOfIncludedSkill] += charm.skills.size();
 										}
 
 										// 計算仍然需要的技能數量
@@ -387,12 +391,12 @@ class EquipmentOptimizer {
 		List<String> skillNameList = skillListWithDecoration.skillName();
 		for (int i = 0; i <= skillListWithDecoration.size() - 1; i++) {
 			String skillNow = skillNameList.get(i);
-			int indexOfDecorationList = decorationList.indexOf(skillNow);
+			int indexOfDecorationList = skillHashMap.indexOf(skillNow);
 			skillListWithDecoration.setSkillLevel(i,
-					Math.min(skillListWithDecoration.getSkillLevel(i), decorationList.get(indexOfDecorationList).max));
+					Math.min(skillListWithDecoration.getSkillLevel(i), skillHashMap.get(indexOfDecorationList).level));
 		}
 		currentEquipmentList.setEquipmentSkillList(skillListWithDecoration);
-		PrintMessage.print(textArea, skillListWithDecoration.toAdditionalString(decorationList) + "\n");
+		//PrintMessage.print(textArea, skillListWithDecoration.toAdditionalString(decorationList) + "\n");
 
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append(String.format("防禦力： %d,", currentEquipmentList.defense));
