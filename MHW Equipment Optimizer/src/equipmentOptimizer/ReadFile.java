@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.List;
 
 class ReadFile {
 	private static final int DEFAULT_READ_FLAG = -5;
@@ -101,9 +100,15 @@ class ReadFile {
 				} else if (jewelSlotLevel <= 3 && stringBlock.length == 3) {
 					// 攻擊
 					String skillName = stringBlock[1].split(",")[0];
+					// 7,5
+					String[] requirementBlock = stringBlock[2].split(",");
 					// 7
-					int level = Integer.parseInt(stringBlock[2].split(",")[0]);
-					skillHashMap.put(skillIndex, new Skill(skillName, level));
+					int level = Integer.parseInt(requirementBlock[0]);
+					// 5
+					int owned = Integer.parseInt(requirementBlock[1]);
+					boolean isReplaceable = (level - owned) <= 0;
+
+					skillHashMap.put(skillIndex, new Skill(skillName, level, isReplaceable));
 					skillIndex++;
 				}
 			}
@@ -211,8 +216,8 @@ class ReadFile {
 		return armorList;
 	}
 
-	static List<Armor> readArmorSetsFile(final String equipmentFileDirectory, final String[] armorSetFileNames, final SkillHashMap skillHashMap, final JLabel eventLabel) {
-		List<Armor> armorSetsList = new ArrayList();
+	static ArrayList<Armor> readArmorSetFile(final String equipmentFileDirectory, final String[] armorSetFileNames, final SkillHashMap skillHashMap, final JLabel eventLabel) {
+		ArrayList<Armor> armorSetsList = new ArrayList();
 
 		for (String fileName : armorSetFileNames) {
 			Reader reader = null;
@@ -343,10 +348,17 @@ class ReadFile {
 		return jewelList;
 	}
 
-	static void readRequirementFile(String fileName, JTextArea textArea, JLabel eventLabel,
-									SkillHashMap skillHashMap, WeaponList weaponList, ArmorList armorList,
-									SetBonusList setBonus, SkillList includedSkill, SkillList excludedSkill,
-									WeaponList includedWeaponList, ArmorList includedArmorList) throws CloneNotSupportedException {
+	static void readRequirementFile(final String fileName,
+									final SkillHashMap skillHashMap,
+									final WeaponList weaponList,
+									final ArmorList armorList,
+									final SetBonusList setBonusList,
+									final ItemSkillList includedSkill,
+									final ItemSkillList excludedSkill,
+									final WeaponList includedWeaponList,
+									final ArmorList includedArmorList,
+									final JTextArea textArea,
+									final JLabel eventLabel) throws CloneNotSupportedException {
 		Reader reader = null;
 		BufferedReader br = null;
 		try {
@@ -373,35 +385,32 @@ class ReadFile {
 						String setBonusName = stringBlock[0];
 						int setBonusLevel = Integer.parseInt(stringBlock[1]);
 						if (setBonusLevel >= 1) {
-							setBonus.add(setBonusName, setBonusLevel);
+							setBonusList.add(setBonusName, setBonusLevel);
 						} else {
 							PrintMessage.warning(textArea, "自動忽略系列技能-" + currentLine);
 						}
 					} else if (readFlag == SKILL_INCLUSION_READ_FLAG) {
 						String readSkill = stringBlock[0];
-						int readSkillRequirement = Integer.parseInt(stringBlock[1]);
+						int readSkillRequiredLevel = Integer.parseInt(stringBlock[1]);
 
-						if (readSkillRequirement <= 0) {
+						if (readSkillRequiredLevel <= 0) {
 							PrintMessage.warning(textArea, "自動忽略需求技能-" + currentLine);
 							continue;
 						}
 
-						int indexOfReadSkill = skillHashMap.indexOf(readSkill);
-						if (indexOfReadSkill != -1) {
-							Skill temp = skillHashMap.get(indexOfReadSkill);
-							temp.setRequired(readSkillRequirement);
-							includedSkill.add(temp);
+						int readSkillIndex = skillHashMap.keyOfSkillName(readSkill);
+						if (readSkillIndex != -1) {
+							includedSkill.put(readSkillIndex, readSkillRequiredLevel);
 						} else {
 							PrintMessage.warning(textArea, "找不到需求技能-" + stringBlock[0]);
 						}
 					} else if (readFlag == SKILL_EXCLUSION_READ_FLAG) {
 						for (String readSkill : stringBlock) {
-							int indexOfReadSkill = skillHashMap.indexOf(readSkill);
-							if (indexOfReadSkill != -1) {
-								Skill temp = skillHashMap.get(indexOfReadSkill);
-								excludedSkill.add(temp);
+							int readSkillIndex = skillHashMap.keyOfSkillName(readSkill);
+							if (readSkillIndex != -1) {
+								excludedSkill.put(readSkillIndex, 1);
 							} else {
-								PrintMessage.warning(textArea, "找不到排除技能-" + stringBlock[0]);
+								PrintMessage.warning(textArea, "找不到排除技能-" + readSkill);
 							}
 						}
 					} else if (readFlag == WEAPON_READ_FLAG) {

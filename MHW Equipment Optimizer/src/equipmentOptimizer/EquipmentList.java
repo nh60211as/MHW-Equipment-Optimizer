@@ -1,25 +1,20 @@
 package equipmentOptimizer;
 
 import java.util.ArrayList;
-import java.util.List;
 
 // TODO
 // This part need a code clean up
 class EquipmentList {
-	final Charm charm;
-	final List<Armor> armors;
 	private final Weapon weapon;
+	final SetBonusList setBonusList; // 這項會在建構式出現
+	private final ArrayList<Armor> armors;
+	private final Charm charm;
+	ItemSkillList equipmentSkillList;
 	int defense;
-	int decor3;
-	int decor2;
-	int decor1;
-	int combinedDecor3;
-	int combinedDecor2;
-	int combinedDecor1;
+	int[] decorSlots = new int[5];
+	int[] combinedDecorSlots = new int[5];
 	int totalCombinedDecor;
 	int[] elementalResistance;
-	SetBonusList setBonusList; // 這項會在建構式出現
-	EquipmentSkillList equipmentSkillList;
 
 	EquipmentList(Weapon weapon, Armor armorSet, Charm charm) {
 		this.weapon = weapon;
@@ -53,24 +48,41 @@ class EquipmentList {
 		}
 	}
 
-	void setDecorationSlot() {
-		decor3 = this.weapon.decor3;
-		decor2 = this.weapon.decor2;
-		decor1 = this.weapon.decor1;
+	int[] getDecorationSlot() {
+		decorSlots[0] = 0;
+
+		decorSlots[1] = this.weapon.decor1;
+		decorSlots[2] = this.weapon.decor2;
+		decorSlots[3] = this.weapon.decor3;
+		decorSlots[4] = this.weapon.decor4;
+
 		for (Armor currentArmor : armors) {
-			decor3 += currentArmor.decor3;
-			decor2 += currentArmor.decor2;
-			decor1 += currentArmor.decor1;
+			decorSlots[1] += currentArmor.decor1;
+			decorSlots[2] += currentArmor.decor2;
+			decorSlots[3] += currentArmor.decor3;
+			decorSlots[4] += currentArmor.decor4;
 		}
-		decor3 += charm.decor3;
-		decor2 += charm.decor2;
-		decor1 += charm.decor1;
+
+		decorSlots[1] += charm.decor1;
+		decorSlots[2] += charm.decor2;
+		decorSlots[3] += charm.decor3;
+		decorSlots[4] += charm.decor4;
+
+		return decorSlots;
+	}
+
+	ItemSkillList getEquipmentSkillList() {
+		equipmentSkillList = new ItemSkillList();
+
+		equipmentSkillList.addSkill(weapon.skills);
+		for (Armor currentArmor : armors)
+			equipmentSkillList.addSkill(currentArmor.skills);
+		equipmentSkillList.addSkill(charm.skills);
+
+		return equipmentSkillList;
 	}
 
 	void setAdditionalInformation() {
-		setBonusList = new SetBonusList();
-		equipmentSkillList = new EquipmentSkillList();
-
 //		equipmentSkillList.plus(weapon.skillList);
 //		for (Armor currentArmor : armors)
 //			equipmentSkillList.plus(currentArmor.skillList);
@@ -78,8 +90,8 @@ class EquipmentList {
 		updateDefenseAndElementalResistance();
 	}
 
-	void setEquipmentSkillList(EquipmentSkillList equipmentSkillList) {
-		this.equipmentSkillList = equipmentSkillList;
+	void setEquipmentSkillList(ItemSkillList equipmentSkillList) {
+		this.equipmentSkillList = new ItemSkillList(equipmentSkillList);
 		updateDefenseAndElementalResistance();
 	}
 
@@ -99,40 +111,40 @@ class EquipmentList {
 		defense += charm.defense;
 		for (int i = 0; i <= elementalResistance.length - 1; i++)
 			elementalResistance[i] += charm.elementalResistance[i];
-
-		String skillName = "防禦";
-		if (equipmentSkillList.contains(skillName)) {
-			int defBonus = equipmentSkillList.getSkillLevel(skillName);
-			defense += defBonus * 5;
-			if (defBonus >= 4) {
-				for (int i = 0; i <= elementalResistance.length - 1; i++)
-					elementalResistance[i] += 3;
-			}
-		}
-
-		String[] elementalDefPrefix = {"火", "水", "雷", "冰", "龍"};
-		for (int i = 0; i <= elementalDefPrefix.length - 1; i++) {
-			skillName = elementalDefPrefix[i] + "耐性";
-			if (equipmentSkillList.contains(skillName)) {
-				int elementalDefBonus = equipmentSkillList.getSkillLevel(skillName);
-				elementalResistance[i] += elementalDefBonus * 6;
-				if (elementalDefBonus == 3) {
-					elementalResistance[i] += 2;
-					defense += 10;
-				}
-			}
-		}
+//
+//		String skillName = "防禦";
+//		if (equipmentSkillList.contains(skillName)) {
+//			int defBonus = equipmentSkillList.getSkillLevel(skillName);
+//			defense += defBonus * 5;
+//			if (defBonus >= 4) {
+//				for (int i = 0; i <= elementalResistance.length - 1; i++)
+//					elementalResistance[i] += 3;
+//			}
+//		}
+//
+//		String[] elementalDefPrefix = {"火", "水", "雷", "冰", "龍"};
+//		for (int i = 0; i <= elementalDefPrefix.length - 1; i++) {
+//			skillName = elementalDefPrefix[i] + "耐性";
+//			if (equipmentSkillList.contains(skillName)) {
+//				int elementalDefBonus = equipmentSkillList.getSkillLevel(skillName);
+//				elementalResistance[i] += elementalDefBonus * 6;
+//				if (elementalDefBonus == 3) {
+//					elementalResistance[i] += 2;
+//					defense += 10;
+//				}
+//			}
+//		}
 	}
 
 	public String toString() {
 		StringBuilder output = new StringBuilder();
-//		output.append(weapon.equipmentName);
-//		output.append(",");
-//		for (int currentArmorIndex = 0; currentArmorIndex <= armors.size() - 1; currentArmorIndex++) {
-//			output.append(armors.get(currentArmorIndex).equipmentName);
-//			output.append(",");
-//		}
-//		output.append(charm.equipmentName);
+		output.append(weapon.name);
+		output.append(",");
+		for (int currentArmorIndex = 0; currentArmorIndex <= armors.size() - 1; currentArmorIndex++) {
+			output.append(armors.get(currentArmorIndex).name);
+			output.append(",");
+		}
+		output.append(charm.name);
 		return output.toString();
 	}
 

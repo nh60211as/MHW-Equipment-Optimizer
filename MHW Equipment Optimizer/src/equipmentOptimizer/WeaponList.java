@@ -3,7 +3,7 @@ package equipmentOptimizer;
 import java.util.ArrayList;
 import java.util.List;
 
-class WeaponList extends ArrayList<List<Weapon>> {
+class WeaponList extends ArrayList<ArrayList<Weapon>> {
 	static final int GREATSWORD = 0;
 	static final int LONGSWORD = 1;
 	static final int SWORDNSHIELD = 2;
@@ -25,7 +25,7 @@ class WeaponList extends ArrayList<List<Weapon>> {
 	}
 
 	public boolean add(int weaponType, Weapon addedWeapon) {
-		List<Weapon> weaponTypeNow = this.get(weaponType);
+		ArrayList<Weapon> weaponTypeNow = this.get(weaponType);
 		for (Weapon weaponNow : weaponTypeNow) {
 			if (weaponNow.name.contentEquals(addedWeapon.name)) {
 				return false;
@@ -40,7 +40,7 @@ class WeaponList extends ArrayList<List<Weapon>> {
 	}
 
 	public Weapon get(String weaponName) {
-		for (List<Weapon> weaponTypeNow : this) {
+		for (ArrayList<Weapon> weaponTypeNow : this) {
 			for (Weapon weaponNow : weaponTypeNow) {
 				if (weaponName.contentEquals(weaponNow.name)) {
 					return weaponNow;

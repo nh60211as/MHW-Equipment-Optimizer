@@ -3,7 +3,7 @@ package equipmentOptimizer;
 import java.util.ArrayList;
 import java.util.List;
 
-class ArmorList extends ArrayList<List<Armor>> {
+class ArmorList extends ArrayList<ArrayList<Armor>> {
 	static final int HEAD = 0;
 	static final int BODY = 1;
 	static final int HANDS = 2;
@@ -16,7 +16,7 @@ class ArmorList extends ArrayList<List<Armor>> {
 	}
 
 	public boolean add(int bodyPart, Armor addedArmor) {
-		List<Armor> bodyPartNow = this.get(bodyPart);
+		ArrayList<Armor> bodyPartNow = this.get(bodyPart);
 		for (Armor armorNow : bodyPartNow) {
 			if (armorNow.name.contentEquals(addedArmor.name)) {
 				return false;

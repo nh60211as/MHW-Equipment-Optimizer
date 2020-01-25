@@ -6,6 +6,7 @@ public class Jewel extends Item {
 	int maxRequired; // the minimum jewels needed to max out the skill
 	int owned;
 
+
 	// Used to optimize equipment
 	//int required;
 	//boolean isReplaceable;
@@ -13,7 +14,6 @@ public class Jewel extends Item {
 	public Jewel(final String input, final int slotLevel, final SkillHashMap skillHashMap) {
 		// 跳躍迴避珠;迴避距離UP,1,迴避性能,1;5,1
 		String[] stringBlock = input.split(";");
-		skillHashMap.put(1, new Skill("", 1));
 		// 跳躍迴避珠
 		name = stringBlock[0];
 		// 迴避距離UP,1,迴避性能,1
@@ -22,10 +22,12 @@ public class Jewel extends Item {
 		// 5,1
 		String[] requirementBlock = stringBlock[2].split(",");
 		// 5
-		int maxRequired = Integer.parseInt(requirementBlock[0]);
+		maxRequired = Integer.parseInt(requirementBlock[0]);
 		// 1
-		int owned = Integer.parseInt(requirementBlock[1]);
+		owned = Math.min(maxRequired, Integer.parseInt(requirementBlock[1]));
 
 		this.slotLevel = slotLevel;
+
+
 	}
 }

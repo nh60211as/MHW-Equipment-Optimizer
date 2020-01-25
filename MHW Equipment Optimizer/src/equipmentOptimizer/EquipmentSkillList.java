@@ -105,19 +105,19 @@ class EquipmentSkillList {
 		return output.toString();
 	}
 
-	String toAdditionalString(SkillList input) {
-		EquipmentSkillList output = new EquipmentSkillList();
-		for (int i = 0; i <= this.size() - 1; i++) {
-			int inputIndex = input.indexOf(this._skillName.get(i));
-			if (inputIndex != -1) {
-				int difference = this._skillLevel.get(i) - input.get(inputIndex).required;
-				if (difference >= 1) {
-					output.add(this._skillName.get(i), difference);
-				}
-			}
-		}
-
-		return output.toString();
-	}
+//	String toAdditionalString(SkillList input) {
+//		EquipmentSkillList output = new EquipmentSkillList();
+//		for (int i = 0; i <= this.size() - 1; i++) {
+//			int inputIndex = input.indexOf(this._skillName.get(i));
+//			if (inputIndex != -1) {
+//				int difference = this._skillLevel.get(i) - input.get(inputIndex).required;
+//				if (difference >= 1) {
+//					output.add(this._skillName.get(i), difference);
+//				}
+//			}
+//		}
+//
+//		return output.toString();
+//	}
 
 }

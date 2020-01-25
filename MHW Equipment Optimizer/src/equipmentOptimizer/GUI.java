@@ -43,7 +43,6 @@ class GUI {
 				EquipmentOptimizer equipmentOptimizer = new EquipmentOptimizer(resultTextArea, eventLabel);
 				try {
 					equipmentOptimizer.readRequirement(fileName);
-					equipmentOptimizer.generateIncludedEquipmentList();
 				} catch (Exception e1) {
 					startMatchingButton.setEnabled(false);
 					eventLabel.setText("檔案格式錯誤");

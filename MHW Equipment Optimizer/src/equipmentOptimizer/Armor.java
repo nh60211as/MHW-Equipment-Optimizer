@@ -1,8 +1,5 @@
 package equipmentOptimizer;
 
-import java.util.ArrayList;
-import java.util.List;
-
 class Armor extends Equipment {
 	// 用於比較防具
 	static final int BETTER = 0;
@@ -44,8 +41,8 @@ class Armor extends Equipment {
 	}
 
 	private static int isBetterDecorationSlot(Armor e1, Armor e2) {
-		int e1Score = e1.decor3 * 100 + e1.decor2 * 10 + e1.decor1;
-		int e2Score = e2.decor3 * 100 + e2.decor2 * 10 + e2.decor1;
+		int e1Score = e1.decor4 * 1000 + e1.decor3 * 100 + e1.decor2 * 10 + e1.decor1;
+		int e2Score = e2.decor4 * 1000 + e2.decor3 * 100 + e2.decor2 * 10 + e2.decor1;
 
 		int decorationLevelScore = decorationScore(e1Score, e2Score);
 		int decorationNumberScore = decorationScore(e1.totalDecor, e2.totalDecor);
@@ -54,8 +51,8 @@ class Armor extends Equipment {
 	}
 
 	private static int isBetterCombinedDecorationSlot(Armor e1, Armor e2) {
-		int e1Score = e1.combinedDecor3 * 100 + e1.combinedDecor2 * 10 + e1.combinedDecor1;
-		int e2Score = e2.combinedDecor3 * 100 + e2.combinedDecor2 * 10 + e2.combinedDecor1;
+		int e1Score = e1.combinedDecor4 * 1000 + e1.combinedDecor3 * 100 + e1.combinedDecor2 * 10 + e1.combinedDecor1;
+		int e2Score = e2.combinedDecor4 * 1000 + e2.combinedDecor3 * 100 + e2.combinedDecor2 * 10 + e2.combinedDecor1;
 
 		int decorationLevelScore = decorationScore(e1Score, e2Score);
 		int decorationNumberScore = decorationScore(e1.totalCombinedDecor, e2.totalCombinedDecor);
@@ -105,85 +102,78 @@ class Armor extends Equipment {
 		}
 	}
 
-	void setCombinedDecoration(SkillList includedSkill) {
-		for (Skill includedSkillNow : includedSkill) {
-			int indexOfSkill = skills.get(includedSkillNow.skillName);
-			if (indexOfSkill != -1) {
-				int skillLevel = skills.get(includedSkillNow.skillName);
-				switch (includedSkillNow.levelOfDecor) {
-					case 1:
-						combinedDecor1 += skillLevel;
-						break;
-					case 2:
-						combinedDecor2 += skillLevel;
-						break;
-					case 3:
-						combinedDecor3 += skillLevel;
-						break;
-					default:
-						break;
-				}
-			}
-		}
-
-		totalCombinedDecor = combinedDecor3 + combinedDecor2 + combinedDecor1;
-	}
+//	void setCombinedDecoration(ItemSkillList includedSkill) {
+//		for (Integer skillIndex : this.skills.keySet()) {
+//			if (includedSkill.containsSkillIndex(skillIndex)) {
+//				int skillLevel = skills.getSkillLevel(skillIndex);
+//				switch (includedSkill.) {
+//					case 1:
+//						combinedDecor1 += skillLevel;
+//						break;
+//					case 2:
+//						combinedDecor2 += skillLevel;
+//						break;
+//					case 3:
+//						combinedDecor3 += skillLevel;
+//						break;
+//					case 4:
+//						combinedDecor4 += skillLevel;
+//						break;
+//					default:
+//						break;
+//				}
+//			}
+//		}
+//
+//		totalCombinedDecor = combinedDecor3 + combinedDecor2 + combinedDecor1;
+//	}
 
 	boolean containsSetBonus(SetBonusList setBonusList) {
 		return setBonusList.contains(setBonus);
 	}
 
-	int isBetter(Armor anotherArmor, SkillList includedSkill) {
+	int isBetter(final Armor anotherArmor, final ItemSkillList includedSkill, final SkillHashMap skillHashMap) {
+		// Compare the valid skills (skills required to optimize the equipment) of with another armor
 		int BETTERHERE = BETTER;
 		int SAMEHERE = SAME;
 		int WORSEHERE = WORSE;
 
-		List<Boolean> thisIrreplaceableSkill = new ArrayList<>();
-		List<Boolean> anotherIrreplaceableSkill = new ArrayList<>();
-		for (Skill currentSkill : includedSkill) {
-			if (!currentSkill.isReplaceable) {
-				String currentSkillName = currentSkill.skillName;
-				thisIrreplaceableSkill.add(this.skills.containsKey(currentSkillName));
-				anotherIrreplaceableSkill.add(anotherArmor.skills.containsKey(currentSkillName));
-			}
-		}
+		boolean thisIsIrreplaceable = false;
+		boolean anotherIsIrreplaceable = false;
+		for (Integer skillIndex : this.skills.keySet())
+			if (includedSkill.containsSkillIndex(skillIndex) && !skillHashMap.get(skillIndex).isReplaceable)
+				thisIsIrreplaceable = true;
+		for (Integer skillIndex : anotherArmor.skills.keySet())
+			if (includedSkill.containsSkillIndex(skillIndex) && !skillHashMap.get(skillIndex).isReplaceable)
+				anotherIsIrreplaceable = true;
 
-		if (thisIrreplaceableSkill.contains(true) && anotherIrreplaceableSkill.contains(true)) {
-//			for (int i = 0; i <= thisIrreplaceableSkill.size() - 1; i++) {
-//				if (thisIrreplaceableSkill.get(i) != anotherIrreplaceableSkill.get(i)) {
-//					return MAYBE;
-//				}
-//			}
+		if (thisIsIrreplaceable && anotherIsIrreplaceable)
 			return MAYBE;
-		}
-
-		if (thisIrreplaceableSkill.contains(true) && !anotherIrreplaceableSkill.contains(true)) {
+		if (thisIsIrreplaceable && !anotherIsIrreplaceable) {
 			WORSEHERE = MAYBE;
 			SAMEHERE = MAYBE;
 		}
-		if (!thisIrreplaceableSkill.contains(true) && anotherIrreplaceableSkill.contains(true)) {
+		if (!thisIsIrreplaceable && anotherIsIrreplaceable) {
 			BETTERHERE = MAYBE;
 			SAMEHERE = MAYBE;
 		}
 
-		int[] score = {MAYBE, MAYBE, MAYBE}; // 防禦 實際裝飾珠, 總和裝飾珠
-
-		int temp = MAYBE;
+		int[] score = {MAYBE, MAYBE}; // 防禦, 裝飾珠數量
+		// 比較防禦力
+		int isBetterDefense = MAYBE;
 		if (this.defense > anotherArmor.defense)
-			temp = BETTER;
+			isBetterDefense = BETTER;
 		else if (this.defense == anotherArmor.defense)
-			temp = SAME;
+			isBetterDefense = SAME;
 		else if (this.defense < anotherArmor.defense)
-			temp = WORSE;
+			isBetterDefense = WORSE;
 
-		score[0] = temp;
+		score[0] = isBetterDefense;
 		score[1] = isBetterDecorationSlot(this, anotherArmor);
-		score[2] = isBetterCombinedDecorationSlot(this, anotherArmor);
 
 		int[] scoreCount = {0, 0, 0, 0};
-		for (int i = 0; i <= score.length - 1; i++) {
+		for (int i = 0; i < score.length; i++)
 			scoreCount[score[i]]++;
-		}
 
 		if (scoreCount[MAYBE] >= 1) {
 			return MAYBE;
@@ -200,6 +190,5 @@ class Armor extends Equipment {
 		} else {
 			return WORSEHERE;
 		}
-		//return MAYBE;
 	}
 }

@@ -21,7 +21,8 @@ public class Charm extends Equipment {
 			elementalResistance[i] = Integer.parseInt(elementalDefBlock[i]);
 
 		// 0,0,0,0
-		setDecorToDefault();
+		String[] decorBlock = stringBlock[3].split(",");
+		setDecor(decorBlock);
 
 		// (無);採集達人,1,剝取鐵人,1
 		String[] skillBlock = stringBlock[4].split(",");
