@@ -219,7 +219,7 @@ class EquipmentOptimizer {
 					armorsUsedNow.set(0, -1);
 					for (long armorIter = 0; armorIter < armorSize; armorIter++) {
 						double currentPrint = searchCount * 100.0 / (totalSize);
-						if (lastPrint <= currentPrint - 10) {
+						if (lastPrint <= currentPrint - 1) {
 							lastPrint = currentPrint;
 							PrintMessage.updateEventLabel(eventLabel, String.format("已搜尋:%.2f%%\n\n", currentPrint));
 						}
