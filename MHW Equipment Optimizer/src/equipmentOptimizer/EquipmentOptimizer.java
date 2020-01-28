@@ -225,14 +225,14 @@ class EquipmentOptimizer {
 						}
 						searchCount++;
 						bitsAddOne(armorsUsedNow, includedArmorList);
-//										EquipmentList currentEquipmentList =
-//												new EquipmentList(weapon,
-//														includedArmorList.get(ArmorList.HEAD).get(14),
-//														includedArmorList.get(ArmorList.BODY).get(14),
-//														includedArmorList.get(ArmorList.HANDS).get(14),
-//														includedArmorList.get(ArmorList.BELT).get(18),
-//														includedArmorList.get(ArmorList.FEET).get(9),
-//														includedCharmList.get(0));
+//						EquipmentList currentEquipmentList =
+//								new EquipmentList(weapon,
+//										includedArmorList.get(ArmorList.HEAD).get(34),
+//										includedArmorList.get(ArmorList.BODY).get(14),
+//										includedArmorList.get(ArmorList.HANDS).get(14),
+//										includedArmorList.get(ArmorList.BELT).get(18),
+//										includedArmorList.get(ArmorList.FEET).get(9),
+//										includedCharmList.get(0));
 
 						Armor head = includedArmorList.get(ArmorList.HEAD).get(armorsUsedNow.get(0));
 						Armor body = includedArmorList.get(ArmorList.BODY).get(armorsUsedNow.get(1));
