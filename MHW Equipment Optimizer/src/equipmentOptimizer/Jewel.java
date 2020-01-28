@@ -28,6 +28,6 @@ public class Jewel extends Item {
 
 		this.slotLevel = slotLevel;
 
-
+		validSkills = new ItemSkillList();
 	}
 }

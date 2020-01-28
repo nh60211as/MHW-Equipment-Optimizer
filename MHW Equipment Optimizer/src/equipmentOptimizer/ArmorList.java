@@ -9,6 +9,7 @@ class ArmorList extends ArrayList<ArrayList<Armor>> {
 	static final int HANDS = 2;
 	static final int BELT = 3;
 	static final int FEET = 4;
+	static final int size = FEET + 1;
 
 	ArmorList() {
 		for (int i = HEAD; i <= FEET; i++)
