@@ -104,47 +104,86 @@ class EquipmentOptimizer {
 						includedArmorWithSetBonus.add(currentArmor);
 						continue;
 					}
-					if (currentArmor.skills.containsSkill(includedSkill)) {
+
+					if (includedArmorWithIncludedSkill.size() == 0) {
 						includedArmorWithIncludedSkill.add(currentArmor);
 						continue;
 					}
+					if (currentArmor.skills.containsSkill(includedSkill)) {
+						ArrayList<Integer> markedToRemove = new ArrayList<>();
+						boolean markedToAdd = false;
+						for (int includedArmorIndex = 0; includedArmorIndex <= includedArmorWithIncludedSkill.size() - 1; includedArmorIndex++) {
+							Armor armorNow = includedArmorWithIncludedSkill.get(includedArmorIndex);
+
+							int isCurrentArmorBetter = armorNow.isBetter(currentArmor, includedSkill, skillHashMap);
+//						System.out.println(armorNow.name + " " +
+////								isCurrentArmorBetter + " " +
+////								currentArmor.name);
+							if (isCurrentArmorBetter == Armor.BETTER) {
+								break;
+							} else if (isCurrentArmorBetter == Armor.SAME) {
+								markedToAdd = true;
+							} else if (isCurrentArmorBetter == Armor.WORSE) {
+								markedToRemove.add(includedArmorIndex);
+								markedToAdd = true;
+							} else if (isCurrentArmorBetter == Armor.MAYBE) {
+								markedToAdd = true;
+							}
+						}
+						//includedEquipmentList.printBodyPart(bodyPartNow);
+						//System.out.print("remove: ");
+						//System.out.println(markedToRemove);
+						for (int i = markedToRemove.size() - 1; i >= 0; i--) {
+							includedArmorWithIncludedSkill.remove((int) markedToRemove.get(i));
+						}
+						if (markedToAdd) {
+							//System.out.println("add: " + currentEquipment.equipmentName);
+							includedArmorWithIncludedSkill.add(currentArmor);
+						}
+						//includedArmorList.printBodyPart(currentBodyPart);
+						//System.out.println();
+						//includedArmorWithIncludedSkill.add(currentArmor);
+						continue;
+					}
+
 					if (includedArmorGeneral.size() == 0) {
 						includedArmorGeneral.add(currentArmor);
 						continue;
 					}
+					{
+						ArrayList<Integer> markedToRemove = new ArrayList<>();
+						boolean markedToAdd = false;
+						for (int includedArmorIndex = 0; includedArmorIndex <= includedArmorGeneral.size() - 1; includedArmorIndex++) {
+							Armor armorNow = includedArmorGeneral.get(includedArmorIndex);
 
-					ArrayList<Integer> markedToRemove = new ArrayList<>();
-					boolean markedToAdd = false;
-					for (int includedArmorIndex = 0; includedArmorIndex <= includedArmorGeneral.size() - 1; includedArmorIndex++) {
-						Armor armorNow = includedArmorGeneral.get(includedArmorIndex);
-
-						int isCurrentArmorBetter = armorNow.isBetter(currentArmor, includedSkill, skillHashMap);
+							int isCurrentArmorBetter = armorNow.isBetter(currentArmor, includedSkill, skillHashMap);
 //						System.out.println(armorNow.name + " " +
 ////								isCurrentArmorBetter + " " +
 ////								currentArmor.name);
-						if (isCurrentArmorBetter == Armor.BETTER) {
-							break;
-						} else if (isCurrentArmorBetter == Armor.SAME) {
-							markedToAdd = true;
-						} else if (isCurrentArmorBetter == Armor.WORSE) {
-							markedToRemove.add(includedArmorIndex);
-							markedToAdd = true;
-						} else if (isCurrentArmorBetter == Armor.MAYBE) {
-							markedToAdd = true;
+							if (isCurrentArmorBetter == Armor.BETTER) {
+								break;
+							} else if (isCurrentArmorBetter == Armor.SAME) {
+								markedToAdd = true;
+							} else if (isCurrentArmorBetter == Armor.WORSE) {
+								markedToRemove.add(includedArmorIndex);
+								markedToAdd = true;
+							} else if (isCurrentArmorBetter == Armor.MAYBE) {
+								markedToAdd = true;
+							}
 						}
+						//includedEquipmentList.printBodyPart(bodyPartNow);
+						//System.out.print("remove: ");
+						//System.out.println(markedToRemove);
+						for (int i = markedToRemove.size() - 1; i >= 0; i--) {
+							includedArmorGeneral.remove((int) markedToRemove.get(i));
+						}
+						if (markedToAdd) {
+							//System.out.println("add: " + currentEquipment.equipmentName);
+							includedArmorGeneral.add(currentArmor);
+						}
+						//includedArmorList.printBodyPart(currentBodyPart);
+						//System.out.println();
 					}
-					//includedEquipmentList.printBodyPart(bodyPartNow);
-					//System.out.print("remove: ");
-					//System.out.println(markedToRemove);
-					for (int i = markedToRemove.size() - 1; i >= 0; i--) {
-						includedArmorGeneral.remove((int) markedToRemove.get(i));
-					}
-					if (markedToAdd) {
-						//System.out.println("add: " + currentEquipment.equipmentName);
-						includedArmorGeneral.add(currentArmor);
-					}
-					//includedArmorList.printBodyPart(currentBodyPart);
-					//System.out.println();
 				}
 				currentIncludedArmorList.addAll(includedArmorWithSetBonus);
 				currentIncludedArmorList.addAll(includedArmorWithIncludedSkill);
