@@ -514,7 +514,7 @@ class EquipmentOptimizer {
 		PrintMessage.print(textArea, currentEquipmentList.toString() + "\n");
 
 		// 印出裝備技能名稱和等級
-		ItemSkillList skillListWithDecoration = ItemSkillList.maxSkill(currentEquipmentList.equipmentSkillList, includedSkill);
+		ItemSkillList skillListWithDecoration = ItemSkillList.maxSkill(currentEquipmentList.equipmentSkillList, includedSkill, skillHashMap);
 		PrintMessage.print(textArea, skillListWithDecoration.toString(skillHashMap) + "\n");
 		//PrintMessage.print(textArea, currentEquipmentList.equipmentSkillList.toString(skillHashMap) + "\n");
 
@@ -541,7 +541,7 @@ class EquipmentOptimizer {
 		PrintMessage.print(textArea, currentEquipmentList.toString() + "\n");
 
 		// 印出裝備技能名稱和等級
-		ItemSkillList skillListWithDecoration = ItemSkillList.maxSkill(currentEquipmentList.equipmentSkillList, includedSkill);
+		ItemSkillList skillListWithDecoration = ItemSkillList.maxSkill(currentEquipmentList.equipmentSkillList, includedSkill, skillHashMap);
 		PrintMessage.print(textArea, skillListWithDecoration.toString(skillHashMap) + "\n");
 		//PrintMessage.print(textArea, currentEquipmentList.equipmentSkillList.toString(skillHashMap) + "\n");
 

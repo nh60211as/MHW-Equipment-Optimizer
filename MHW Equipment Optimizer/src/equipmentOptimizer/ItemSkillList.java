@@ -40,7 +40,7 @@ public class ItemSkillList extends HashMap<Integer, Integer> {
 		return ans;
 	}
 
-	public static ItemSkillList maxSkill(final ItemSkillList skillList1, final ItemSkillList skillList2) {
+	public static ItemSkillList maxSkill(final ItemSkillList skillList1, final ItemSkillList skillList2, final SkillHashMap skillHashMap) {
 		ItemSkillList ans = new ItemSkillList(skillList1);
 		for (Integer skillIndex : skillList2.keySet()) {
 			Integer skillLevel = 0;
@@ -48,6 +48,8 @@ public class ItemSkillList extends HashMap<Integer, Integer> {
 				skillLevel = Math.max(ans.getSkillLevel(skillIndex), skillList2.getSkillLevel(skillIndex));
 			else
 				skillLevel = skillList2.getSkillLevel(skillIndex);
+
+			skillLevel = Math.min(skillLevel, skillHashMap.get(skillIndex).level);
 			ans.put(skillIndex, skillLevel);
 		}
 
