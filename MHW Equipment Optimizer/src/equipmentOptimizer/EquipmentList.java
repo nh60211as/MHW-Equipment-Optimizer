@@ -48,7 +48,7 @@ class EquipmentList {
 		}
 	}
 
-	int[] getDecorationSlot() {
+	ArrayList<Integer> getDecorationSlot() {
 		decorSlots[0] = 0;
 
 		decorSlots[1] = this.weapon.decor1;
@@ -68,7 +68,11 @@ class EquipmentList {
 		decorSlots[3] += charm.decor3;
 		decorSlots[4] += charm.decor4;
 
-		return decorSlots;
+		ArrayList<Integer> ans = new ArrayList<>();
+		for (int decorSlot : decorSlots) {
+			ans.add(decorSlot);
+		}
+		return ans;
 	}
 
 	ItemSkillList getEquipmentSkillList() {

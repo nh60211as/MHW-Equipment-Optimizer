@@ -40,7 +40,7 @@ class Armor extends Equipment {
 		skills = new ItemSkillList(stringBlock[5], skillHashMap);
 	}
 
-	private static int isBetterDecorationSlot(Armor e1, Armor e2) {
+	static int isBetterDecorationSlot(Armor e1, Armor e2) {
 		int e1Score = e1.decor4 * 1000 + e1.decor3 * 100 + e1.decor2 * 10 + e1.decor1;
 		int e2Score = e2.decor4 * 1000 + e2.decor3 * 100 + e2.decor2 * 10 + e2.decor1;
 
@@ -84,7 +84,7 @@ class Armor extends Equipment {
 					default:
 						return MAYBE;
 				}
-			case 1: //{1,1,0} , {1,1,0}
+			case 1: // {1,1,0} , {1,1,0}
 				return SAME;
 			case 2:
 				switch (decorationNumberScore) {
@@ -190,5 +190,44 @@ class Armor extends Equipment {
 		} else {
 			return WORSEHERE;
 		}
+	}
+
+	int isBetterWithNoSkill(final Armor anotherArmor) {
+		int[] score = {MAYBE, MAYBE}; // 防禦, 裝飾珠數量
+		// 比較防禦力
+		int isBetterDefense = MAYBE;
+		if (this.defense > anotherArmor.defense)
+			isBetterDefense = BETTER;
+		else if (this.defense == anotherArmor.defense)
+			isBetterDefense = SAME;
+		else if (this.defense < anotherArmor.defense)
+			isBetterDefense = WORSE;
+
+		score[0] = isBetterDefense;
+		score[1] = isBetterDecorationSlot(this, anotherArmor);
+
+		int[] scoreCount = {0, 0, 0, 0};
+		for (int i = 0; i < score.length; i++)
+			scoreCount[score[i]]++;
+
+		if (scoreCount[MAYBE] >= 1) {
+			return MAYBE;
+		}
+		if (scoreCount[SAME] == score.length) {
+			return SAME;
+		}
+		if (scoreCount[BETTER] >= 1) {
+			if (scoreCount[WORSE] >= 1) {
+				return MAYBE;
+			} else {
+				return BETTER;
+			}
+		} else {
+			return WORSE;
+		}
+	}
+
+	public String toString() {
+		return this.name;
 	}
 }
