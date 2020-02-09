@@ -40,17 +40,13 @@ public class ItemSkillList extends HashMap<Integer, Integer> {
 		return ans;
 	}
 
-	public static ItemSkillList maxSkill(final ItemSkillList skillList1, final ItemSkillList skillList2, final SkillHashMap skillHashMap) {
-		ItemSkillList ans = new ItemSkillList(skillList1);
-		for (Integer skillIndex : skillList2.keySet()) {
-			Integer skillLevel = 0;
-			if (ans.containsSkillIndex(skillIndex))
-				skillLevel = Math.max(ans.getSkillLevel(skillIndex), skillList2.getSkillLevel(skillIndex));
-			else
-				skillLevel = skillList2.getSkillLevel(skillIndex);
-
-			skillLevel = Math.min(skillLevel, skillHashMap.get(skillIndex).level);
-			ans.put(skillIndex, skillLevel);
+	public static ItemSkillList printedSkill(final ItemSkillList equipmentSkill, final ItemSkillList includedSkill, final SkillHashMap skillHashMap) {
+		ItemSkillList ans = new ItemSkillList();
+		for (Integer skillIndex : equipmentSkill.keySet()) {
+			if (!includedSkill.containsSkillIndex(skillIndex)) {
+				int skillLevel = Math.min(equipmentSkill.getSkillLevel(skillIndex), skillHashMap.get(skillIndex).level);
+				ans.put(skillIndex, skillLevel);
+			}
 		}
 
 		return ans;

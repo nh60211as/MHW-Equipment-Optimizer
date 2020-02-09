@@ -248,14 +248,16 @@ class EquipmentOptimizer {
 				ArrayList<Integer> armorsUsedNow = new ArrayList<Integer>(Collections.nCopies(ArmorList.size, 0));
 				armorsUsedNow.set(0, -1);
 				for (long armorIter = 0; armorIter < armorSize; armorIter++) {
+					bitsAddOne(armorsUsedNow, includedArmor);
 					for (Charm charm : includedCharm) {
 						double currentPrint = searchCount * 100.0 / (totalSize);
-						if (lastPrint <= currentPrint - 0.01) {
+						if (lastPrint <= currentPrint - 0.1) {
 							lastPrint = currentPrint;
-							PrintMessage.updateEventLabel(eventLabel, String.format("已搜尋:%.2f%%\n\n", currentPrint));
+							PrintMessage.updateEventLabel(eventLabel, String.format("已搜尋:%.1f%%\n\n", currentPrint));
 						}
 						searchCount++;
-						bitsAddOne(armorsUsedNow, includedArmor);
+
+						//System.out.println(armorsUsedNow.toString() + ", " + charm.name);
 //						EquipmentList currentEquipmentList =
 //								new EquipmentList(weapon,
 //										includedArmor.get(ArmorList.HEAD).get(2),
@@ -420,6 +422,7 @@ class EquipmentOptimizer {
 								}
 							}
 							if (success) {
+								//System.out.println(armorIter + " " + armorsUsedNow.toString());
 								printEquipment(currentEquipmentList, numberOfHoleHave);
 								break;
 							}
@@ -514,7 +517,7 @@ class EquipmentOptimizer {
 		PrintMessage.print(textArea, currentEquipmentList.toString() + "\n");
 
 		// 印出裝備技能名稱和等級
-		ItemSkillList skillListWithDecoration = ItemSkillList.maxSkill(currentEquipmentList.equipmentSkillList, includedSkill, skillHashMap);
+		ItemSkillList skillListWithDecoration = ItemSkillList.printedSkill(currentEquipmentList.equipmentSkillList, includedSkill, skillHashMap);
 		PrintMessage.print(textArea, skillListWithDecoration.toString(skillHashMap) + "\n");
 		//PrintMessage.print(textArea, currentEquipmentList.equipmentSkillList.toString(skillHashMap) + "\n");
 
@@ -541,8 +544,8 @@ class EquipmentOptimizer {
 		PrintMessage.print(textArea, currentEquipmentList.toString() + "\n");
 
 		// 印出裝備技能名稱和等級
-		ItemSkillList skillListWithDecoration = ItemSkillList.maxSkill(currentEquipmentList.equipmentSkillList, includedSkill, skillHashMap);
-		PrintMessage.print(textArea, skillListWithDecoration.toString(skillHashMap) + "\n");
+		ItemSkillList printedSkillList = ItemSkillList.printedSkill(currentEquipmentList.equipmentSkillList, includedSkill, skillHashMap);
+		PrintMessage.print(textArea, printedSkillList.toString(skillHashMap) + "\n");
 		//PrintMessage.print(textArea, currentEquipmentList.equipmentSkillList.toString(skillHashMap) + "\n");
 
 		StringBuilder stringBuilder = new StringBuilder();
