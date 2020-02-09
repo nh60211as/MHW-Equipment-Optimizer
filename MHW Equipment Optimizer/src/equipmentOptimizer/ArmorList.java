@@ -46,8 +46,8 @@ class ArmorList extends ArrayList<ArrayList<Armor>> {
 		System.out.println();
 	}
 
-	int iterationSize() {
-		int size = 1;
+	long iterationSize() {
+		long size = 1;
 		for (List<Armor> bodyPartNow : this) {
 			size *= bodyPartNow.size();
 		}

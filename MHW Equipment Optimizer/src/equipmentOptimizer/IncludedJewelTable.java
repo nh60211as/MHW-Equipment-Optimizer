@@ -1,6 +1,7 @@
 package equipmentOptimizer;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.TreeMap;
 
 // ArrayList<JewelList>(0)：1級裝飾珠
@@ -40,7 +41,9 @@ public class IncludedJewelTable extends TreeMap<Integer, ArrayList<JewelList>> {
 					lowestSlotLevel = Math.min(lowestSlotLevel, currentJewel.slotLevel);
 				} else {
 					if (hasDominantJewel && currentJewel.validSkills.size() == 1 && currentJewel.slotLevel >= lowestSlotLevel) {
-						removeList.add(currentJewelIndex);
+						Collection<Integer> skillLevel = currentJewel.validSkills.values();
+						if (skillLevel.iterator().next() == 1)
+							removeList.add(currentJewelIndex);
 					}
 				}
 			}

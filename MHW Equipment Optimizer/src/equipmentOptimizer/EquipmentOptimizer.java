@@ -193,6 +193,9 @@ class EquipmentOptimizer {
 			}
 		}
 
+		// 用來測試
+		//includedArmor = armorList;
+
 		// 加入要搜尋的護石
 		for (Charm currentCharm : charmList) {
 			if (currentCharm.skills.containsSkill(excludedSkill))
