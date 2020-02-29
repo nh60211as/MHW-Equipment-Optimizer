@@ -27,7 +27,8 @@ public class ItemSkillList extends HashMap<Integer, Integer> {
 	}
 
 	public static ItemSkillList removeSkill(final ItemSkillList skillRequired, final ItemSkillList skillHave) {
-		ItemSkillList ans = new ItemSkillList(skillRequired);
+		ItemSkillList ans = new ItemSkillList();
+		ans.putAll(skillRequired);
 		for (Integer skillIndex : skillRequired.keySet())
 			if (skillHave.containsSkillIndex(skillIndex)) {
 				Integer remainingSkillLevel = skillRequired.getSkillLevel(skillIndex) - skillHave.getSkillLevel(skillIndex);

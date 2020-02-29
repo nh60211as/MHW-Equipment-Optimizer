@@ -30,4 +30,8 @@ public class Jewel extends Item {
 
 		validSkills = new ItemSkillList();
 	}
+
+	public String toString() {
+		return name;
+	}
 }

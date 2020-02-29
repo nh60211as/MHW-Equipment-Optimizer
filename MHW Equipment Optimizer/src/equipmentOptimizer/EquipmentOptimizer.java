@@ -3,6 +3,7 @@ package equipmentOptimizer;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 class EquipmentOptimizer {
 	// 檔案路徑
@@ -61,6 +62,210 @@ class EquipmentOptimizer {
 		// 結束初始化函數
 	}
 
+	// TODO: It's not implemented
+	private static boolean isMultiSkillUniqueJewelListPossible(final JewelList jewelList, ItemSkillList skillNeed, ArrayList<Integer> numberOfSlotHave) {
+		for (Jewel currentJewel : jewelList) {
+			Integer skillIndex = currentJewel.singleValidSkillIndex;
+			if (skillNeed.containsKey(skillIndex)) {
+				float levelProvidedByOneJewel = currentJewel.validSkills.getSkillLevel(skillIndex);
+				float levelNeeded = skillNeed.getSkillLevel(skillIndex);
+				int jewelNeed = (int) Math.ceil(levelNeeded / levelProvidedByOneJewel);
+				int jewelOwned = currentJewel.owned;
+				if (jewelNeed > jewelOwned) {
+					return false;
+				}
+
+				int[] numberOfSlotNeed = new int[5];
+				int jewelSlotLevel = currentJewel.slotLevel;
+				numberOfSlotNeed[jewelSlotLevel] = jewelNeed;
+				if (!isCurrentSlotPossible(numberOfSlotHave, numberOfSlotNeed)) {
+					return false;
+				} else {
+					skillNeed.remove(skillIndex);
+				}
+			}
+		}
+		return true;
+	}
+
+	private static boolean isSingleSkillUniqueJewelListPossible(final JewelList jewelList, ItemSkillList skillNeed, ArrayList<Integer> numberOfSlotHave) {
+		for (Jewel currentJewel : jewelList) {
+			Integer skillIndex = currentJewel.singleValidSkillIndex;
+			if (skillNeed.containsKey(skillIndex)) {
+				float levelProvidedByOneJewel = currentJewel.validSkills.getSkillLevel(skillIndex);
+				float levelNeeded = skillNeed.getSkillLevel(skillIndex);
+				int jewelNeed = (int) Math.ceil(levelNeeded / levelProvidedByOneJewel);
+				int jewelOwned = currentJewel.owned;
+				if (jewelNeed > jewelOwned) {
+					return false;
+				}
+
+				int[] numberOfSlotNeed = new int[5];
+				int jewelSlotLevel = currentJewel.slotLevel;
+				numberOfSlotNeed[jewelSlotLevel] = jewelNeed;
+				if (!isCurrentSlotPossible(numberOfSlotHave, numberOfSlotNeed)) {
+					return false;
+				} else {
+					skillNeed.remove(skillIndex);
+				}
+			}
+		}
+		return true;
+	}
+
+	private static boolean isMultiSkillNonUniqueJewelListPossible(final JewelList jewelList, ArrayList<Integer> jewelsUsedNow,
+																  ItemSkillList skillNeed, ArrayList<Integer> numberOfSlotHave) {
+		ItemSkillList skillNow = new ItemSkillList();
+		int[] numberOfSlotNeed = new int[5];
+		int totalSlotUsed = 0;
+		int maxSlotLevelNow = 0;
+		for (int i = 0; i < jewelsUsedNow.size(); i++) {
+			Jewel currentJewel = jewelList.get(i);
+			if (jewelsUsedNow.get(i) == 0)
+				continue;
+			skillNow.addSkill(currentJewel.validSkills, jewelsUsedNow.get(i));
+			numberOfSlotNeed[currentJewel.slotLevel] += jewelsUsedNow.get(i);
+			totalSlotUsed += jewelsUsedNow.get(i);
+			maxSlotLevelNow = Math.max(maxSlotLevelNow, currentJewel.slotLevel);
+		}
+		if (!isCurrentSlotPossible(numberOfSlotHave, numberOfSlotNeed))
+			return false;
+		else {
+			ItemSkillList skillNeedTemp = ItemSkillList.removeSkill(skillNeed, skillNow);
+			skillNeed.clear();
+			skillNeed.putAll(skillNeedTemp);
+			return true;
+		}
+	}
+
+	private static boolean isSingleSkillNonUniqueJewelListSuccessful(final HashMap<Integer, ArrayList<JewelList>> singleSkillNonUniqueJewelList,
+																	 ItemSkillList skillNeed, ArrayList<Integer> numberOfSlotHave) {
+		JewelList singleSkillUniqueJewelList = new JewelList();
+		HashMap<Integer, ArrayList<JewelList>> singleSkillMultiJewelList = new HashMap<>();
+		for (Integer skillIndex : skillNeed.keySet()) {
+			if (!singleSkillNonUniqueJewelList.containsKey(skillIndex))
+				return false;
+
+			ArrayList<JewelList> separatedSkillJewelList = singleSkillNonUniqueJewelList.get(skillIndex);
+			JewelList multiLevelJewelList = separatedSkillJewelList.get(0);
+			JewelList singleLevelJewelList = separatedSkillJewelList.get(1);
+
+			int multiLevelJewelListSize = multiLevelJewelList.size();
+			int singleLevelJewelListSize = singleLevelJewelList.size();
+			int totalSize = multiLevelJewelListSize + singleLevelJewelListSize;
+
+			// 目前的技能包含的裝飾珠是唯一的
+			if (totalSize == 1) {
+				if (multiLevelJewelListSize == 1)
+					singleSkillUniqueJewelList.add(multiLevelJewelList.get(0));
+				if (singleLevelJewelListSize == 1)
+					singleSkillUniqueJewelList.add(singleLevelJewelList.get(0));
+			} else {
+				singleSkillMultiJewelList.put(skillIndex, separatedSkillJewelList);
+			}
+		}
+
+		boolean possible = isSingleSkillUniqueJewelListPossible(singleSkillUniqueJewelList, skillNeed, numberOfSlotHave);
+		if (!possible)
+			return false;
+		if (skillNeed.isEmpty())
+			return true;
+
+		JewelList finalJewelList = new JewelList(singleSkillMultiJewelList);
+		long totalIter = finalJewelList.getIterationSizeAndRemoveUnnecessaryJewels(skillNeed);
+		ArrayList<Integer> jewelsUsedNow = new ArrayList<>(Collections.nCopies(finalJewelList.size(), 0));
+		if (jewelsUsedNow.size() > 0)
+			jewelsUsedNow.set(0, -1);
+		for (int iter = 0; iter < totalIter; iter++) {
+			// add one jewel every iteration and carry the overflowed jewel to the next one
+			// just like basic math addition
+			bitsAddOne(jewelsUsedNow, finalJewelList);
+
+			possible = isMultiSkillNonUniqueJewelListPossible(finalJewelList, jewelsUsedNow, skillNeed, numberOfSlotHave);
+			if (!possible)
+				continue;
+			if (skillNeed.isEmpty()) {
+				return true;
+			}
+		} // end of finding suitable jewels
+
+		return false;
+	}
+
+	// numberOfSlotHave = [0,1,1,0,0]
+	// numberOfSlotNeed = [0,1,1,0,0]
+	private static boolean isCurrentSlotPossible(ArrayList<Integer> numberOfSlotHave, int[] numberOfSlotNeed) {
+		ArrayList<Integer> numberOfSlotHaveTemp = new ArrayList<>(numberOfSlotHave);
+		boolean finished = true;
+		for (int i = 0; i < numberOfSlotHaveTemp.size(); i++) {
+			numberOfSlotHaveTemp.set(i, numberOfSlotHaveTemp.get(i) - numberOfSlotNeed[i]);
+			if (numberOfSlotHaveTemp.get(i) < 0) {
+				finished = false;
+			}
+		}
+
+		// 如果是 finished 狀態則回傳 true，因為不缺任何鑲嵌槽
+		// 如果不是的話則進入 while 迴圈
+		while (!finished) {
+			finished = true;
+			// 如果最高級的鑲嵌槽數量小於 0 則回傳 false，因為無法再向更高級的鑲嵌槽借位
+			if (numberOfSlotHaveTemp.get(numberOfSlotHaveTemp.size() - 1) < 0)
+				return false;
+
+			for (int i = numberOfSlotHaveTemp.size() - 2; i >= 1; i--) {
+				// 如果目前的鑲嵌槽數量小於 0 則向上一級的鑲嵌槽借位
+				if (numberOfSlotHaveTemp.get(i) < 0) {
+					numberOfSlotHaveTemp.set(i + 1, numberOfSlotHaveTemp.get(i + 1) + numberOfSlotHaveTemp.get(i));
+					numberOfSlotHaveTemp.set(i, 0);
+				}
+			}
+
+			// 完成後檢查目前的 numberOfSlotHaveTemp 數字是不是都大於等於 0
+			for (Integer currentSlot : numberOfSlotHaveTemp) {
+				if (currentSlot < 0) {
+					finished = false;
+					break;
+				}
+			}
+		}
+		for (int i = 0; i < numberOfSlotHave.size(); i++)
+			numberOfSlotHave.set(i, numberOfSlotHaveTemp.get(i));
+		return true;
+	}
+
+	// idea from leetcode 78. Subsets
+	private static void bitsAddOne(ArrayList<Integer> toAddList, ArmorList includedArmorList) {
+		boolean carry = true;
+		for (int i = 0; i < toAddList.size(); i++) {
+			if (carry) {
+				toAddList.set(i, toAddList.get(i) + 1);
+				if (toAddList.get(i) > includedArmorList.get(i).size() - 1) {
+					carry = true;
+					toAddList.set(i, 0);
+				} else {
+					carry = false;
+				}
+			} else
+				break;
+		}
+	}
+
+	private static void bitsAddOne(ArrayList<Integer> toAddList, JewelList jewelList) {
+		boolean carry = true;
+		for (int i = 0; i < toAddList.size(); i++) {
+			if (carry) {
+				toAddList.set(i, toAddList.get(i) + 1);
+				if (toAddList.get(i) > jewelList.get(i).owned) {
+					carry = true;
+					toAddList.set(i, 0);
+				} else {
+					carry = false;
+				}
+			} else
+				break;
+		}
+	}
+
 	void readRequirement(String requirementFileName) throws CloneNotSupportedException {
 		this.requirementFileName = requirementFileName;
 
@@ -72,7 +277,6 @@ class EquipmentOptimizer {
 		includedArmor = new ArmorList();
 		includedCharm = new CharmList();
 		includedJewel = new JewelList();
-		includedJewelTable = new IncludedJewelTable();
 
 		// 讀取技能、裝備需求檔案
 		ReadFile.readRequirementFile(this.requirementFileName, skillHashMap, weaponList, armorList, includedSetBonus, includedSkill, excludedSkill, includedWeapon, includedArmor, textArea, eventLabel);
@@ -220,12 +424,7 @@ class EquipmentOptimizer {
 		}
 
 		// 設定要包含的 Jewel Table
-		for (Integer skillIndex : includedSkill.keySet()) {
-			JewelList currentJewelList = includedJewel.getJewelsContainsValidSkill(skillIndex);
-			currentJewelList.removeContained(includedJewelTable);
-
-			includedJewelTable.add(skillIndex, currentJewelList);
-		}
+		includedJewelTable = new IncludedJewelTable(includedJewel, skillHashMap);
 		//System.out.println("搜索完成");
 	}
 
@@ -249,7 +448,8 @@ class EquipmentOptimizer {
 //					}
 				// 搜尋個別防具
 				ArrayList<Integer> armorsUsedNow = new ArrayList<Integer>(Collections.nCopies(ArmorList.size, 0));
-				armorsUsedNow.set(0, -1);
+				if (armorsUsedNow.size() > 0)
+					armorsUsedNow.set(0, -1);
 				for (long armorIter = 0; armorIter < armorSize; armorIter++) {
 					bitsAddOne(armorsUsedNow, includedArmor);
 					for (Charm charm : includedCharm) {
@@ -263,11 +463,11 @@ class EquipmentOptimizer {
 						//System.out.println(armorsUsedNow.toString() + ", " + charm.name);
 //						EquipmentList currentEquipmentList =
 //								new EquipmentList(weapon,
-//										includedArmor.get(ArmorList.HEAD).get(2),
-//										includedArmor.get(ArmorList.BODY).get(8),
-//										includedArmor.get(ArmorList.HANDS).get(14),
-//										includedArmor.get(ArmorList.BELT).get(18),
-//										includedArmor.get(ArmorList.FEET).get(9),
+//										includedArmor.get(ArmorList.HEAD).get(15),
+//										includedArmor.get(ArmorList.BODY).get(15),
+//										includedArmor.get(ArmorList.HANDS).get(0),
+//										includedArmor.get(ArmorList.BELT).get(4),
+//										includedArmor.get(ArmorList.FEET).get(0),
 //										includedCharm.get(0));
 
 						Armor head = includedArmor.get(ArmorList.HEAD).get(armorsUsedNow.get(0));
@@ -316,37 +516,13 @@ class EquipmentOptimizer {
 						if (maxSkillNeeded > maxSkillPossible)
 							continue;
 
+						boolean possible = false;
 						// 開始使用 includedJewelTable
-						boolean impossible = false;
-						for (Integer skillIndex : includedJewelTable.keySet()) {
-
-							if (skillNeed.containsKey(skillIndex)) {
-								Jewel jewel = includedJewelTable.getJewelWithUniqueSkill(skillIndex);
-								if (jewel != null) {
-									float levelProvidedByOneJewel = jewel.validSkills.getSkillLevel(skillIndex);
-									float levelNeeded = skillNeed.getSkillLevel(skillIndex);
-									int jewelNeed = (int) Math.ceil(levelNeeded / levelProvidedByOneJewel);
-									int jewelOwned = jewel.owned;
-									if (jewelNeed > jewelOwned) {
-										impossible = true;
-										break;
-									}
-
-
-									int[] numberOfSlotNeed = new int[5];
-									int jewelSlotLevel = jewel.slotLevel;
-									numberOfSlotNeed[jewelSlotLevel] = jewelNeed;
-									if (!isCurrentSlotPossible(numberOfSlotHave, numberOfSlotNeed)) {
-										impossible = true;
-										break;
-									} else {
-										skillNeed.remove(skillIndex);
-									}
-								}
-							}
-
-						}
-						if (impossible)
+						possible = isMultiSkillUniqueJewelListPossible(includedJewelTable.multiSkillUniqueJewelList, skillNeed, numberOfSlotHave);
+						if (!possible)
+							continue;
+						possible = isSingleSkillUniqueJewelListPossible(includedJewelTable.singleSkillUniqueJewelList, skillNeed, numberOfSlotHave);
+						if (!possible)
 							continue;
 
 						if (skillNeed.isEmpty()) {
@@ -354,164 +530,36 @@ class EquipmentOptimizer {
 							continue;
 						}
 
-						JewelList finalJewelList = new JewelList(includedJewel);
-						long totalIter = 1;
-						for (int i = finalJewelList.size() - 1; i >= 0; i--) {
-							if (!finalJewelList.get(i).skills.containsSkill(skillNeed))
-								finalJewelList.remove(i);
-							else
-								totalIter *= (finalJewelList.get(i).owned + 1); // calculate the iteration needed for all the jewels
-						}
+						JewelList multiSkillNonUniqueJewelList = new JewelList(includedJewelTable.multiSkillNonUniqueJewelList);
+						long totalIter = multiSkillNonUniqueJewelList.getIterationSizeAndRemoveUnnecessaryJewels(skillNeed);
+						HashMap<Integer, ArrayList<JewelList>> singleSkillNonUniqueJewelList = includedJewelTable.singleSkillNonUniqueJewelList;
 
-						ArrayList<Integer> jewelsUsedNow = new ArrayList<>(Collections.nCopies(finalJewelList.size(), 0));
+						ArrayList<Integer> jewelsUsedNow = new ArrayList<>(Collections.nCopies(multiSkillNonUniqueJewelList.size(), 0));
+						if (jewelsUsedNow.size() > 0)
+							jewelsUsedNow.set(0, -1);
 						for (int iter = 0; iter < totalIter; iter++) {
-							boolean skip = false;
-							ItemSkillList skillNow = new ItemSkillList();
-							int[] numberOfSlotNeed = new int[5];
-							int totalSlotUsed = 0;
-							int maxSlotLevelNow = 0;
-							for (int i = 0; i < jewelsUsedNow.size(); i++) {
-								if (jewelsUsedNow.get(i) == 0)
-									continue;
-								skillNow.addSkill(finalJewelList.get(i).skills, jewelsUsedNow.get(i));
-								numberOfSlotNeed[finalJewelList.get(i).slotLevel] += jewelsUsedNow.get(i);
-								totalSlotUsed += jewelsUsedNow.get(i);
-								maxSlotLevelNow = Math.max(maxSlotLevelNow, finalJewelList.get(i).slotLevel);
-							}
-							// skip if the current set of jewels slot level is too high
-							if (maxSlotLevelNow > maxSlotLevel)
-								skip = true;
-							// skip if the amount of jewels used are higher than the jewels available
-							if (totalSlotUsed > totalSlotHave)
-								skip = true;
-							// skip if there are still skills unfulfilled
-							ItemSkillList skillNeedNow = ItemSkillList.removeSkill(skillNeed, skillNow);
-							if (!skillNeedNow.isEmpty())
-								skip = true;
-							//System.out.println(skip);
-							int[] numberOfHoleHave = new int[0];
-							boolean success = false;
-							if (!skip) {
-								boolean finished = true;
-								numberOfHoleHave = new int[numberOfSlotHave.size()];
-								for (int i = 0; i <= numberOfHoleHave.length - 1; i++) {
-									numberOfHoleHave[i] = numberOfSlotHave.get(i) - numberOfSlotNeed[i];
-									if (numberOfHoleHave[i] < 0) {
-										finished = false;
-									}
-								}
-
-								while (!finished) {
-									finished = true;
-									if (numberOfHoleHave[numberOfHoleHave.length - 1] < 0) {
-										success = false;
-										break;
-									}
-
-									for (int i = numberOfHoleHave.length - 2; i >= 1; i--) {
-										if (numberOfHoleHave[i] < 0) {
-											numberOfHoleHave[i + 1] += numberOfHoleHave[i];
-											numberOfHoleHave[i] += -numberOfHoleHave[i];
-										}
-									}
-
-									for (int i = 0; i <= numberOfHoleHave.length - 1; i++) {
-										if (numberOfHoleHave[i] < 0) {
-											finished = false;
-										}
-									}
-
-									success = true;
-								}
-							}
-							if (success) {
-								//System.out.println(armorIter + " " + armorsUsedNow.toString());
-								printEquipment(currentEquipmentList, numberOfHoleHave);
+							bitsAddOne(jewelsUsedNow, multiSkillNonUniqueJewelList);
+							possible = isMultiSkillNonUniqueJewelListPossible(multiSkillNonUniqueJewelList, jewelsUsedNow, skillNeed, numberOfSlotHave);
+							if (!possible)
+								continue;
+							if (skillNeed.isEmpty()) {
+								printEquipment(currentEquipmentList, numberOfSlotHave);
 								break;
 							}
 
+							boolean success = isSingleSkillNonUniqueJewelListSuccessful(singleSkillNonUniqueJewelList, skillNeed, numberOfSlotHave);
+							if (success) {
+								printEquipment(currentEquipmentList, numberOfSlotHave);
+								break;
+							}
 							// add one jewel every iteration and carry the overflowed jewel to the next one
 							// just like basic math addition
-							bitsAddOne(jewelsUsedNow, finalJewelList);
 						} // end of finding suitable jewels
 
 					}
 				}
 			}
 		PrintMessage.updateEventLabel(eventLabel, String.format("已搜尋:%.2f%%\n\n", 100.0));
-	}
-
-	// numberOfSlotHave = [0,1,1,0,0]
-	// numberOfSlotNeed = [0,1,1,0,0]
-	private boolean isCurrentSlotPossible(ArrayList<Integer> numberOfSlotHave, int[] numberOfSlotNeed) {
-		boolean finished = true;
-
-		for (int i = 0; i < numberOfSlotHave.size(); i++) {
-			numberOfSlotHave.set(i, numberOfSlotHave.get(i) - numberOfSlotNeed[i]);
-			if (numberOfSlotHave.get(i) < 0) {
-				finished = false;
-			}
-		}
-
-		// 如果是 finished 狀態則回傳 true，因為不缺任何鑲嵌槽
-		// 如果不是的話則進入 while 迴圈
-		while (!finished) {
-			finished = true;
-			// 如果最高級的鑲嵌槽數量小於 0 則回傳 false，因為無法再向更高級的鑲嵌槽借位
-			if (numberOfSlotHave.get(numberOfSlotHave.size() - 1) < 0)
-				return false;
-
-			for (int i = numberOfSlotHave.size() - 2; i >= 1; i--) {
-				// 如果目前的鑲嵌槽數量小於 0 則向上一級的鑲嵌槽借位
-				if (numberOfSlotHave.get(i) < 0) {
-					numberOfSlotHave.set(i + 1, numberOfSlotHave.get(i + 1) + numberOfSlotHave.get(i));
-					numberOfSlotHave.set(i, 0);
-				}
-			}
-
-			// 完成後檢查目前的 numberOfSlotHave 數字是不是都大於等於 0
-			for (Integer currentSlot : numberOfSlotHave) {
-				if (currentSlot < 0) {
-					finished = false;
-					break;
-				}
-			}
-		}
-
-		return true;
-	}
-
-	// idea from leetcode 78. Subsets
-	private void bitsAddOne(ArrayList<Integer> toAddList, ArmorList includedArmorList) {
-		boolean carry = true;
-		for (int i = 0; i < toAddList.size(); i++) {
-			if (carry) {
-				toAddList.set(i, toAddList.get(i) + 1);
-				if (toAddList.get(i) > includedArmorList.get(i).size() - 1) {
-					carry = true;
-					toAddList.set(i, 0);
-				} else {
-					carry = false;
-				}
-			} else
-				break;
-		}
-	}
-
-	private void bitsAddOne(ArrayList<Integer> toAddList, JewelList jewelList) {
-		boolean carry = true;
-		for (int i = 0; i < toAddList.size(); i++) {
-			if (carry) {
-				toAddList.set(i, toAddList.get(i) + 1);
-				if (toAddList.get(i) > jewelList.get(i).owned) {
-					carry = true;
-					toAddList.set(i, 0);
-				} else {
-					carry = false;
-				}
-			} else
-				break;
-		}
 	}
 
 	private void printEquipment(EquipmentList currentEquipmentList, ArrayList<Integer> remainDecorSlot) {
