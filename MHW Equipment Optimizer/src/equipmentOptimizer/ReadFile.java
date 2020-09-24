@@ -352,7 +352,7 @@ class ReadFile {
 									final SkillHashMap skillHashMap,
 									final WeaponList weaponList,
 									final ArmorList armorList,
-									final SetBonusList setBonusList,
+									final SetBonusHashMap setBonusHashMap,
 									final ItemSkillList includedSkill,
 									final ItemSkillList excludedSkill,
 									final WeaponList includedWeaponList,
@@ -385,7 +385,7 @@ class ReadFile {
 						String setBonusName = stringBlock[0];
 						int setBonusLevel = Integer.parseInt(stringBlock[1]);
 						if (setBonusLevel >= 1) {
-							setBonusList.add(setBonusName, setBonusLevel);
+							setBonusHashMap.add(setBonusName, setBonusLevel);
 						} else {
 							PrintMessage.warning(textArea, "自動忽略系列技能-" + currentLine);
 						}

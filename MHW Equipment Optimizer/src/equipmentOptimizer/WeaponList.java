@@ -82,8 +82,8 @@ class WeaponList extends ArrayList<ArrayList<Weapon>> {
 		return true;
 	}
 
-	int totalSize() {
-		int size = 0;
+	long totalSize() {
+		long size = 0;
 		for (List<Weapon> weaponTypeNow : this) {
 			size += weaponTypeNow.size();
 		}

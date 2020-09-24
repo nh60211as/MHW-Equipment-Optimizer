@@ -1,12 +1,13 @@
 package equipmentOptimizer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 // TODO
 // This part need a code clean up
 class EquipmentList {
 	private final Weapon weapon;
-	final SetBonusList setBonusList; // 這項會在建構式出現
+	final SetBonusHashMap setBonus; // 這項會在建構式出現
 	private final ArrayList<Armor> armors;
 	private final Charm charm;
 	ItemSkillList equipmentSkillList;
@@ -24,27 +25,22 @@ class EquipmentList {
 
 		this.charm = charm;
 
-		setBonusList = new SetBonusList();
+		setBonus = new SetBonusHashMap();
 		for (Armor currentArmor : armors) {
-			setBonusList.plus1(currentArmor.setBonus);
+			setBonus.plus1(currentArmor.setBonusName);
 		}
 	}
 
 	EquipmentList(Weapon weapon, Armor head, Armor body, Armor hands, Armor belt, Armor feet, Charm charm) {
 		this.weapon = weapon;
 
-		armors = new ArrayList<>();
-		armors.add(head);
-		armors.add(body);
-		armors.add(hands);
-		armors.add(belt);
-		armors.add(feet);
+		armors = new ArrayList<Armor>(Arrays.asList(head, body, hands, belt, feet));
 
 		this.charm = charm;
 
-		setBonusList = new SetBonusList();
+		setBonus = new SetBonusHashMap();
 		for (Armor currentArmor : armors) {
-			setBonusList.plus1(currentArmor.setBonus);
+			setBonus.plus1(currentArmor.setBonusName);
 		}
 	}
 

@@ -24,8 +24,8 @@ class EquipmentOptimizer {
 	private final JewelList jewelList;
 
 	// 需求技能的資料
-	private SetBonusList includedSetBonus;
-	private ItemSkillList includedSkill;
+	private SetBonusHashMap requiredSetBonus;
+	private ItemSkillList requiredSkill;
 	private ItemSkillList excludedSkill;
 	// 包含裝備的資料
 	private WeaponList includedWeapon;
@@ -269,8 +269,8 @@ class EquipmentOptimizer {
 	void readRequirement(String requirementFileName) throws CloneNotSupportedException {
 		this.requirementFileName = requirementFileName;
 
-		includedSetBonus = new SetBonusList();
-		includedSkill = new ItemSkillList();
+		requiredSetBonus = new SetBonusHashMap();
+		requiredSkill = new ItemSkillList();
 		excludedSkill = new ItemSkillList();
 
 		includedWeapon = new WeaponList();
@@ -279,7 +279,7 @@ class EquipmentOptimizer {
 		includedJewel = new JewelList();
 
 		// 讀取技能、裝備需求檔案
-		ReadFile.readRequirementFile(this.requirementFileName, skillHashMap, weaponList, armorList, includedSetBonus, includedSkill, excludedSkill, includedWeapon, includedArmor, textArea, eventLabel);
+		ReadFile.readRequirementFile(this.requirementFileName, skillHashMap, weaponList, armorList, requiredSetBonus, requiredSkill, excludedSkill, includedWeapon, includedArmor, textArea, eventLabel);
 
 		// 若未指定武器則加入空武器
 		if (includedWeapon.isEmptyWeaponList()) {
@@ -297,13 +297,13 @@ class EquipmentOptimizer {
 				ArrayList<Armor> includedArmorWithIncludedSkill = new ArrayList<>();
 				ArrayList<Armor> includedArmorGeneral = new ArrayList<>();
 				for (Armor currentArmor : armorList.get(currentBodyPart)) {
-					currentArmor.setValidSkills(includedSkill);
+					currentArmor.setValidSkills(requiredSkill);
 					// 如果目前的防具有不能加入的技能則跳過
 					if (currentArmor.skills.containsSkill(excludedSkill))
 						continue;
 
 					// 如果目前的防具有系列技能則加入
-					if (currentArmor.containsSetBonus(includedSetBonus)) {
+					if (currentArmor.containsSetBonus(requiredSetBonus)) {
 						includedArmorWithSetBonus.add(currentArmor);
 						continue;
 					}
@@ -321,7 +321,7 @@ class EquipmentOptimizer {
 						for (int includedArmorIndex = 0; includedArmorIndex < includedArmorWithIncludedSkill.size(); includedArmorIndex++) {
 							Armor armorNow = includedArmorWithIncludedSkill.get(includedArmorIndex);
 
-							int isArmorNowBetter = armorNow.isBetter(currentArmor, includedSkill, skillHashMap);
+							int isArmorNowBetter = armorNow.isBetter(currentArmor, requiredSkill, skillHashMap);
 //						System.out.println(armorNow.name + " " +
 ////								isArmorNowBetter + " " +
 ////								currentArmor.name);
@@ -405,7 +405,7 @@ class EquipmentOptimizer {
 			if (currentCharm.skills.containsSkill(excludedSkill))
 				continue;
 
-			currentCharm.setValidSkills(includedSkill);
+			currentCharm.setValidSkills(requiredSkill);
 			if (!currentCharm.validSkills.isEmpty())
 				includedCharm.add(currentCharm);
 		}
@@ -417,7 +417,7 @@ class EquipmentOptimizer {
 			if (currentJewel.owned == 0)
 				continue;
 
-			currentJewel.setValidSkills(includedSkill);
+			currentJewel.setValidSkills(requiredSkill);
 			if (!currentJewel.validSkills.isEmpty()) {
 				includedJewel.add(currentJewel);
 			}
@@ -479,7 +479,7 @@ class EquipmentOptimizer {
 								new EquipmentList(weapon, head, body, hands, belt, feet, charm);
 
 						//檢查是否為套裝
-						if (!includedSetBonus.checkSetBonus(currentEquipmentList.setBonusList))
+						if (!requiredSetBonus.isSubset(currentEquipmentList.setBonus))
 							continue;
 
 						// 計算目前裝備的鑲嵌槽數量
@@ -497,7 +497,7 @@ class EquipmentOptimizer {
 						maxSkillPossible += numberOfSlotHave.get(4) * 2;
 
 						// 目前需要的技能
-						ItemSkillList skillRequired = new ItemSkillList(includedSkill);
+						ItemSkillList skillRequired = new ItemSkillList(requiredSkill);
 						// 計算目前裝備的技能列表
 						ItemSkillList skillHave = currentEquipmentList.getEquipmentSkillList();
 						// 計算仍然需要的技能列表
@@ -568,7 +568,7 @@ class EquipmentOptimizer {
 		PrintMessage.print(textArea, currentEquipmentList.toString() + "\n");
 
 		// 印出裝備技能名稱和等級
-		ItemSkillList skillListWithDecoration = ItemSkillList.printedSkill(currentEquipmentList.equipmentSkillList, includedSkill, skillHashMap);
+		ItemSkillList skillListWithDecoration = ItemSkillList.printedSkill(currentEquipmentList.equipmentSkillList, requiredSkill, skillHashMap);
 		PrintMessage.print(textArea, skillListWithDecoration.toString(skillHashMap) + "\n");
 		//PrintMessage.print(textArea, currentEquipmentList.equipmentSkillList.toString(skillHashMap) + "\n");
 
@@ -595,7 +595,7 @@ class EquipmentOptimizer {
 		PrintMessage.print(textArea, currentEquipmentList.toString() + "\n");
 
 		// 印出裝備技能名稱和等級
-		ItemSkillList printedSkillList = ItemSkillList.printedSkill(currentEquipmentList.equipmentSkillList, includedSkill, skillHashMap);
+		ItemSkillList printedSkillList = ItemSkillList.printedSkill(currentEquipmentList.equipmentSkillList, requiredSkill, skillHashMap);
 		PrintMessage.print(textArea, printedSkillList.toString(skillHashMap) + "\n");
 		//PrintMessage.print(textArea, currentEquipmentList.equipmentSkillList.toString(skillHashMap) + "\n");
 

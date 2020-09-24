@@ -7,7 +7,7 @@ class Armor extends Equipment {
 	static final int WORSE = 2;
 	static final int MAYBE = 3;
 	final int[] elementalResistance;
-	final String setBonus;
+	final String setBonusName;
 
 	Armor(final String input, final SkillHashMap skillHashMap) {
 		// 巨蜂頭盔α;76;-2,+1,+1,+1,+2;0,0,0,0;(無);收刀術,1,麻痺屬性強化,1
@@ -33,9 +33,9 @@ class Armor extends Equipment {
 		String[] skillBlock = stringBlock[4].split(",");
 		// (無)
 		if (skillBlock[0].contentEquals("(無)"))
-			setBonus = "";
+			setBonusName = "";
 		else
-			setBonus = skillBlock[0];
+			setBonusName = skillBlock[0];
 		// 收刀術,1,麻痺屬性強化,1
 		skills = new ItemSkillList(stringBlock[5], skillHashMap);
 	}
@@ -128,8 +128,8 @@ class Armor extends Equipment {
 //		totalCombinedDecor = combinedDecor3 + combinedDecor2 + combinedDecor1;
 //	}
 
-	boolean containsSetBonus(SetBonusList setBonusList) {
-		return setBonusList.contains(setBonus);
+	boolean containsSetBonus(SetBonusHashMap setBonusHashMap) {
+		return setBonusHashMap.contains(this.setBonusName);
 	}
 
 	int isBetter(final Armor anotherArmor, final ItemSkillList includedSkill, final SkillHashMap skillHashMap) {
