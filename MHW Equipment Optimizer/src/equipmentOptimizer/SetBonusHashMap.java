@@ -9,7 +9,7 @@ class SetBonusHashMap extends HashMap<String, Integer> {
 	}
 
 	boolean add(String setBonusName, int setBonusRequirement) {
-		if (!setBonusName.isEmpty())
+		if (setBonusName.isEmpty())
 			return false;
 
 		this.put(setBonusName, setBonusRequirement);
@@ -18,12 +18,9 @@ class SetBonusHashMap extends HashMap<String, Integer> {
 
 	boolean plus1(String setBonusName) {
 		if (!setBonusName.isEmpty()) {
-			Integer setBonusLevel = this.get(setBonusName);
-			if (setBonusLevel == null)
-				this.put(setBonusName, 1);
-			else {
-				setBonusLevel++;
-			}
+			// set value to 1 if setBonusName doesn't exist yet
+			// plus 1 if setBonusName already exist
+			this.merge(setBonusName, 1, Integer::sum);
 			return true;
 		} else
 			return false;
@@ -37,12 +34,9 @@ class SetBonusHashMap extends HashMap<String, Integer> {
 
 		for (HashMap.Entry<String, Integer> entry : superSet.entrySet()) {
 			Integer setBonusLevel = this.get(entry.getKey());
-			if (setBonusLevel == null)
-				return false;
-			else {
+			if (setBonusLevel != null)
 				if (setBonusLevel > entry.getValue())
 					return false;
-			}
 		}
 		return true;
 	}

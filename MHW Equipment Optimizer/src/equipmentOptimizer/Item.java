@@ -23,4 +23,9 @@ public class Item extends Object {
 			singleValidSkillLevel = this.validSkills.getSkillLevel(singleValidSkillIndex);
 		}
 	}
+
+	@Override
+	public String toString() {
+		return this.name;
+	}
 }

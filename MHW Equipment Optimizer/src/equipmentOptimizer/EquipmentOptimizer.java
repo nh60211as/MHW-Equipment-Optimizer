@@ -463,12 +463,12 @@ class EquipmentOptimizer {
 						//System.out.println(armorsUsedNow.toString() + ", " + charm.name);
 //						EquipmentList currentEquipmentList =
 //								new EquipmentList(weapon,
-//										includedArmor.get(ArmorList.HEAD).get(15),
-//										includedArmor.get(ArmorList.BODY).get(15),
-//										includedArmor.get(ArmorList.HANDS).get(0),
-//										includedArmor.get(ArmorList.BELT).get(4),
-//										includedArmor.get(ArmorList.FEET).get(0),
-//										includedCharm.get(0));
+//										includedArmor.get(ArmorList.HEAD).get(0),
+//										includedArmor.get(ArmorList.BODY).get(0),
+//										includedArmor.get(ArmorList.HANDS).get(18),
+//										includedArmor.get(ArmorList.BELT).get(14),
+//										includedArmor.get(ArmorList.FEET).get(7),
+//										includedCharm.get(2));
 
 						Armor head = includedArmor.get(ArmorList.HEAD).get(armorsUsedNow.get(0));
 						Armor body = includedArmor.get(ArmorList.BODY).get(armorsUsedNow.get(1));
